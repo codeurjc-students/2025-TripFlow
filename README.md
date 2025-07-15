@@ -115,6 +115,7 @@
 > ---
 
 > **🧭 Navigation Diagram**
+> ---
 > ![Navigation Diagram](/docs/assets/navigation.svg)
 
 ---
