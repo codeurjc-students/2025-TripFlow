@@ -114,6 +114,77 @@
 
 > ---
 
+> **📦 Entities**
+> 
+> *👤 User*
+> - id: Long (Primary key, auto-increment)
+> - username: String (Unique, not null)
+> - hashedPassword: String (Not null)
+> - role: UserType (Not null)
+> - name: String (Nullable)
+> - description: String (Nullable)
+> - location: String (Nullable)
+> - avatar: Blob (Nullable)
+> - createdAt: Timestamp (Not null, auto-generated)
+> 
+> *🤖 AILog*
+> - id: Long (Primary key, auto-increment)
+> - place: String (Not null)
+> - days: int (Positive, default: 1)
+> - createdAt: Timestamp (Not null, auto-generated)
+> - user: User (Foreign key)
+>
+> *🏆 Achievement*
+> - id: Long (Primary key, auto-increment)
+> - type: AchievementType (Enum)
+> - createdAt: Timestamp (Not null, auto-generated)
+> - user: User (Foreign key)
+>
+> *🗺️ Itinerary*
+> - id: Long (Primary key, auto-increment)
+> - place: String (Not null)
+> - updatedCount: long (Default: 0)
+> - status: ItineraryStatus (Enum, default: DRAFT)
+> - createdAt: Timestamp (Not null, auto-generated)
+> - user: User (Foreign key)
+> 
+> *📅 ItineraryDay*
+> - id: Long (Primary key, auto-increment)
+> - day: int (Positive)
+> - itinerary: Itinerary (Foreign key)
+> 
+> *🎯 Activity*
+> - id: Long (Primary key, auto-increment)
+> - activity: String (Not null)
+> - details: String (Nullable)
+> - time: String (Nullable)
+> - duration: String (Nullable)
+> - itineraryDay: ItineraryDay (Foreign key)
+> - location: Location (Foreign key)
+> 
+> *📍 Location*
+> - id: Long (Primary key, auto-increment)
+> - name: String (Not null)
+> - latitude: double (Not null)
+> - longitude: double (Not null)
+> - address: String (Nullable)
+
+> ---
+
+> **🔒 User Permissions**
+> 
+> *🛜 Public*
+> - Access to the landing page and general information
+> - Demo of the application
+> 
+> *🔐 Registered Users*
+> - Full access to all features
+> - Ability to create, edit, and delete itineraries
+> - AI itinerary generation and advanced route optimization
+> - Achievement tracking
+
+> ---
+
 > **🧭 Navigation Diagram**
 > ---
 > ![Navigation Diagram](/docs/assets/navigation.svg)
