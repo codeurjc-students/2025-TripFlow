@@ -55,7 +55,7 @@
 > - **Framework**: React with TypeScript + Vite
 > - **Routing**: React Router
 > - **HTTP Client**: Axios
-> - **Testing**: Jest, React Testing Library, Puppeteer
+> - **Testing**: Vitest, React Testing Library, Puppeteer
 > - **PWA**: Service Workers, vite-plugin-pwa
 >
 > *🗄️ Storage*
