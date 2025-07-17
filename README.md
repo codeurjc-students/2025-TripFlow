@@ -4,6 +4,8 @@
 
 ---
 
+> **🧭 Overview**
+> 
 > **TripFlow** is an innovative Progressive Web App (PWA) designed for comprehensive travel itinerary management and intelligent route optimization. Built with modern web technologies, it empowers travelers to create, customize, and optimize their journeys with the help of artificial intelligence and advanced algorithms.
 > 
 > This **Final Degree Project (TFG)** develops a travel planning application using Spring Boot and React, with AI-powered itinerary generation and route optimization algorithms. The project demonstrates the integration of modern web technologies to solve real-world travel planning challenges.
