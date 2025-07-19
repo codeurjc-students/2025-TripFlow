@@ -1,5 +1,8 @@
 package com.tripflow.service;
 
+import java.util.NoSuchElementException;
+
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,19 @@ public class UserService {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    /**
+     * Retrieves a public user DTO by username.
+     *
+     * @param username the username of the user to retrieve
+     * @return a PublicUserDTO containing the user's public information
+     * @throws NoSuchElementException
+     */
+    public PublicUserDTO getPublicUserByUsername(String username) {
+        User user = this.userRepository.findByUsername(username).
+            orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return userMapper.toPublicUserDTO(user);
     }
 
     /**

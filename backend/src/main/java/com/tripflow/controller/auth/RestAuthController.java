@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tripflow.dto.auth.AuthResponse;
 import com.tripflow.dto.auth.AuthStatus;
+import com.tripflow.dto.auth.LoginRequest;
 import com.tripflow.dto.user.RegisterUserRequest;
 import com.tripflow.service.AuthService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,5 +32,15 @@ public class RestAuthController {
             : HttpStatusCode.valueOf(201);
 
         return ResponseEntity.status(status).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(HttpServletResponse response, @RequestBody LoginRequest request) {
+        AuthResponse authResponse = authService.login(response, request);
+        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE
+            ? HttpStatusCode.valueOf(401)
+            : HttpStatusCode.valueOf(200);
+        
+        return ResponseEntity.status(status).body(authResponse);
     }
 }

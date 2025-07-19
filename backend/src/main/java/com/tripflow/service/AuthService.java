@@ -2,18 +2,39 @@ package com.tripflow.service;
 
 import java.util.Map;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import com.tripflow.dto.auth.AuthResponse;
 import com.tripflow.dto.auth.AuthStatus;
+import com.tripflow.dto.auth.LoginRequest;
 import com.tripflow.dto.user.PublicUserDTO;
 import com.tripflow.dto.user.RegisterUserRequest;
+import com.tripflow.security.jwt.JwtTokenProvider;
+import com.tripflow.security.jwt.TokenType;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class AuthService {
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
+    private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
 
-    public AuthService(UserService userService) {
+    public AuthService(
+        AuthenticationManager authenticationManager, UserDetailsService userDetailsService,
+        JwtTokenProvider jwtTokenProvider, UserService userService
+    ) {
+        this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
+        this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
     }
 
@@ -21,7 +42,7 @@ public class AuthService {
      * Handles user registration by creating a new user.
      * 
      * @param request  the register request containing user details
-     * @return an AuthResponse containing the status, message, and public user information
+     * @return an AuthResponse containing the status, message, errors, and public user information
      */
     public AuthResponse register(RegisterUserRequest request) {
         try {
@@ -49,5 +70,51 @@ public class AuthService {
                 null
             );
         }
+    }
+
+    /**
+     * Handles user login by authenticating the user and generating JWT tokens.
+     *
+     * @param response the HTTP response to add cookies to
+     * @param request  the login request containing username and password
+     * @return an AuthResponse containing the status, message, and public user information
+     */
+    public AuthResponse login(HttpServletResponse response, LoginRequest request) {
+        // Authenticate the user
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.username(), request.password())
+        );
+
+        // Set the authentication in the security context
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Retrieve user details and public user information
+        String username = request.username();
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+        PublicUserDTO publicUser = this.userService.getPublicUserByUsername(username);
+
+        // Add the JWT token to the response as a Read-Only Cookie
+        String newAuthToken = this.jwtTokenProvider.generateAuthToken(userDetails);
+        String newRefreshToken = this.jwtTokenProvider.generateRefreshToken(userDetails);
+
+        response.addCookie(this.buildTokenCookie(TokenType.AUTH_TOKEN, newAuthToken));
+        response.addCookie(this.buildTokenCookie(TokenType.REFRESH_TOKEN, newRefreshToken));
+
+        return new AuthResponse(
+            AuthStatus.SUCCESS,
+            "Login successful",
+            null,
+            publicUser
+        );
+    }
+
+    // [Private Methods] ================================================================
+
+    private Cookie buildTokenCookie(TokenType type, String token) {
+        Cookie cookie = new Cookie(type.getCookieName(), token);
+        cookie.setMaxAge((int) type.getDuration().getSeconds());
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        return cookie;
     }
 }
