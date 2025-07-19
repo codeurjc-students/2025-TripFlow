@@ -53,6 +53,8 @@
 - [ ] {Unit-Frontend} Itinerary creation and editing tests
 - [ ] {Component-Frontend} Navigation and routing tests
 - [ ] {Integration-Backend} API endpoint tests (RestAssured + Postman)
+    - [X] {Integration-Backend} User authentication endpoints
+    - [ ] {Integration-Backend} Itinerary endpoints
 - [ ] {Integration-Frontend} Frontend-backend communication tests
 - [ ] {E2E} User flow tests (Puppeteer)
 - [ ] {Security} Authorization tests for protected resources
