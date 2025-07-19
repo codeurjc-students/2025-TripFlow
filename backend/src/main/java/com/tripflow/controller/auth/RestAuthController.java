@@ -12,7 +12,7 @@ import com.tripflow.dto.auth.AuthResponse;
 import com.tripflow.dto.auth.AuthStatus;
 import com.tripflow.dto.auth.LoginRequest;
 import com.tripflow.dto.user.RegisterUserRequest;
-import com.tripflow.service.AuthService;
+import com.tripflow.service.auth.AuthService;
 
 import jakarta.servlet.http.HttpServletResponse;
 

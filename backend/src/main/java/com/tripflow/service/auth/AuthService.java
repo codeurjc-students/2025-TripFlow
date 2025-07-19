@@ -1,4 +1,4 @@
-package com.tripflow.service;
+package com.tripflow.service.auth;
 
 import java.util.Map;
 
@@ -17,6 +17,7 @@ import com.tripflow.dto.user.PublicUserDTO;
 import com.tripflow.dto.user.RegisterUserRequest;
 import com.tripflow.security.jwt.JwtTokenProvider;
 import com.tripflow.security.jwt.TokenType;
+import com.tripflow.service.UserService;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
@@ -28,15 +29,17 @@ public class AuthService {
     private final UserDetailsService userDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final AuthValidator authValidator;
 
     public AuthService(
         AuthenticationManager authenticationManager, UserDetailsService userDetailsService,
-        JwtTokenProvider jwtTokenProvider, UserService userService
+        JwtTokenProvider jwtTokenProvider, UserService userService, AuthValidator authValidator
     ) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
+        this.authValidator = authValidator;
     }
 
     /**
@@ -46,6 +49,19 @@ public class AuthService {
      * @return an AuthResponse containing the status, message, errors, and public user information
      */
     public AuthResponse register(RegisterUserRequest request) {
+        // Validate the registration request
+        Map<String, String> errors = this.authValidator.validateUserRegistrationRequest(request);
+
+        // If there are validation errors, return them in the response
+        if (!errors.isEmpty()) {
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                null,
+                errors,
+                null
+            );
+        }
+
         try {
             // Try to register the user
             PublicUserDTO publicUser = this.userService.registerUser(request);
