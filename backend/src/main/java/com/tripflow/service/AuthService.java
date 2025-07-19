@@ -108,11 +108,40 @@ public class AuthService {
         );
     }
 
+    /**
+     * Handles user logout by clearing the authentication and removing tokens.
+     *
+     * @param response the HTTP response to add cookies to
+     * @return an AuthResponse indicating the logout status
+     */
+    public AuthResponse logout(HttpServletResponse response) {
+        // Clear the authentication from the security context
+        SecurityContextHolder.clearContext();
+
+        response.addCookie(this.removeTokenFromCookie(TokenType.AUTH_TOKEN));
+        response.addCookie(this.removeTokenFromCookie(TokenType.REFRESH_TOKEN));
+
+        return new AuthResponse(
+            AuthStatus.SUCCESS,
+            "Logout successful",
+            null,
+            null
+        );
+    }
+
     // [Private Methods] ================================================================
 
     private Cookie buildTokenCookie(TokenType type, String token) {
         Cookie cookie = new Cookie(type.getCookieName(), token);
         cookie.setMaxAge((int) type.getDuration().getSeconds());
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        return cookie;
+    }
+
+    private Cookie removeTokenFromCookie(TokenType type) {
+        Cookie cookie = new Cookie(type.getCookieName(), "");
+        cookie.setMaxAge(0);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         return cookie;

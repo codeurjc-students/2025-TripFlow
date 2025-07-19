@@ -43,4 +43,14 @@ public class RestAuthController {
         
         return ResponseEntity.status(status).body(authResponse);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<AuthResponse> logout(HttpServletResponse response) {
+        AuthResponse authResponse = authService.logout(response);
+        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE
+            ? HttpStatusCode.valueOf(400)
+            : HttpStatusCode.valueOf(200);
+        
+        return ResponseEntity.status(status).body(authResponse);
+    }
 }

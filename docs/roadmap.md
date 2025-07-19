@@ -17,7 +17,7 @@
     - [X] {Model} User entity with roles
     - [X] {API} Register endpoint - `POST /api/auth/register`
     - [X] {API} Login endpoint - `POST /api/auth/login`
-    - [ ] {API} Logout endpoint - `POST /api/auth/logout`
+    - [X] {API} Logout endpoint - `POST /api/auth/logout`
     - [ ] {API} Refresh Token endpoint - `POST /api/auth/refresh`
 - [ ] Itinerary management logic
     - [ ] {Model} Itinerary entity
