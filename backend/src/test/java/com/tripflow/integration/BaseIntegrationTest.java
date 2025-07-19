@@ -7,11 +7,11 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -23,9 +23,17 @@ import io.restassured.RestAssured;
 @ActiveProfiles("test")
 @TestInstance(Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+@TestPropertySource(properties = {
+    "JWT_SECRET=VGhpcyBpcyBhIHZlcnkgc2VjdXJlIGRldmVsb3BtZW50IHNlY3JldCEyMw==",
+    "POSTGRES_PASSWORD=test",
+    "spring.jpa.hibernate.ddl-auto=create-drop",
+    "spring.jpa.show-sql=false",
+    "spring.datasource.hikari.maximum-pool-size=3"
+})
 public abstract class BaseIntegrationTest {
 
     @Container
+    @ServiceConnection
     public static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
         .withDatabaseName("tripflow_test")
         .withUsername("test")
@@ -33,23 +41,6 @@ public abstract class BaseIntegrationTest {
         .withStartupTimeout(Duration.ofSeconds(60))
         .withConnectTimeoutSeconds(5)
         .withCommand("postgres -c fsync=off -c synchronous_commit=off");
-
-    @DynamicPropertySource
-    public static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
-        registry.add("spring.jpa.show-sql", () -> "false");
-
-        registry.add("spring.datasource.hikari.maximum-pool-size", () -> "2");
-        registry.add("spring.datasource.hikari.connection-timeout", () -> "5000");
-        registry.add("spring.datasource.hikari.idle-timeout", () -> "30000");
-
-        registry.add("JWT_SECRET", () -> "test-secret-key-for-integration-tests-that-is-long-enough");
-        registry.add("POSTGRES_PASSWORD", postgres::getPassword);
-    }
 
     @LocalServerPort
     protected int port;
