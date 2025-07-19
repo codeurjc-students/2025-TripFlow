@@ -12,10 +12,11 @@ public class HealthCheckTest extends BaseIntegrationTest{
     @Test
     @DisplayName("Health Check Endpoint")
     public void healthCheck() {
-        RestAssured.given()
-            .when()
+        RestAssured
+        .given()
+        .when()
             .get("/health")
-            .then()
+        .then()
             .statusCode(200);
     }
 }
