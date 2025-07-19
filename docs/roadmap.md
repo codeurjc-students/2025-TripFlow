@@ -12,7 +12,7 @@
 ### 🔧 Backend
 
 - [X] {API} Health Check endpoint - `GET /api/health`
-- [ ] {DB} PostgreSQL database setup and integration with Spring Boot JPA
+- [X] {DB} PostgreSQL database setup and integration with Spring Boot JPA
 - [ ] Spring Boot security configuration with JWT
     - [ ] {Model} User entity with roles
     - [ ] {API} Register endpoint - `POST /api/auth/register`

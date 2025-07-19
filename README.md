@@ -21,6 +21,27 @@
 | **Student** | Diego Sánchez Rincón | [@CuB1z](https://github.com/CuB1z)                       | [Diego Sánchez Rincón](https://www.linkedin.com/in/cub1z/)          |
 | **Tutor**   | Óscar Soto Sánchez   | [@OscarSotoSanchez](https://github.com/OscarSotoSanchez) | [Óscar Soto Sánchez](https://www.linkedin.com/in/oscarsotosanchez/) |
 
+## 🧪 Development Environment
+
+> **🚀 Running a SQL PostgreSQL Database**
+>
+> To run the application locally, you need to have a PostgreSQL database set up. You can use Docker to quickly create a PostgreSQL container. Here’s how to do it:
+>
+> ```bash
+> docker run --name tripflow-postgres -e POSTGRES_USER=YOUR_USER -e POSTGRES_PASSWORD=YOUR_PASSWORD -e POSTGRES_DB=tripflow_db -p 5432:5432 -d postgres:latest
+> ```
+>
+> This command will create a new PostgreSQL container with the specified user, password, and database name.
+> 
+> Make sure to replace `application.properties` file in the backend with your database credentials:
+> ```properties
+> spring.datasource.url=${POSTGRES_URL:jdbc:postgresql://localhost:5432/tripflow_db}
+> spring.datasource.username=${POSTGRES_USER:YOUR_USER}
+> spring.datasource.password=${POSTGRES_PASSWORD:YOUR_PASSWORD}
+> spring.datasource.driver-class-name=org.postgresql.Driver
+> spring.jpa.hibernate.ddl-auto=create-drop // for development, change to 'update' for production
+> ```
+
 ---
 
 ## 📋 Phase 0 - Functionality Definition
