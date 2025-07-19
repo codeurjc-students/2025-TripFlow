@@ -18,6 +18,7 @@ import com.tripflow.dto.user.RegisterUserRequest;
 import com.tripflow.security.jwt.JwtTokenProvider;
 import com.tripflow.security.jwt.TokenType;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -127,6 +128,44 @@ public class AuthService {
             null,
             null
         );
+    }
+
+    /**
+     * Refreshes the authentication tokens.
+     *
+     * @param response the HTTP response to add cookies to
+     * @param refreshToken the refresh token from the request for validation
+     * @return an AuthResponse containing the new token and public user information
+     */
+    public AuthResponse refresh(HttpServletResponse response, String refreshToken) {
+        try {
+            Claims claims = this.jwtTokenProvider.validateToken(refreshToken);
+            String username = claims.getSubject();
+
+            // Generate new tokens using the JWT token provider
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            String newAuthToken = this.jwtTokenProvider.generateAuthToken(userDetails);
+
+            // Add the new auth token to the response as a Read-Only Cookie
+            response.addCookie(this.buildTokenCookie(TokenType.AUTH_TOKEN, newAuthToken));
+
+            // Retrieve public user information
+            PublicUserDTO publicUser = this.userService.getPublicUserByUsername(username);
+
+            return new AuthResponse(
+                AuthStatus.SUCCESS,
+                "Token refreshed successfully",
+                null,
+                publicUser
+            );
+        } catch (Exception e) {
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Invalid refresh token",
+                Map.of("error", "Refresh token is invalid"),
+                null
+            );
+        }
     }
 
     // [Private Methods] ================================================================

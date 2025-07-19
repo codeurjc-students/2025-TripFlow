@@ -18,7 +18,7 @@
     - [X] {API} Register endpoint - `POST /api/auth/register`
     - [X] {API} Login endpoint - `POST /api/auth/login`
     - [X] {API} Logout endpoint - `POST /api/auth/logout`
-    - [ ] {API} Refresh Token endpoint - `POST /api/auth/refresh`
+    - [X] {API} Refresh Token endpoint - `POST /api/auth/refresh`
 - [ ] Itinerary management logic
     - [ ] {Model} Itinerary entity
     - [ ] {Model} Itinerary Day entity

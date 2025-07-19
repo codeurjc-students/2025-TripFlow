@@ -2,6 +2,7 @@ package com.tripflow.controller.auth;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/api/auth")
 public class RestAuthController {
+    private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     private final AuthService authService;
 
     public RestAuthController(AuthService authService) {
@@ -49,6 +51,19 @@ public class RestAuthController {
         AuthResponse authResponse = authService.logout(response);
         HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE
             ? HttpStatusCode.valueOf(400)
+            : HttpStatusCode.valueOf(200);
+        
+        return ResponseEntity.status(status).body(authResponse);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(
+        HttpServletResponse response,
+        @CookieValue(name = REFRESH_TOKEN_COOKIE_NAME, required = true) String refreshToken
+    ) {
+        AuthResponse authResponse = authService.refresh(response, refreshToken);
+        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE
+            ? HttpStatusCode.valueOf(401)
             : HttpStatusCode.valueOf(200);
         
         return ResponseEntity.status(status).body(authResponse);
