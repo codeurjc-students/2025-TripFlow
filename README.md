@@ -21,6 +21,8 @@
 | **Student** | Diego Sánchez Rincón | [@CuB1z](https://github.com/CuB1z)                       | [Diego Sánchez Rincón](https://www.linkedin.com/in/cub1z/)          |
 | **Tutor**   | Óscar Soto Sánchez   | [@OscarSotoSanchez](https://github.com/OscarSotoSanchez) | [Óscar Soto Sánchez](https://www.linkedin.com/in/oscarsotosanchez/) |
 
+---
+
 ## 🧪 Development Environment
 
 > **🚀 Running a SQL PostgreSQL Database**
@@ -41,6 +43,14 @@
 > spring.datasource.driver-class-name=org.postgresql.Driver
 > spring.jpa.hibernate.ddl-auto=create-drop // for development, change to 'update' for production
 > ```
+
+> ---
+
+> **🛠️ Environment Variables**
+>
+> In order to use environment variables from a `.env` file, you need to have the `dotenv-java` dependency in your backend project.
+> This allows to define sensitive information and configuration settings without hardcoding them into the source code.
+> A `.env.example` file is provided in the backend directory. You can create a `.env` file based on this example and fill in your specific values.
 
 ---
 
