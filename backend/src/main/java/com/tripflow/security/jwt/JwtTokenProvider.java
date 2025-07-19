@@ -1,6 +1,7 @@
 package com.tripflow.security.jwt;
 
 import java.util.Date;
+import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -109,6 +110,7 @@ public class JwtTokenProvider {
 		JwtBuilder builder = Jwts.builder()
             .claim("roles", userDetails.getAuthorities())
             .claim("type", tokenType.getCookieName())
+            .claim("jti", UUID.randomUUID().toString())
             .subject(userDetails.getUsername())
             .issuedAt(currentDate)
             .expiration(expiryDate)
