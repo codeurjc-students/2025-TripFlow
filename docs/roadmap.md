@@ -46,7 +46,7 @@
 
 ### ⚙️ Testing
 
-- [ ] {Unit-Backend} User service tests (registration, login, logout, token refresh)
+- [X] {Unit-Backend} User service tests (registration, login, logout, token refresh)
 - [ ] {Unit-Backend} Itinerary service tests (CRUD operations)
 - [X] {Unit-Backend} JWT Security tests (token generation, validation)
 - [ ] {Unit-Frontend} Authentication form validation tests

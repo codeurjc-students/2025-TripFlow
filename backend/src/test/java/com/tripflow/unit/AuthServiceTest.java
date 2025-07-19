@@ -32,7 +32,7 @@ import io.jsonwebtoken.impl.DefaultClaimsBuilder;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Tag("Unit")
+@Tag("unit")
 public class AuthServiceTest {
     private AuthenticationManager authenticationManager;
     private UserDetailsService userDetailsService;
