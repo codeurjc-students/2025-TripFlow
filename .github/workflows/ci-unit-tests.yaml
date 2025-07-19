@@ -35,6 +35,13 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('backend/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
       
       - name: Run unit tests
         run: mvn test -Dgroups=unit
