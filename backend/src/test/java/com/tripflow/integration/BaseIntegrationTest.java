@@ -22,15 +22,15 @@ import io.restassured.RestAssured;
 @Testcontainers
 @ActiveProfiles("test")
 @TestInstance(Lifecycle.PER_CLASS)
-@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public abstract class BaseIntegrationTest {
 
     @Container
-    public static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
+    public static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
         .withDatabaseName("tripflow_test")
         .withUsername("test")
         .withPassword("test")
-        .withStartupTimeout(Duration.ofSeconds(30))
+        .withStartupTimeout(Duration.ofSeconds(60))
         .withConnectTimeoutSeconds(5)
         .withCommand("postgres -c fsync=off -c synchronous_commit=off");
 
@@ -47,9 +47,8 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.datasource.hikari.connection-timeout", () -> "5000");
         registry.add("spring.datasource.hikari.idle-timeout", () -> "30000");
 
-        registry.add("app.jwt.secret", () -> "test-secret-key-for-integration-tests-that-is-long-enough");
-        registry.add("app.jwt.auth-expiration", () -> "3600000");
-        registry.add("app.jwt.refresh-expiration", () -> "86400000");
+        registry.add("JWT_SECRET", () -> "test-secret-key-for-integration-tests-that-is-long-enough");
+        registry.add("POSTGRES_PASSWORD", postgres::getPassword);
     }
 
     @LocalServerPort
