@@ -14,7 +14,7 @@
 - [X] {API} Health Check endpoint - `GET /api/health`
 - [X] {DB} PostgreSQL database setup and integration with Spring Boot JPA
 - [ ] Spring Boot security configuration with JWT
-    - [ ] {Model} User entity with roles
+    - [X] {Model} User entity with roles
     - [ ] {API} Register endpoint - `POST /api/auth/register`
     - [ ] {API} Login endpoint - `POST /api/auth/login`
     - [ ] {API} Logout endpoint - `POST /api/auth/logout`
@@ -48,7 +48,7 @@
 
 - [ ] {Unit-Backend} User service tests (registration, login, logout, token refresh)
 - [ ] {Unit-Backend} Itinerary service tests (CRUD operations)
-- [ ] {Unit-Backend} JWT Security tests (token generation, validation)
+- [X] {Unit-Backend} JWT Security tests (token generation, validation)
 - [ ] {Unit-Frontend} Authentication form validation tests
 - [ ] {Unit-Frontend} Itinerary creation and editing tests
 - [ ] {Component-Frontend} Navigation and routing tests

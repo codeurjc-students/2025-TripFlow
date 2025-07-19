@@ -108,7 +108,7 @@ public class JwtTokenProvider {
 
 		JwtBuilder builder = Jwts.builder()
             .claim("roles", userDetails.getAuthorities())
-            .claim("type", tokenType.name())
+            .claim("type", tokenType.getCookieName())
             .subject(userDetails.getUsername())
             .issuedAt(currentDate)
             .expiration(expiryDate)
