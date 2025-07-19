@@ -1,10 +1,11 @@
-name: CI - Testing
+name: CI - Unit Tests
 
 on:
   push:
     branches:
       - main
       - develop
+      - 'feat-*'
     paths:
       - 'backend/**'
       - 'frontend/**'
@@ -12,13 +13,14 @@ on:
   pull_request:
     branches:
       - main
+      - develop
     paths:
       - 'backend/**'
       - 'frontend/**'
       - '.github/workflows/**'
 
 jobs:
-  backend-testing:
+  backend-unit-testing:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,10 +36,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       
-      - name: Run tests
-        run: mvn test
-  
-  frontend-testing:
+      - name: Run unit tests
+        run: mvn test -Dgroups=unit
+
+  frontend-unit-testing:
     runs-on: ubuntu-latest
     defaults:
       run:
