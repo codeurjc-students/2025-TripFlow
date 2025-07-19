@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -97,10 +98,20 @@ public class AuthService {
      * @return an AuthResponse containing the status, message, and public user information
      */
     public AuthResponse login(HttpServletResponse response, LoginRequest request) {
-        // Authenticate the user
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.username(), request.password())
-        );
+        // Try to authenticate the user
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.username(), request.password())
+            );
+        } catch (AuthenticationException e) {
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Invalid credentials",
+                null,
+                null
+            );
+        }
 
         // Set the authentication in the security context
 		SecurityContextHolder.getContext().setAuthentication(authentication);

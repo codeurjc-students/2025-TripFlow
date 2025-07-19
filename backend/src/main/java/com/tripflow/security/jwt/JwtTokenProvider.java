@@ -69,7 +69,7 @@ public class JwtTokenProvider {
      * @param token the JWT token to validate
      * @return the claims contained in the token if valid, otherwise throws an exception
      */
-    public Claims validateToken(String token) {
+    public Claims validateToken(String token) throws IllegalArgumentException {
 		return jwtParser.parseSignedClaims(token).getPayload();
 	}
 
