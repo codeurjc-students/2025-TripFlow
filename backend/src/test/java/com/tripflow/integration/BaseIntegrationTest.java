@@ -24,7 +24,6 @@ public abstract class BaseIntegrationTest {
         .withDatabaseName("tripflow_test")
         .withUsername("test")
         .withPassword("test")
-        .withReuse(true)
         .withStartupTimeout(Duration.ofSeconds(30))
         .withConnectTimeoutSeconds(5)
         .withCommand("postgres -c fsync=off -c synchronous_commit=off");
