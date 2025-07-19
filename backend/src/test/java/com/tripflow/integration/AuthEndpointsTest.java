@@ -9,6 +9,7 @@ import com.tripflow.dto.user.RegisterUserRequest;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 
 import static org.hamcrest.Matchers.*;
 
@@ -218,7 +219,9 @@ public class AuthEndpointsTest extends BaseIntegrationTest {
             .body("status", equalTo("SUCCESS"))
             .body("message", equalTo("Login successful"))
             .body("errors", nullValue())
-            .body("user", notNullValue());
+            .body("user", notNullValue())
+            .cookie("auth_token", notNullValue())
+            .cookie("refresh_token", notNullValue());
     }
 
     @Test
@@ -284,5 +287,118 @@ public class AuthEndpointsTest extends BaseIntegrationTest {
             .body("message", equalTo("Invalid credentials"))
             .body("errors", nullValue())
             .body("user", nullValue());
+    }
+
+    @Test
+    @DisplayName("Test successful logout")
+    public void testSuccessfulLogout() {
+        String uniqueUsername = this.generateUniqueValue("LogoutUser");
+        // Prepare the registration request body
+        RegisterUserRequest registerRequest = new RegisterUserRequest(
+            uniqueUsername,
+            "Ab12345678",
+            "Ab12345678"
+        );
+
+        // Prepare the login request body
+        LoginRequest loginRequest = new LoginRequest(
+            uniqueUsername,
+            "Ab12345678"
+        );
+
+        // First, register the user
+        RestAssured
+        .given()
+            .contentType(ContentType.JSON)
+            .body(registerRequest)
+        .when()
+            .post("/auth/register")
+        .then()
+            .statusCode(201);
+        
+        // Then, login the user
+        Response loginResponse = RestAssured
+        .given()
+            .contentType(ContentType.JSON)
+            .body(loginRequest)
+        .when()
+            .post("/auth/login")
+        .then()
+            .statusCode(200)
+            .extract()
+            .response();
+        
+        // Now, send the logout request
+        RestAssured
+        .given()
+            .cookie("auth_token", loginResponse.getCookie("auth_token"))
+            .cookie("refresh_token", loginResponse.getCookie("refresh_token"))
+        .when()
+            .post("/auth/logout")
+        .then()
+            .statusCode(200)
+            .cookie("auth_token", equalTo(""))
+            .cookie("refresh_token", equalTo(""))
+            .body("message", equalTo("Logout successful"))
+            .body("user", nullValue())
+            .body("status", equalTo("SUCCESS"));
+    }
+
+    @Test
+    @DisplayName("Test refresh token with a valid token")
+    public void testRefreshWithValidToken() {
+        String uniqueUsername = this.generateUniqueValue("RefreshUser");
+        
+        // Prepare the registration request body
+        RegisterUserRequest registerRequest = new RegisterUserRequest(
+            uniqueUsername,
+            "Ab12345678",
+            "Ab12345678"
+        );
+
+        // Prepare the login request body
+        LoginRequest loginRequest = new LoginRequest(
+            uniqueUsername,
+            "Ab12345678"
+        );
+
+        // First, register the user
+        RestAssured
+        .given()
+            .contentType(ContentType.JSON)
+            .body(registerRequest)
+        .when()
+            .post("/auth/register")
+        .then()
+            .statusCode(201);
+        
+        // Then, login the user to get a refresh token
+        Response loginResponse = RestAssured
+        .given()
+            .contentType(ContentType.JSON)
+            .body(loginRequest)
+        .when()
+            .post("/auth/login")
+        .then()
+            .statusCode(200)
+            .extract()
+            .response();
+
+        String authToken = loginResponse.getCookie("auth_token");
+        String refreshToken = loginResponse.getCookie("refresh_token");
+
+        // Now, send the refresh request with the cookies
+        RestAssured
+        .given()
+            .cookie("refresh_token", refreshToken)
+            .cookie("auth_token", authToken)
+        .when()
+            .post("/auth/refresh")
+        .then()
+            .statusCode(200)
+            .body("status", equalTo("SUCCESS"))
+            .body("message", equalTo("Token refreshed successfully"))
+            .body("user", notNullValue())
+            .cookie("auth_token", not(equalTo(authToken)));
     }
 }
