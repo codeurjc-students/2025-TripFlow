@@ -15,7 +15,7 @@
 - [X] {DB} PostgreSQL database setup and integration with Spring Boot JPA
 - [ ] Spring Boot security configuration with JWT
     - [X] {Model} User entity with roles
-    - [ ] {API} Register endpoint - `POST /api/auth/register`
+    - [X] {API} Register endpoint - `POST /api/auth/register`
     - [ ] {API} Login endpoint - `POST /api/auth/login`
     - [ ] {API} Logout endpoint - `POST /api/auth/logout`
     - [ ] {API} Refresh Token endpoint - `POST /api/auth/refresh`
