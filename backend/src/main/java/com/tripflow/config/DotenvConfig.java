@@ -11,7 +11,18 @@ public class DotenvConfig {
     private Dotenv dotenv;
 
     private DotenvConfig() {
-        this.dotenv = Dotenv.configure().load();
+        boolean isCI = System.getenv("CI") != null || System.getenv("GITHUB_ACTIONS") != null;
+
+        if (isCI) {
+            // Load environment variables from the CI environment
+            this.dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .systemProperties()
+                .load();
+        } else {
+            // Load environment variables from the .env file
+            this.dotenv = Dotenv.configure().load();
+        }
     }
 
     public static DotenvConfig getInstance() {

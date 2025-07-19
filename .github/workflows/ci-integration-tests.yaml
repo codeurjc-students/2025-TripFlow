@@ -41,3 +41,7 @@ jobs:
 
       - name: Run integration tests
         run: mvn test -Dgroups=integration
+        env:
+          CI: true
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}

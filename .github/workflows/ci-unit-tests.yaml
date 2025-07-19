@@ -38,6 +38,10 @@ jobs:
       
       - name: Run unit tests
         run: mvn test -Dgroups=unit
+        env:
+          CI: true
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
   frontend-unit-testing:
     runs-on: ubuntu-latest
