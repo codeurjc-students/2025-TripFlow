@@ -9,7 +9,7 @@ import java.util.Map;
 @Component
 public class AuthValidator {
     private static final String USERNAME_REGEX = "^[a-zA-Z0-9_]+$";
-    private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$";
+    private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
     private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
     private static final int MAX_USERNAME_LENGTH = 30;
     private static final int MIN_USERNAME_LENGTH = 3;

@@ -1,6 +1,6 @@
 // Validation restrictions for usernames and passwords
 const USERNAME_REGEX = /^[a-zA-Z0-9_]+$/;
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 const MAX_USERNAME_LENGTH = 30;
 const MIN_USERNAME_LENGTH = 3;
 const MIN_PASSWORD_LENGTH = 8;
