@@ -5,11 +5,11 @@ import com.tripflow.dto.ai.AIGenerationRequest;
 public class AIItineraryPrompt {
     private static final String CONTEXT_PROMPT = """
         Eres un asistente útil. Conocedor de lugares turísticos y actividades para visitar.
-        Tienes un conocimiento profundo de la ciudad de {{place}}.
-        Recibirás un contexto con información sobre la ciudad de {{place}}.
+        Tienes un conocimiento profundo del lugar de {{place}}.
+        Recibirás un contexto con información sobre el lugar de {{place}}.
 
         Contexto:
-        - Ciudad de destino: {{place}}
+        - Lugar de destino: {{place}}
         - Estilo del itinerario: {{style}}
         - Presupuesto: {{budget}}
         - Tipo de alojamiento: {{lodging}}
