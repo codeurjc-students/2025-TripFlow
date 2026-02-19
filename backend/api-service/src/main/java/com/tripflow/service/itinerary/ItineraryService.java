@@ -21,8 +21,11 @@ import com.tripflow.model.itinerary.Itinerary;
 import com.tripflow.model.itinerary.ItineraryDay;
 import com.tripflow.model.types.ItineraryStatus;
 import com.tripflow.repository.itinerary.ItineraryRepository;
+import com.tripflow.repository.itinerary.ItineraryCollaboratorRepository;
 import com.tripflow.service.ExternalImageService;
 import com.tripflow.service.UserService;
+import com.tripflow.model.itinerary.ItineraryCollaborator;
+import com.tripflow.model.types.CollaboratorRole;
 
 import jakarta.transaction.Transactional;
 
@@ -33,19 +36,25 @@ public class ItineraryService {
     private final ExternalImageService externalImageService;
     private final ItineraryDayService itineraryDayService;
     private final ItineraryMapper itineraryMapper;
+    private final ItineraryPermissionService itineraryPermissionService;
+    private final ItineraryCollaboratorRepository itineraryCollaboratorRepository;
 
     public ItineraryService(
         ItineraryRepository itineraryRepository,
         UserService userService,
         ExternalImageService externalImageService,
         ItineraryDayService itineraryDayService,
-        ItineraryMapper itineraryMapper
+        ItineraryMapper itineraryMapper,
+        ItineraryPermissionService itineraryPermissionService,
+        ItineraryCollaboratorRepository itineraryCollaboratorRepository
     ) {
         this.itineraryRepository = itineraryRepository;
         this.userService = userService;
         this.externalImageService = externalImageService;
         this.itineraryDayService = itineraryDayService;
         this.itineraryMapper = itineraryMapper;
+        this.itineraryPermissionService = itineraryPermissionService;
+        this.itineraryCollaboratorRepository = itineraryCollaboratorRepository;
     }
 
     /**
@@ -98,7 +107,18 @@ public class ItineraryService {
         ExternalImage coverImage = this.externalImageService.getOrCreateImageByQuery(itineraryDTO.place());
         newItinerary.setCoverImage(coverImage);
 
-        return this.itineraryMapper.toExtendedDTO(this.itineraryRepository.save(newItinerary));
+        Itinerary savedItinerary = this.itineraryRepository.save(newItinerary);
+
+        // Add owner as a collaborator with OWNER role
+        ItineraryCollaborator ownerCollaborator = new ItineraryCollaborator(
+            CollaboratorRole.OWNER,
+            user,
+            savedItinerary
+        );
+
+        this.itineraryCollaboratorRepository.save(ownerCollaborator);
+
+        return this.itineraryMapper.toExtendedDTO(savedItinerary);
     }
 
     /**
@@ -122,20 +142,18 @@ public class ItineraryService {
     public PaginatedDTO<ItineraryDTO> getAllItineraries(Pageable pageable, String search) {
         User authenticatedUser = this.userService.getAuthenticatedUser();
 
-        // Retrieve paginated itineraries for the authenticated user
         Page<Itinerary> itinerariesPage;
 
         if (search != null && !search.trim().isEmpty()) {
-            itinerariesPage = this.itineraryRepository.findAllByUserAndSearchOrderByUpdatedAtDesc(
+            itinerariesPage = this.itineraryRepository.findAllByUserOrCollaboratorAndSearchOrderByUpdatedAtDesc(
                 authenticatedUser, search.trim(), pageable
             );
         } else {
-            itinerariesPage = this.itineraryRepository.findAllByUserOrderByUpdatedAtDesc(
+            itinerariesPage = this.itineraryRepository.findAllByUserOrCollaboratorOrderByUpdatedAtDesc(
                 authenticatedUser, pageable
             );
         }
 
-        // Map the retrieved itineraries to DTOs
         List<ItineraryDTO> itineraryDTOs = this.itineraryMapper.toDTOs(itinerariesPage.getContent());
 
         return new PaginatedDTO<ItineraryDTO>(
@@ -149,7 +167,7 @@ public class ItineraryService {
     }
 
     /**
-     * Retrieves an itinerary by its ID, ensuring the authenticated user is the owner.
+     * Retrieves an itinerary by its ID, ensuring the authenticated user has view permission.
      *
      * @param id the ID of the itinerary to retrieve
      * @return the ItineraryDTO for the specified ID
@@ -160,9 +178,9 @@ public class ItineraryService {
             () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Itinerary with ID %d not found", id))
         );
 
-        // Ensure the authenticated user is the owner of the itinerary
+        // Ensure the authenticated user has permission to view the itinerary
         User authenticatedUser = this.userService.getAuthenticatedUser();
-        if (!itinerary.getUser().getId().equals(authenticatedUser.getId())) {
+        if (!this.itineraryPermissionService.canView(itinerary, authenticatedUser)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this itinerary");
         }
 
@@ -183,9 +201,9 @@ public class ItineraryService {
             () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Itinerary with ID %d not found", id))
         );
 
-        // Ensure the authenticated user is the owner of the itinerary
+        // Ensure the authenticated user has permission to update the itinerary
         User authenticatedUser = this.userService.getAuthenticatedUser();
-        if (!itinerary.getUser().getId().equals(authenticatedUser.getId())) {
+        if (!this.itineraryPermissionService.canEdit(itinerary, authenticatedUser)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to update this itinerary");
         }
 
@@ -223,7 +241,7 @@ public class ItineraryService {
 
         // Ensure the authenticated user is the owner of the itinerary
         User authenticatedUser = this.userService.getAuthenticatedUser();
-        if (!itinerary.getUser().getId().equals(authenticatedUser.getId())) {
+        if (!this.itineraryPermissionService.canDelete(itinerary, authenticatedUser)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this itinerary");
         }
 
