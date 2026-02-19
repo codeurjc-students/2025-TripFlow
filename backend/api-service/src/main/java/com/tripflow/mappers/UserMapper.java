@@ -1,10 +1,12 @@
-package com.tripflow.dto.user;
+package com.tripflow.mappers;
 
 import java.util.List;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import com.tripflow.dto.user.PublicUserDTO;
+import com.tripflow.dto.user.RegisterUserRequest;
 import com.tripflow.model.User;
 import com.tripflow.model.types.UserType;
 
@@ -30,5 +32,6 @@ public interface UserMapper {
     @Mapping(target = "verificationCodeExpiresAt", ignore = true)
     @Mapping(target = "processingAI", ignore = true)
     @Mapping(target = "aiUsages", ignore = true)
+    @Mapping(target = "collaborations", ignore = true)
     User toDomain(RegisterUserRequest request, String hashedPassword, UserType role);
 }

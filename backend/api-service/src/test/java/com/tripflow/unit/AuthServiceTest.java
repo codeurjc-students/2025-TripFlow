@@ -27,8 +27,8 @@ import com.tripflow.dto.user.VerificationCode;
 import com.tripflow.exception.EmailAlreadyExistsException;
 import com.tripflow.exception.UsernameAlreadyExistsException;
 import com.tripflow.model.User;
-import com.tripflow.model.types.PlanType;
-import com.tripflow.model.types.UserType;
+import com.tripflow.dto.user.PlanTypeDTO;
+import com.tripflow.dto.user.UserTypeDTO;
 import com.tripflow.security.jwt.JwtTokenProvider;
 import com.tripflow.service.KafkaService;
 import com.tripflow.service.UserService;
@@ -75,7 +75,7 @@ public class AuthServiceTest {
         UserDetails userDetails = mock(UserDetails.class);
         PublicUserDTO publicUser = new PublicUserDTO(
             username, username, 
-            "", "Earth", true, null, UserType.USER, PlanType.FREE
+            "", "Earth", true, null, UserTypeDTO.USER, PlanTypeDTO.FREE
         );
         User user = mock(User.class);
         
@@ -141,7 +141,7 @@ public class AuthServiceTest {
         RegisterUserRequest request = new RegisterUserRequest(email, username, password, password);
         PublicUserDTO publicUser = new PublicUserDTO(
             username, username, 
-            "", "Earth", true, null, UserType.USER, PlanType.FREE
+            "", "Earth", true, null, UserTypeDTO.USER, PlanTypeDTO.FREE
         );
 
         when(this.userService.registerUser(request)).thenReturn(publicUser);
@@ -231,7 +231,7 @@ public class AuthServiceTest {
         
         PublicUserDTO publicUser = new PublicUserDTO(
             username, username,
-            "", "Earth", true, null, UserType.USER, PlanType.FREE
+            "", "Earth", true, null, UserTypeDTO.USER, PlanTypeDTO.FREE
         );
 
         when(this.jwtTokenProvider.validateToken(refreshToken)).thenReturn(claims);
