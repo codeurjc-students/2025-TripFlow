@@ -1,636 +1,760 @@
 {
-	"info": {
-		"_postman_id": "8b2c03b6-9af7-40d2-b167-3a0f9a6b16be",
-		"name": "TripFlow",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "37129679"
-	},
-	"item": [
-		{
-			"name": "Auth",
-			"item": [
-				{
-					"name": "Register",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"cub1zdev@gmail.com\",\r\n    \"username\": \"CuB1\",\r\n    \"password\": \"Ab12345678\",\r\n    \"confirmPassword\": \"Ab12345678\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{BASE_URL}}/api/auth/register",
-							"host": [
-								"{{BASE_URL}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Login",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"CuB1\",\r\n    \"password\": \"Ab12345678\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{BASE_URL}}/api/auth/login",
-							"host": [
-								"{{BASE_URL}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{BASE_URL}}/api/auth/logout",
-							"host": [
-								"{{BASE_URL}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Refresh",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"CuB1\",\r\n    \"password\": \"Ab12345678\",\r\n    \"confirmPassword\": \"Ab12345678\"\r\n}"
-						},
-						"url": {
-							"raw": "{{BASE_URL}}/api/auth/refresh",
-							"host": [
-								"{{BASE_URL}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"refresh"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Verify",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"CuB1\",\r\n    \"code\": \"290963\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{BASE_URL}}/api/auth/verify",
-							"host": [
-								"{{BASE_URL}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"verify"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Resend Code",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"CuB1\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{BASE_URL}}/api/auth/resend-code",
-							"host": [
-								"{{BASE_URL}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"resend-code"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "V1",
-			"item": [
-				{
-					"name": "Itineraries",
-					"item": [
-						{
-							"name": "Create itinerary",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"title\": \"Visita a Madrid\",\r\n    \"people\": 2,\r\n    \"budget\": 1500.50,\r\n    \"date\": \"06-10-2025\",\r\n    \"tags\": [\"Madrid\", \"Holidays\"],\r\n    \"place\": \"Madrid\",\r\n    \"days\": [\r\n        {\r\n            \"day\": 1,\r\n            \"activities\": [\r\n                {\r\n                    \"activity\": \"Visitar la Puerta del Sol\",\r\n                    \"details\": \"Conocido como el centro de Madrid.\",\r\n                    \"location\": {\r\n                        \"name\": \"Puerta del Sol\",\r\n                        \"address\": \"Entre las calles de Alcalá, Montera y Preciados.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4167,\r\n                            \"longitude\": -3.7036\r\n                        }\r\n                    },\r\n                    \"time\": \"09:00\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Pasear por el Parque del Retiro\",\r\n                    \"details\": \"Uno de los parques más famosos de Madrid, ideal para un paseo y un descanso.\",\r\n                    \"location\": {\r\n                        \"name\": \"Parque del Buen Retiro\",\r\n                        \"address\": \"Plaza de la Independencia, 7, 28001 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4123,\r\n                            \"longitude\": -3.688\r\n                        }\r\n                    },\r\n                    \"time\": \"11:30\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Visitar el Palacio Real de Madrid\",\r\n                    \"details\": \"Visita el Palacio Real y descubre su belleza y la historia de los reyes de España.\",\r\n                    \"location\": {\r\n                        \"name\": \"Palacio Real de Madrid\",\r\n                        \"address\": \"Calle de Bailén, s/n, 28071 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4148,\r\n                            \"longitude\": -3.7182\r\n                        }\r\n                    },\r\n                    \"time\": \"15:00\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Pasear y cenar en el barrio de Chueca\",\r\n                    \"details\": \"El barrio de Chueca es un lugar lleno de vida y actividad, especialmente conocido por sus restaurantes y locales de moda.\",\r\n                    \"location\": {\r\n                        \"name\": \"Barrio de Chueca\",\r\n                        \"address\": \"Calle de Hortaleza, 68, 28004 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4221,\r\n                            \"longitude\": -3.6939\r\n                        }\r\n                    },\r\n                    \"time\": \"20:00\",\r\n                    \"duration\": \"3 horas\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/itineraries",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"itineraries"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Retrieve itinerary",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/itineraries/1",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"itineraries",
-										"1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Retrieve all itineraries",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/itineraries",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"itineraries"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update itinerary",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"title\": \"Escapada a Madrid\",\r\n    \"people\": 2,\r\n    \"budget\": 1500.50,\r\n    \"date\": \"06-10-2025\",\r\n    \"tags\": [\"Madrid\"],\r\n    \"place\": \"Madrid\",\r\n    \"status\": \"PLANNED\",\r\n    \"days\": [\r\n        {\r\n            \"day\": 1,\r\n            \"activities\": [\r\n                {\r\n                    \"activity\": \"Visitar la Puerta del Sol\",\r\n                    \"details\": \"Conocido como el centro de Madrid.\",\r\n                    \"location\": {\r\n                        \"name\": \"Puerta del Sol\",\r\n                        \"address\": \"Entre las calles de Alcalá, Montera y Preciados.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4167,\r\n                            \"longitude\": -3.7036\r\n                        }\r\n                    },\r\n                    \"time\": \"09:00\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Pasear por el Parque del Retiro\",\r\n                    \"details\": \"Uno de los parques más famosos de Madrid, ideal para un paseo y un descanso.\",\r\n                    \"location\": {\r\n                        \"name\": \"Parque del Buen Retiro\",\r\n                        \"address\": \"Plaza de la Independencia, 7, 28001 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4123,\r\n                            \"longitude\": -3.688\r\n                        }\r\n                    },\r\n                    \"time\": \"11:30\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Visitar el Palacio Real de Madrid\",\r\n                    \"details\": \"Visita el Palacio Real y descubre su belleza y la historia de los reyes de España.\",\r\n                    \"location\": {\r\n                        \"name\": \"Palacio Real de Madrid\",\r\n                        \"address\": \"Calle de Bailén, s/n, 28071 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4148,\r\n                            \"longitude\": -3.7182\r\n                        }\r\n                    },\r\n                    \"time\": \"15:00\",\r\n                    \"duration\": \"2 horas\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/itineraries/1",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"itineraries",
-										"1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Remove itinerary",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"place\": \"Madrid\",\r\n    \"status\": \"PLANNED\",\r\n    \"days\": [\r\n        {\r\n            \"day\": 1,\r\n            \"activities\": [\r\n                {\r\n                    \"activity\": \"Visitar la Puerta del Sol\",\r\n                    \"details\": \"Conocido como el centro de Madrid.\",\r\n                    \"location\": {\r\n                        \"name\": \"Puerta del Sol\",\r\n                        \"address\": \"Entre las calles de Alcalá, Montera y Preciados.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4167,\r\n                            \"longitude\": -3.7036\r\n                        }\r\n                    },\r\n                    \"time\": \"09:00\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Pasear por el Parque del Retiro\",\r\n                    \"details\": \"Uno de los parques más famosos de Madrid, ideal para un paseo y un descanso.\",\r\n                    \"location\": {\r\n                        \"name\": \"Parque del Buen Retiro\",\r\n                        \"address\": \"Plaza de la Independencia, 7, 28001 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4123,\r\n                            \"longitude\": -3.688\r\n                        }\r\n                    },\r\n                    \"time\": \"11:30\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Visitar el Palacio Real de Madrid\",\r\n                    \"details\": \"Visita el Palacio Real y descubre su belleza y la historia de los reyes de España.\",\r\n                    \"location\": {\r\n                        \"name\": \"Palacio Real de Madrid\",\r\n                        \"address\": \"Calle de Bailén, s/n, 28071 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4148,\r\n                            \"longitude\": -3.7182\r\n                        }\r\n                    },\r\n                    \"time\": \"15:00\",\r\n                    \"duration\": \"2 horas\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}"
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/itineraries/1",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"itineraries",
-										"1"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Stats",
-					"item": [
-						{
-							"name": "User stats",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/stats/user",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"stats",
-										"user"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "AI",
-					"item": [
-						{
-							"name": "AI Request",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"aiPrompt\": \"Un viaje a parís para ver los campos eliseos\",\r\n    \"destination\": \"París\",\r\n    \"style\": \"Romantic\",\r\n    \"budget\": 500,\r\n    \"lodging\": \"hostel\",\r\n    \"duration\": \"1 day\",\r\n    \"interests\": [\"Eifel Tower\", \"Seine\", \"Les Champs-Élysées\"]\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/ai",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"ai"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "AI Status",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"destination\": \"París\",\r\n    \"style\": \"Romantic\",\r\n    \"budget\": 500,\r\n    \"lodging\": \"hostel\",\r\n    \"duration\": \"1 day\",\r\n    \"interests\": [\"Eifel Tower\", \"Seine\", \"Les Champs-Élysées\"]\r\n}"
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/ai/status",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"ai",
-										"status"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Users",
-					"item": [
-						{
-							"name": "Retrieve all users",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"place\": \"Madrid\",\r\n    \"status\": \"PLANNED\",\r\n    \"days\": [\r\n        {\r\n            \"day\": 1,\r\n            \"activities\": [\r\n                {\r\n                    \"activity\": \"Visitar la Puerta del Sol\",\r\n                    \"details\": \"Conocido como el centro de Madrid.\",\r\n                    \"location\": {\r\n                        \"name\": \"Puerta del Sol\",\r\n                        \"address\": \"Entre las calles de Alcalá, Montera y Preciados.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4167,\r\n                            \"longitude\": -3.7036\r\n                        }\r\n                    },\r\n                    \"time\": \"09:00\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Pasear por el Parque del Retiro\",\r\n                    \"details\": \"Uno de los parques más famosos de Madrid, ideal para un paseo y un descanso.\",\r\n                    \"location\": {\r\n                        \"name\": \"Parque del Buen Retiro\",\r\n                        \"address\": \"Plaza de la Independencia, 7, 28001 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4123,\r\n                            \"longitude\": -3.688\r\n                        }\r\n                    },\r\n                    \"time\": \"11:30\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Visitar el Palacio Real de Madrid\",\r\n                    \"details\": \"Visita el Palacio Real y descubre su belleza y la historia de los reyes de España.\",\r\n                    \"location\": {\r\n                        \"name\": \"Palacio Real de Madrid\",\r\n                        \"address\": \"Calle de Bailén, s/n, 28071 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4148,\r\n                            \"longitude\": -3.7182\r\n                        }\r\n                    },\r\n                    \"time\": \"15:00\",\r\n                    \"duration\": \"2 horas\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}"
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/users",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Retrieve user",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/users/CuB1",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users",
-										"CuB1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Retrieve user avatar",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/users/CuB1/avatar",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users",
-										"CuB1",
-										"avatar"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Upload user avatar",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "formdata",
-									"formdata": [
-										{
-											"key": "avatar",
-											"type": "file",
-											"src": "postman-cloud:///1f0c9ce4-7a29-4a50-bed0-0c68bbcf45b4"
-										}
-									]
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/users/CuB1/avatar",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users",
-										"CuB1",
-										"avatar"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update user",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"CuB1 zz\",\r\n    \"description\": \"Life enjoyer\",\r\n    \"location\": \"Madrid, España\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/users/CuB1",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users",
-										"CuB1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update user notification",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"notificationsAllowed\": false\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/users/CuB1",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users",
-										"CuB1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete user",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{BASE_URL}}/api/v1/users/CuB1",
-									"host": [
-										"{{BASE_URL}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users",
-										"CuB1"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				}
-			]
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "BASE_URL",
-			"value": "http://localhost:8080",
-			"type": "string"
-		}
-	]
+  "info": {
+    "_postman_id": "8b2c03b6-9af7-40d2-b167-3a0f9a6b16be",
+    "name": "TripFlow",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37129679"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"cub1zdev@gmail.com\",\r\n    \"username\": \"CuB1\",\r\n    \"password\": \"Ab12345678\",\r\n    \"confirmPassword\": \"Ab12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/register",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"CuB1\",\r\n    \"password\": \"Ab12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/login",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/logout",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"CuB1\",\r\n    \"password\": \"Ab12345678\",\r\n    \"confirmPassword\": \"Ab12345678\"\r\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/refresh",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"CuB1\",\r\n    \"code\": \"290963\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/verify",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resend Code",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"CuB1\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/resend-code",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "resend-code"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "V1",
+      "item": [
+        {
+          "name": "Itineraries",
+          "item": [
+            {
+              "name": "Create itinerary",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"title\": \"Visita a Madrid\",\r\n    \"people\": 2,\r\n    \"budget\": 1500.50,\r\n    \"date\": \"06-10-2025\",\r\n    \"tags\": [\"Madrid\", \"Holidays\"],\r\n    \"place\": \"Madrid\",\r\n    \"days\": [\r\n        {\r\n            \"day\": 1,\r\n            \"activities\": [\r\n                {\r\n                    \"activity\": \"Visitar la Puerta del Sol\",\r\n                    \"details\": \"Conocido como el centro de Madrid.\",\r\n                    \"location\": {\r\n                        \"name\": \"Puerta del Sol\",\r\n                        \"address\": \"Entre las calles de Alcalá, Montera y Preciados.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4167,\r\n                            \"longitude\": -3.7036\r\n                        }\r\n                    },\r\n                    \"time\": \"09:00\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Pasear por el Parque del Retiro\",\r\n                    \"details\": \"Uno de los parques más famosos de Madrid, ideal para un paseo y un descanso.\",\r\n                    \"location\": {\r\n                        \"name\": \"Parque del Buen Retiro\",\r\n                        \"address\": \"Plaza de la Independencia, 7, 28001 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4123,\r\n                            \"longitude\": -3.688\r\n                        }\r\n                    },\r\n                    \"time\": \"11:30\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Visitar el Palacio Real de Madrid\",\r\n                    \"details\": \"Visita el Palacio Real y descubre su belleza y la historia de los reyes de España.\",\r\n                    \"location\": {\r\n                        \"name\": \"Palacio Real de Madrid\",\r\n                        \"address\": \"Calle de Bailén, s/n, 28071 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4148,\r\n                            \"longitude\": -3.7182\r\n                        }\r\n                    },\r\n                    \"time\": \"15:00\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Pasear y cenar en el barrio de Chueca\",\r\n                    \"details\": \"El barrio de Chueca es un lugar lleno de vida y actividad, especialmente conocido por sus restaurantes y locales de moda.\",\r\n                    \"location\": {\r\n                        \"name\": \"Barrio de Chueca\",\r\n                        \"address\": \"Calle de Hortaleza, 68, 28004 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4221,\r\n                            \"longitude\": -3.6939\r\n                        }\r\n                    },\r\n                    \"time\": \"20:00\",\r\n                    \"duration\": \"3 horas\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/itineraries",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "itineraries"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Retrieve itinerary",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/itineraries/1",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "itineraries",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Retrieve all itineraries",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/itineraries",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "itineraries"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update itinerary",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"title\": \"Escapada a Madrid\",\r\n    \"people\": 2,\r\n    \"budget\": 1500.50,\r\n    \"date\": \"06-10-2025\",\r\n    \"tags\": [\"Madrid\"],\r\n    \"place\": \"Madrid\",\r\n    \"status\": \"PLANNED\",\r\n    \"days\": [\r\n        {\r\n            \"day\": 1,\r\n            \"activities\": [\r\n                {\r\n                    \"activity\": \"Visitar la Puerta del Sol\",\r\n                    \"details\": \"Conocido como el centro de Madrid.\",\r\n                    \"location\": {\r\n                        \"name\": \"Puerta del Sol\",\r\n                        \"address\": \"Entre las calles de Alcalá, Montera y Preciados.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4167,\r\n                            \"longitude\": -3.7036\r\n                        }\r\n                    },\r\n                    \"time\": \"09:00\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Pasear por el Parque del Retiro\",\r\n                    \"details\": \"Uno de los parques más famosos de Madrid, ideal para un paseo y un descanso.\",\r\n                    \"location\": {\r\n                        \"name\": \"Parque del Buen Retiro\",\r\n                        \"address\": \"Plaza de la Independencia, 7, 28001 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4123,\r\n                            \"longitude\": -3.688\r\n                        }\r\n                    },\r\n                    \"time\": \"11:30\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Visitar el Palacio Real de Madrid\",\r\n                    \"details\": \"Visita el Palacio Real y descubre su belleza y la historia de los reyes de España.\",\r\n                    \"location\": {\r\n                        \"name\": \"Palacio Real de Madrid\",\r\n                        \"address\": \"Calle de Bailén, s/n, 28071 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4148,\r\n                            \"longitude\": -3.7182\r\n                        }\r\n                    },\r\n                    \"time\": \"15:00\",\r\n                    \"duration\": \"2 horas\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/itineraries/1",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "itineraries",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Remove itinerary",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"place\": \"Madrid\",\r\n    \"status\": \"PLANNED\",\r\n    \"days\": [\r\n        {\r\n            \"day\": 1,\r\n            \"activities\": [\r\n                {\r\n                    \"activity\": \"Visitar la Puerta del Sol\",\r\n                    \"details\": \"Conocido como el centro de Madrid.\",\r\n                    \"location\": {\r\n                        \"name\": \"Puerta del Sol\",\r\n                        \"address\": \"Entre las calles de Alcalá, Montera y Preciados.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4167,\r\n                            \"longitude\": -3.7036\r\n                        }\r\n                    },\r\n                    \"time\": \"09:00\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Pasear por el Parque del Retiro\",\r\n                    \"details\": \"Uno de los parques más famosos de Madrid, ideal para un paseo y un descanso.\",\r\n                    \"location\": {\r\n                        \"name\": \"Parque del Buen Retiro\",\r\n                        \"address\": \"Plaza de la Independencia, 7, 28001 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4123,\r\n                            \"longitude\": -3.688\r\n                        }\r\n                    },\r\n                    \"time\": \"11:30\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Visitar el Palacio Real de Madrid\",\r\n                    \"details\": \"Visita el Palacio Real y descubre su belleza y la historia de los reyes de España.\",\r\n                    \"location\": {\r\n                        \"name\": \"Palacio Real de Madrid\",\r\n                        \"address\": \"Calle de Bailén, s/n, 28071 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4148,\r\n                            \"longitude\": -3.7182\r\n                        }\r\n                    },\r\n                    \"time\": \"15:00\",\r\n                    \"duration\": \"2 horas\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/itineraries/1",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "itineraries",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Collaboration",
+          "item": [
+            {
+              "name": "Add Collaborator",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"CuB1_Collaborator\",\r\n    \"role\": \"VIEWER\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/itineraries/1/collaborators",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "itineraries",
+                    "1",
+                    "collaborators"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Retrieve Collaborators",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"destination\": \"París\",\r\n    \"style\": \"Romantic\",\r\n    \"budget\": 500,\r\n    \"lodging\": \"hostel\",\r\n    \"duration\": \"1 day\",\r\n    \"interests\": [\"Eifel Tower\", \"Seine\", \"Les Champs-Élysées\"]\r\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/itineraries/1/collaborators",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "itineraries",
+                    "1",
+                    "collaborators"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Collaborator",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"CuB1_Collaborator\",\r\n    \"role\": \"EDITOR\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/itineraries/1/collaborators",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "itineraries",
+                    "1",
+                    "collaborators"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Remove Collaborator",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"CuB1_Collaborator\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/itineraries/1/collaborators",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "itineraries",
+                    "1",
+                    "collaborators"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Stats",
+          "item": [
+            {
+              "name": "User stats",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/stats/user",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "stats",
+                    "user"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "AI",
+          "item": [
+            {
+              "name": "AI Request",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"aiPrompt\": \"Un viaje a parís para ver los campos eliseos\",\r\n    \"destination\": \"París\",\r\n    \"style\": \"Romantic\",\r\n    \"budget\": 500,\r\n    \"lodging\": \"hostel\",\r\n    \"duration\": \"1 day\",\r\n    \"interests\": [\"Eifel Tower\", \"Seine\", \"Les Champs-Élysées\"]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/ai",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "ai"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "AI Status",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"destination\": \"París\",\r\n    \"style\": \"Romantic\",\r\n    \"budget\": 500,\r\n    \"lodging\": \"hostel\",\r\n    \"duration\": \"1 day\",\r\n    \"interests\": [\"Eifel Tower\", \"Seine\", \"Les Champs-Élysées\"]\r\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/ai/status",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "ai",
+                    "status"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Users",
+          "item": [
+            {
+              "name": "Retrieve all users",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"place\": \"Madrid\",\r\n    \"status\": \"PLANNED\",\r\n    \"days\": [\r\n        {\r\n            \"day\": 1,\r\n            \"activities\": [\r\n                {\r\n                    \"activity\": \"Visitar la Puerta del Sol\",\r\n                    \"details\": \"Conocido como el centro de Madrid.\",\r\n                    \"location\": {\r\n                        \"name\": \"Puerta del Sol\",\r\n                        \"address\": \"Entre las calles de Alcalá, Montera y Preciados.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4167,\r\n                            \"longitude\": -3.7036\r\n                        }\r\n                    },\r\n                    \"time\": \"09:00\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Pasear por el Parque del Retiro\",\r\n                    \"details\": \"Uno de los parques más famosos de Madrid, ideal para un paseo y un descanso.\",\r\n                    \"location\": {\r\n                        \"name\": \"Parque del Buen Retiro\",\r\n                        \"address\": \"Plaza de la Independencia, 7, 28001 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4123,\r\n                            \"longitude\": -3.688\r\n                        }\r\n                    },\r\n                    \"time\": \"11:30\",\r\n                    \"duration\": \"2 horas\"\r\n                },\r\n                {\r\n                    \"activity\": \"Visitar el Palacio Real de Madrid\",\r\n                    \"details\": \"Visita el Palacio Real y descubre su belleza y la historia de los reyes de España.\",\r\n                    \"location\": {\r\n                        \"name\": \"Palacio Real de Madrid\",\r\n                        \"address\": \"Calle de Bailén, s/n, 28071 Madrid.\",\r\n                        \"coordinates\": {\r\n                            \"latitude\": 40.4148,\r\n                            \"longitude\": -3.7182\r\n                        }\r\n                    },\r\n                    \"time\": \"15:00\",\r\n                    \"duration\": \"2 horas\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/users",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "users"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Retrieve user",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/users/CuB1",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "users",
+                    "CuB1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Retrieve user avatar",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/users/CuB1/avatar",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "users",
+                    "CuB1",
+                    "avatar"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Upload user avatar",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "avatar",
+                      "type": "file",
+                      "uuid": "d01855db-9817-4010-8896-31fcfd7d481e",
+                      "src": "postman-cloud:///1f0c9ce4-7a29-4a50-bed0-0c68bbcf45b4"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/users/CuB1/avatar",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "users",
+                    "CuB1",
+                    "avatar"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update user",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"CuB1 zz\",\r\n    \"description\": \"Life enjoyer\",\r\n    \"location\": \"Madrid, España\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/users/CuB1",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "users",
+                    "CuB1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update user notification",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"notificationsAllowed\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/users/CuB1",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "users",
+                    "CuB1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete user",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/users/CuB1",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "users",
+                    "CuB1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
 }
