@@ -1,0 +1,23 @@
+package com.tripflow.repository.itinerary;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.tripflow.model.User;
+import com.tripflow.model.itinerary.Itinerary;
+import com.tripflow.model.itinerary.ItineraryCollaborator;
+
+@Repository
+public interface ItineraryCollaboratorRepository extends JpaRepository<ItineraryCollaborator, Long> {
+    
+    List<ItineraryCollaborator> findByItinerary(Itinerary itinerary);
+
+    Optional<ItineraryCollaborator> findByItineraryAndUser(Itinerary itinerary, User user);
+
+    boolean existsByItineraryAndUser(Itinerary itinerary, User user);
+
+    void deleteByItineraryAndUser(Itinerary itinerary, User user);
+}

@@ -1,5 +1,6 @@
 package com.tripflow.model;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.tripflow.model.itinerary.Itinerary;
+import com.tripflow.model.itinerary.ItineraryCollaborator;
 import com.tripflow.model.types.PlanType;
 import com.tripflow.model.types.UserType;
 
@@ -47,7 +49,7 @@ public class User {
     private String verificationCode;
 
     @Column(name = "verification_code_expires_at")
-    private java.time.Instant verificationCodeExpiresAt;
+    private Instant verificationCodeExpiresAt;
 
     @Column(nullable = true, unique = false)
     private String name;
@@ -82,6 +84,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AIUsage> aiUsages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItineraryCollaborator> collaborations = new ArrayList<>();
 
     // [Constructors] =================================================
 
@@ -160,11 +165,11 @@ public class User {
         this.verificationCode = verificationCode;
     }
 
-    public java.time.Instant getVerificationCodeExpiresAt() {
+    public Instant getVerificationCodeExpiresAt() {
         return verificationCodeExpiresAt;
     }
 
-    public void setVerificationCodeExpiresAt(java.time.Instant verificationCodeExpiresAt) {
+    public void setVerificationCodeExpiresAt(Instant verificationCodeExpiresAt) {
         this.verificationCodeExpiresAt = verificationCodeExpiresAt;
     }
 
@@ -270,5 +275,13 @@ public class User {
 
     public void setAiUsages(List<AIUsage> aiUsages) {
         this.aiUsages = aiUsages;
+    }
+
+    public List<ItineraryCollaborator> getCollaborations() {
+        return collaborations;
+    }
+
+    public void setCollaborations(List<ItineraryCollaborator> collaborations) {
+        this.collaborations = collaborations;
     }
 }
