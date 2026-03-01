@@ -15,7 +15,7 @@ import com.tripflow.model.itinerary.Itinerary;
 public interface ItineraryRepository extends JpaRepository<Itinerary, Long> {
     @Query("SELECT DISTINCT i FROM Itinerary i " +
            "LEFT JOIN i.collaborators c " +
-           "WHERE i.user = :user OR c.user = :user " +
+           "WHERE i.user = :user OR (c.user = :user AND c.status = 'ACCEPTED') " +
            "ORDER BY i.updatedAt DESC")
     Page<Itinerary> findAllByUserOrCollaboratorOrderByUpdatedAtDesc(
         @Param("user") User user,
@@ -24,7 +24,7 @@ public interface ItineraryRepository extends JpaRepository<Itinerary, Long> {
 
     @Query("SELECT DISTINCT i FROM Itinerary i " +
            "LEFT JOIN i.collaborators c " +
-           "WHERE (i.user = :user OR c.user = :user) AND " +
+           "WHERE (i.user = :user OR (c.user = :user AND c.status = 'ACCEPTED')) AND " +
            "(LOWER(i.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(i.place) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(CAST(function('array_to_string', i.tags, ',') AS string)) LIKE LOWER(CONCAT('%', :search, '%'))) " +

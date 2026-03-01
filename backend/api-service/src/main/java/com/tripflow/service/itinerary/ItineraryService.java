@@ -26,6 +26,7 @@ import com.tripflow.service.ExternalImageService;
 import com.tripflow.service.UserService;
 import com.tripflow.model.itinerary.ItineraryCollaborator;
 import com.tripflow.model.types.CollaboratorRole;
+import com.tripflow.model.types.InvitationStatus;
 
 import jakarta.transaction.Transactional;
 
@@ -109,12 +110,13 @@ public class ItineraryService {
 
         Itinerary savedItinerary = this.itineraryRepository.save(newItinerary);
 
-        // Add owner as a collaborator with OWNER role
+        // Add owner as a collaborator with OWNER role and ACCEPTED status
         ItineraryCollaborator ownerCollaborator = new ItineraryCollaborator(
             CollaboratorRole.OWNER,
             user,
             savedItinerary
         );
+        ownerCollaborator.setStatus(InvitationStatus.ACCEPTED);
 
         this.itineraryCollaboratorRepository.save(ownerCollaborator);
 
