@@ -8,6 +8,7 @@ import com.tripflow.model.User;
 import com.tripflow.model.itinerary.Itinerary;
 import com.tripflow.model.itinerary.ItineraryCollaborator;
 import com.tripflow.model.types.CollaboratorRole;
+import com.tripflow.model.types.InvitationStatus;
 import com.tripflow.repository.itinerary.ItineraryCollaboratorRepository;
 
 @Service
@@ -31,7 +32,7 @@ public class ItineraryPermissionService {
             return true;
         }
 
-        return itineraryCollaboratorRepository.existsByItineraryAndUser(itinerary, user);
+        return itineraryCollaboratorRepository.existsByItineraryAndUserAndStatus(itinerary, user, InvitationStatus.ACCEPTED);
     }
 
     /**
@@ -47,7 +48,7 @@ public class ItineraryPermissionService {
         }
 
         Optional<ItineraryCollaborator> collaborator = itineraryCollaboratorRepository.findByItineraryAndUser(itinerary, user);
-        return collaborator.map(c -> c.getRole() == CollaboratorRole.EDITOR).orElse(false);
+        return collaborator.map(c -> c.getStatus() == InvitationStatus.ACCEPTED && c.getRole() == CollaboratorRole.EDITOR).orElse(false);
     }
 
     /**
