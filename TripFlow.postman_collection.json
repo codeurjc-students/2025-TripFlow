@@ -321,7 +321,7 @@
           "name": "Collaboration",
           "item": [
             {
-              "name": "Add Collaborator",
+              "name": "Send Invitation",
               "request": {
                 "method": "POST",
                 "header": [],
@@ -351,6 +351,70 @@
               "response": []
             },
             {
+              "name": "Accept Invitation",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/itineraries/1/collaborators/CuB1_Collaborator/accept",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "itineraries",
+                    "1",
+                    "collaborators",
+                    "CuB1_Collaborator",
+                    "accept"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Decline Invitation",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/itineraries/1/collaborators/CuB1_Collaborator/decline",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "itineraries",
+                    "1",
+                    "collaborators",
+                    "CuB1_Collaborator",
+                    "decline"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
               "name": "Retrieve Collaborators",
               "protocolProfileBehavior": {
                 "disableBodyPruning": true
@@ -360,7 +424,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"destination\": \"París\",\r\n    \"style\": \"Romantic\",\r\n    \"budget\": 500,\r\n    \"lodging\": \"hostel\",\r\n    \"duration\": \"1 day\",\r\n    \"interests\": [\"Eifel Tower\", \"Seine\", \"Les Champs-Élysées\"]\r\n}"
+                  "raw": ""
                 },
                 "url": {
                   "raw": "{{BASE_URL}}/api/v1/itineraries/1/collaborators",
@@ -379,13 +443,13 @@
               "response": []
             },
             {
-              "name": "Update Collaborator",
+              "name": "Update Collaborator Role",
               "request": {
                 "method": "PUT",
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"username\": \"CuB1_Collaborator\",\r\n    \"role\": \"EDITOR\"\r\n}",
+                  "raw": "{\n    \"role\": \"EDITOR\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -393,7 +457,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{BASE_URL}}/api/v1/itineraries/1/collaborators",
+                  "raw": "{{BASE_URL}}/api/v1/itineraries/1/collaborators/CuB1_Collaborator",
                   "host": [
                     "{{BASE_URL}}"
                   ],
@@ -402,7 +466,8 @@
                     "v1",
                     "itineraries",
                     "1",
-                    "collaborators"
+                    "collaborators",
+                    "CuB1_Collaborator"
                   ]
                 }
               },
@@ -415,7 +480,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"username\": \"CuB1_Collaborator\"\r\n}",
+                  "raw": "",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -423,7 +488,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{BASE_URL}}/api/v1/itineraries/1/collaborators",
+                  "raw": "{{BASE_URL}}/api/v1/itineraries/1/collaborators/CuB1_Collaborator",
                   "host": [
                     "{{BASE_URL}}"
                   ],
@@ -432,7 +497,8 @@
                     "v1",
                     "itineraries",
                     "1",
-                    "collaborators"
+                    "collaborators",
+                    "CuB1_Collaborator"
                   ]
                 }
               },
@@ -556,6 +622,31 @@
                     "api",
                     "v1",
                     "users"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Retrieve pending invitations",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/users/CuB1/invitations",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "users",
+                    "CuB1",
+                    "invitations"
                   ]
                 }
               },
