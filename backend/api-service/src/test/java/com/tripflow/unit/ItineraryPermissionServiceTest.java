@@ -16,6 +16,7 @@ import com.tripflow.model.User;
 import com.tripflow.model.itinerary.Itinerary;
 import com.tripflow.model.itinerary.ItineraryCollaborator;
 import com.tripflow.model.types.CollaboratorRole;
+import com.tripflow.model.types.InvitationStatus;
 import com.tripflow.repository.itinerary.ItineraryCollaboratorRepository;
 import com.tripflow.service.itinerary.ItineraryPermissionService;
 
@@ -63,14 +64,14 @@ public class ItineraryPermissionServiceTest {
     @Test
     @DisplayName("Test canView - Collaborator should have access")
     public void testCanViewCollaborator() {
-        when(itineraryCollaboratorRepository.existsByItineraryAndUser(itinerary, collaborator)).thenReturn(true);
+        when(itineraryCollaboratorRepository.existsByItineraryAndUserAndStatus(itinerary, collaborator, InvitationStatus.ACCEPTED)).thenReturn(true);
         assertTrue(this.itineraryPermissionService.canView(itinerary, collaborator));
     }
 
     @Test
     @DisplayName("Test canView - Other user should NOT have access")
     public void testCanViewOther() {
-        when(itineraryCollaboratorRepository.existsByItineraryAndUser(itinerary, otherUser)).thenReturn(false);
+        when(itineraryCollaboratorRepository.existsByItineraryAndUserAndStatus(itinerary, otherUser, InvitationStatus.ACCEPTED)).thenReturn(false);
         assertFalse(this.itineraryPermissionService.canView(itinerary, otherUser));
     }
 
@@ -84,6 +85,7 @@ public class ItineraryPermissionServiceTest {
     @DisplayName("Test canEdit - Editor should have access")
     public void testCanEditEditor() {
         ItineraryCollaborator editorCollaborator = new ItineraryCollaborator(CollaboratorRole.EDITOR, collaborator, itinerary);
+        editorCollaborator.setStatus(InvitationStatus.ACCEPTED);
         when(itineraryCollaboratorRepository.findByItineraryAndUser(itinerary, collaborator))
             .thenReturn(Optional.of(editorCollaborator));
 
