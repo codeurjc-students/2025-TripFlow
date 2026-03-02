@@ -9,6 +9,7 @@ import com.tripflow.dto.ai.AIGenerationRequest;
 import com.tripflow.dto.itinerary.ExtendedItineraryDTO;
 import com.tripflow.utils.AIItineraryMock;
 import com.tripflow.utils.AIItineraryPrompt;
+import com.tripflow.utils.AIPromptResult;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class AIGenerationService {
             return AIItineraryMock.getItineraryMock();
         }
 
-        String prompt = AIItineraryPrompt.generatePrompt(request);
+        AIPromptResult prompt = AIItineraryPrompt.generatePrompt(request);
         ChatCompletion chatCompletion = this.createChat(prompt);
         String response = chatCompletion
             .choices().get(0).message().content().get()
@@ -57,14 +58,17 @@ public class AIGenerationService {
     }
 
     /**
-     * Creates a chat completion using the AI client with the provided prompt.
+     * Creates a chat completion using separate system and user message roles.
+     * This prevents prompt injection by ensuring user input cannot override
+     * the system-level instructions.
      * 
-     * @param prompt the prompt to send to the AI model
+     * @param prompt the structured prompt containing system and user messages
      * @return a ChatCompletion object containing the AI's response
      */
-    private ChatCompletion createChat(String prompt) {
+    private ChatCompletion createChat(AIPromptResult prompt) {
         ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
-            .addUserMessage(prompt)
+            .addSystemMessage(prompt.systemMessage())
+            .addUserMessage(prompt.userMessage())
             .model(this.apiModel)
             .build();
         return this.openAIClient.chat().completions().create(params);
