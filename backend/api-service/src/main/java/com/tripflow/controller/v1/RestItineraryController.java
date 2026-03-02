@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.tripflow.dto.itinerary.ExtendedItineraryDTO;
@@ -49,7 +51,7 @@ public class RestItineraryController {
         @ApiResponse(responseCode = "400", description = "Invalid itinerary data provided"),
         @ApiResponse(responseCode = "401", description = "Unauthorized access")
     })
-    public ResponseEntity<ExtendedItineraryDTO> createItinerary(@RequestBody ExtendedItineraryDTO itineraryDTO) throws Exception {
+    public ResponseEntity<ExtendedItineraryDTO> createItinerary(@Valid @RequestBody ExtendedItineraryDTO itineraryDTO) throws Exception {
         ExtendedItineraryDTO createdItinerary = this.itineraryService.createItinerary(itineraryDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
             .buildAndExpand(createdItinerary.id()).toUri();
@@ -109,7 +111,7 @@ public class RestItineraryController {
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<ExtendedItineraryDTO> updateItinerary(
-        @PathVariable Long id, @RequestBody ExtendedItineraryDTO itineraryDTO
+        @PathVariable Long id, @Valid @RequestBody ExtendedItineraryDTO itineraryDTO
     ) throws Exception {
         ExtendedItineraryDTO updatedItinerary = this.itineraryService.updateItinerary(id, itineraryDTO);
 

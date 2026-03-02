@@ -20,11 +20,12 @@ public class UserEndpointsTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Test get all users")
     public void testGetAllUsers() {
-        AuthTestUtils.authenticateUserAndGetToken("User1", false);
+        String token = AuthTestUtils.authenticateUserAndGetToken("User1", false);
 
         RestAssured
             .given()
                 .contentType(ContentType.JSON)
+                .cookie("auth_token", token)
             .when()
                 .get("/v1/users")
             .then()

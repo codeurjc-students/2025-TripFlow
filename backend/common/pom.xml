@@ -19,6 +19,12 @@
 
     <dependencies>
 
+        <!-- Bean Validation (Jakarta) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
         <!-- Kafka message deserialization -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>

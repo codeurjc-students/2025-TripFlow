@@ -17,6 +17,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
@@ -57,7 +59,7 @@ public class RestAIController {
         @ApiResponse(responseCode = "429", description = "Too many requests - daily AI usage limit exceeded"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<AIResponse> handleAIRequest(@RequestBody AIGenerationRequest request) throws Exception {
+    public ResponseEntity<AIResponse> handleAIRequest(@Valid @RequestBody AIGenerationRequest request) throws Exception {
         AIResponse response = this.aiService.requestAIProcessing(request);
         return ResponseEntity.ok(response);
     }

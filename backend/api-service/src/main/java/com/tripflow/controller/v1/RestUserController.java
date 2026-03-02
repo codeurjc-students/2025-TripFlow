@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -96,7 +98,7 @@ public class RestUserController {
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<PublicUserDTO> updateUser(
-        @PathVariable String username, @RequestBody UpdateUserRequest request
+        @PathVariable String username, @Valid @RequestBody UpdateUserRequest request
     ) throws Exception {
         PublicUserDTO user = this.userService.updateUser(username, request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import com.tripflow.dto.itinerary.collaborator.AddCollaboratorRequest;
 import com.tripflow.dto.itinerary.collaborator.CollaboratorDTO;
 import com.tripflow.dto.itinerary.collaborator.UpdateCollaboratorRequest;
@@ -51,7 +53,7 @@ public class RestCollaborationController {
     })
     public ResponseEntity<CollaboratorDTO> sendInvitation(
         @PathVariable Long itineraryId,
-        @RequestBody AddCollaboratorRequest request
+        @Valid @RequestBody AddCollaboratorRequest request
     ) {
         CollaboratorDTO collaborator = this.collaborationService.sendInvitation(itineraryId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(collaborator);
@@ -125,7 +127,7 @@ public class RestCollaborationController {
     public ResponseEntity<CollaboratorDTO> updateCollaboratorRole(
         @PathVariable Long itineraryId,
         @PathVariable String username,
-        @RequestBody UpdateCollaboratorRequest request
+        @Valid @RequestBody UpdateCollaboratorRequest request
     ) {
         CollaboratorDTO collaborator = this.collaborationService.updateCollaboratorRole(itineraryId, username, request);
         return ResponseEntity.ok(collaborator);
