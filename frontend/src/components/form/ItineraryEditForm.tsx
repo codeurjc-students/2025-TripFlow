@@ -40,7 +40,7 @@ export default function ItineraryEditForm({
                 onAddNewDay={onAddNewDay}
             />
 
-            {onDelete && (
+            {onDelete && itinerary.permissions.delete && (
                 <div className={styles.formFooter}>
                     <Button
                         onClick={onDelete}

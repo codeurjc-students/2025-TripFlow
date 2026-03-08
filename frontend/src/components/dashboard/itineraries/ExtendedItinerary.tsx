@@ -21,6 +21,7 @@ import {
     ChevronRight,
     ListIcon,
     Maximize2Icon,
+    Users2Icon,
 } from "lucide-react";
 
 import Badge from "@components/shared/Badge";
@@ -30,11 +31,12 @@ import ActivityCard from "@components/dashboard/itineraries/ActivityCard";
 
 interface ExtendedItineraryProps {
     itinerary: ExtendedItinerary;
+    onOpenCollaboration?: () => void;
 }
 
 const ICON_SIZE = 24;
 
-export default function ExtendedItinerary({ itinerary }: ExtendedItineraryProps) {
+export default function ExtendedItinerary({ itinerary, onOpenCollaboration }: ExtendedItineraryProps) {
     const [currentDayIndex, setCurrentDayIndex] = useState(0);
     const [isFocusMode, setIsFocusMode] = useState(false);
 
@@ -80,13 +82,25 @@ export default function ExtendedItinerary({ itinerary }: ExtendedItineraryProps)
                             ))}
                         </div>
 
-                        <Button 
-                            style={["tool_bordered"]}
-                            onClick={() => setIsFocusMode(true)}
-                            ariaLabel="Ver itinerario día a día"
-                        >
-                            <Maximize2Icon size={20} />
-                        </Button>
+                        <div className={styles.modeActions}>
+                            <Button 
+                                style={["tool_bordered"]}
+                                onClick={() => setIsFocusMode(true)}
+                                ariaLabel="Ver itinerario día a día"
+                            >
+                                <Maximize2Icon size={20} />
+                            </Button>
+
+                            {onOpenCollaboration && (
+                                <Button
+                                    style={["tool_bordered"]}
+                                    onClick={onOpenCollaboration}
+                                    ariaLabel="Gestionar colaboradores"
+                                >
+                                    <Users2Icon size={20} />
+                                </Button>
+                            )}
+                        </div>
                     </div>
 
                     {/* Trip Info */}
@@ -177,7 +191,7 @@ export default function ExtendedItinerary({ itinerary }: ExtendedItineraryProps)
                         </div>
                         
                         {currentDay.activities.length === 0 && (
-                            <p style={{ textAlign: "center", color: "var(--text-tertiary)" }}>
+                            <p className={styles.emptyDayMessage}>
                                 No hay actividades planeadas para este día.
                             </p>
                         )}

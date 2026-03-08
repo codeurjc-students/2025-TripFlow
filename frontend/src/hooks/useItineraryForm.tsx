@@ -75,6 +75,11 @@ export function createDefaultItinerary(): ExtendedItinerary {
             imageUrl: "",
             authorUsername: "",
         },
+        permissions: {
+            view: true,
+            edit: true,
+            delete: true
+        }
     };
 }
 

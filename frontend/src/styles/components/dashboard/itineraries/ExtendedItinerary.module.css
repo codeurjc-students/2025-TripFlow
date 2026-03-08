@@ -44,6 +44,11 @@
     gap: var(--space-md);
 }
 
+.modeActions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
 .tags {
     display: flex;
     flex-wrap: wrap;
@@ -138,6 +143,13 @@
 .closeFocusButton {
     display: flex;
     justify-self: end;
+}
+
+.emptyDayMessage {
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: var(--font-size-md);
+    margin-top: var(--space-xl);
 }
 
 @keyframes fadeIn {

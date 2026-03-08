@@ -56,8 +56,16 @@ export default function ItineraryEdit() {
             setIsLoading(true);
 
             const itineraryData = await getItineraryById(itineraryId);
-            setItinerary(itineraryData);
+            
+            if (itineraryData && !itineraryData.permissions?.edit) {
+                notify("No tienes permisos para editar este itinerario", "error", {
+                    title: "Acceso denegado"
+                });
+                navigate(`/itineraries/${itineraryId}`);
+                return;
+            }
 
+            setItinerary(itineraryData);
             setIsLoading(false);
         };
 

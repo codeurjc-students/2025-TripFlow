@@ -23,6 +23,7 @@ let itineraries: ExtendedItinerary[] = [
       imageUrl: "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4MzA1NjJ8MHwxfHNlYXJjaHwxfHxUb2t5b3xlbnwwfHx8fDE3NjUwNDMxNjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
       authorUsername: "thetalkinglens",
     },
+    permissions: { view: true, edit: true, delete: true },
     days: [
       {
         day: 1,
@@ -100,6 +101,7 @@ let itineraries: ExtendedItinerary[] = [
       imageUrl: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4MzA1NjJ8MHwxfHNlYXJjaHwxfHxQYXJpc3xlbnwwfHx8fDE3NjUwNDMxMDJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       authorUsername: "anthonydelanoix",
     },
+    permissions: { view: true, edit: true, delete: true },
     days: [
       {
         day: 1,
@@ -161,6 +163,7 @@ let itineraries: ExtendedItinerary[] = [
       imageUrl: "https://images.unsplash.com/photo-1541336032412-2048a678540d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4MzA1NjJ8MHwxfHNlYXJjaHwxfHxOZXclMjBZb3JrfGVufDB8fHx8MTc2NTA0MzAzMnww&ixlib=rb-4.1.0&q=80&w=1080",
       authorUsername: "timovaknar",
     },
+    permissions: { view: true, edit: true, delete: true },
     days: [
       {
         day: 1,
@@ -233,6 +236,7 @@ let itineraries: ExtendedItinerary[] = [
       imageUrl: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4MzA1NjJ8MHwxfHNlYXJjaHwxfHxSb21hfGVufDB8fHx8MTc2NTA0MzI5N3ww&ixlib=rb-4.1.0&q=80&w=1080",
       authorUsername: "davidkhlr",
     },
+    permissions: { view: true, edit: true, delete: true },
     days: [
       {
         day: 1,
@@ -283,6 +287,7 @@ let itineraries: ExtendedItinerary[] = [
       imageUrl: "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4MzA1NjJ8MHwxfHNlYXJjaHwxfHxMaXNib258ZW58MHx8fHwxNzY1MDQzMzU5fDA&ixlib=rb-4.1.0&q=80&w=1080",
       authorUsername: "aayush_gupta",
     },
+    permissions: { view: true, edit: true, delete: true },
     days: [
       {
         day: 1,
