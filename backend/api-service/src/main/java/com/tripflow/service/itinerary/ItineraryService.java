@@ -10,8 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.tripflow.dto.itinerary.ExtendedItineraryDTO;
+import com.tripflow.dto.itinerary.ExtendedItineraryResponseDTO;
 import com.tripflow.dto.itinerary.ItineraryDTO;
+import com.tripflow.dto.itinerary.ItineraryResponseDTO;
 import com.tripflow.dto.itinerary.ItineraryDayDTO;
+import com.tripflow.dto.itinerary.PermissionsDTO;
 import com.tripflow.dto.shared.PaginatedDTO;
 import com.tripflow.kafka.messages.AIGenerationMessage;
 import com.tripflow.mappers.ItineraryMapper;
@@ -85,9 +88,9 @@ public class ItineraryService {
      * @param user the user who owns the itinerary
      * @param itineraryDTO the DTO containing itinerary data
      * 
-     * @return the created ItineraryDTO
+     * @return the created ExtendedItineraryResponseDTO
      */
-    public ExtendedItineraryDTO createItinerary(User user, ExtendedItineraryDTO itineraryDTO) {
+    public ExtendedItineraryResponseDTO createItinerary(User user, ExtendedItineraryDTO itineraryDTO) {
         Itinerary newItinerary = new Itinerary();
         
         // Assign basic details from the DTO to the entity
@@ -120,16 +123,18 @@ public class ItineraryService {
 
         this.itineraryCollaboratorRepository.save(ownerCollaborator);
 
-        return this.itineraryMapper.toExtendedDTO(savedItinerary);
+        ExtendedItineraryDTO dto = this.itineraryMapper.toExtendedDTO(savedItinerary);
+        PermissionsDTO permissions = new PermissionsDTO(true, true, true);
+        return new ExtendedItineraryResponseDTO(dto, permissions);
     }
 
     /**
      * Creates a new itinerary from the provided ItineraryDTO.
      *
      * @param itineraryDTO the DTO containing itinerary data
-     * @return the created ItineraryDTO
+     * @return the created ExtendedItineraryResponseDTO
      */
-    public ExtendedItineraryDTO createItinerary(ExtendedItineraryDTO itineraryDTO) {
+    public ExtendedItineraryResponseDTO createItinerary(ExtendedItineraryDTO itineraryDTO) {
         User authenticatedUser = this.userService.getAuthenticatedUser();
         return this.createItinerary(authenticatedUser, itineraryDTO);
     }
@@ -139,9 +144,9 @@ public class ItineraryService {
      *
      * @param pageable pagination information
      * @param search optional search query to filter itineraries
-     * @return a PaginatedDTO containing a list of ItineraryDTOs
+     * @return a PaginatedDTO containing a list of ItineraryResponseDTOs
      */
-    public PaginatedDTO<ItineraryDTO> getAllItineraries(Pageable pageable, String search) {
+    public PaginatedDTO<ItineraryResponseDTO> getAllItineraries(Pageable pageable, String search) {
         User authenticatedUser = this.userService.getAuthenticatedUser();
 
         Page<Itinerary> itinerariesPage;
@@ -156,10 +161,18 @@ public class ItineraryService {
             );
         }
 
-        List<ItineraryDTO> itineraryDTOs = this.itineraryMapper.toDTOs(itinerariesPage.getContent());
+        List<Itinerary> itineraries = itinerariesPage.getContent();
+        List<ItineraryDTO> itineraryDTOs = this.itineraryMapper.toDTOs(itineraries);
 
-        return new PaginatedDTO<ItineraryDTO>(
-            itineraryDTOs,
+        List<ItineraryResponseDTO> responseDTOs = new ArrayList<>();
+        for (int i = 0; i < itineraries.size(); i++) {
+            Itinerary itinerary = itineraries.get(i);
+            PermissionsDTO permissions = this.createPermissionsDTO(itinerary, authenticatedUser);
+            responseDTOs.add(new ItineraryResponseDTO(itineraryDTOs.get(i), permissions));
+        }
+
+        return new PaginatedDTO<ItineraryResponseDTO>(
+            responseDTOs,
             itinerariesPage.getNumber(),
             itinerariesPage.getTotalPages(),
             itinerariesPage.getTotalElements(),
@@ -172,10 +185,10 @@ public class ItineraryService {
      * Retrieves an itinerary by its ID, ensuring the authenticated user has view permission.
      *
      * @param id the ID of the itinerary to retrieve
-     * @return the ItineraryDTO for the specified ID
      * @throws ResponseStatusException NOT_FOUND | FORBIDDEN
+     * @return the ExtendedItineraryResponseDTO for the specified ID
      */
-    public ExtendedItineraryDTO getItineraryById(Long id) throws ResponseStatusException {
+    public ExtendedItineraryResponseDTO getItineraryById(Long id) throws ResponseStatusException {
         Itinerary itinerary = this.itineraryRepository.findById(id).orElseThrow(
             () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Itinerary with ID %d not found", id))
         );
@@ -186,7 +199,10 @@ public class ItineraryService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this itinerary");
         }
 
-        return this.itineraryMapper.toExtendedDTO(itinerary);
+        PermissionsDTO permissions = this.createPermissionsDTO(itinerary, authenticatedUser);
+        ExtendedItineraryDTO dto = this.itineraryMapper.toExtendedDTO(itinerary);
+
+        return new ExtendedItineraryResponseDTO(dto, permissions);
     }
 
     /**
@@ -194,11 +210,11 @@ public class ItineraryService {
      *
      * @param id the ID of the itinerary to update
      * @param itineraryDTO the DTO containing updated itinerary data
-     * @return the updated ItineraryDTO
      * @throws ResponseStatusException NOT_FOUND | FORBIDDEN
+     * @return the updated ExtendedItineraryResponseDTO
      */
     @Transactional
-    public ExtendedItineraryDTO updateItinerary(Long id, ExtendedItineraryDTO itineraryDTO) throws ResponseStatusException {
+    public ExtendedItineraryResponseDTO updateItinerary(Long id, ExtendedItineraryDTO itineraryDTO) throws ResponseStatusException {
         Itinerary itinerary = this.itineraryRepository.findById(id).orElseThrow(
             () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Itinerary with ID %d not found", id))
         );
@@ -227,7 +243,13 @@ public class ItineraryService {
         itinerary.setUpdatedCount(itinerary.getUpdatedCount() + 1);
 
         // Save and return the updated DTO
-        return this.itineraryMapper.toExtendedDTO(this.itineraryRepository.save(itinerary));
+        ExtendedItineraryDTO dto = this.itineraryMapper.toExtendedDTO(this.itineraryRepository.save(itinerary));
+        
+        PermissionsDTO permissions = new PermissionsDTO(
+            true, true, this.itineraryPermissionService.canDelete(itinerary, authenticatedUser)
+        );
+
+        return new ExtendedItineraryResponseDTO(dto, permissions);
     }
 
     /**
@@ -295,6 +317,14 @@ public class ItineraryService {
             itineraryDTO.status() != null
                 ? ItineraryStatus.valueOf(itineraryDTO.status().name())
                 : ItineraryStatus.DRAFT
+        );
+    }
+
+    private PermissionsDTO createPermissionsDTO(Itinerary itinerary, User user) {
+        return new PermissionsDTO(
+            this.itineraryPermissionService.canView(itinerary, user),
+            this.itineraryPermissionService.canEdit(itinerary, user),
+            this.itineraryPermissionService.canDelete(itinerary, user)
         );
     }
 }

@@ -45,7 +45,11 @@ public class ItineraryEndpointsTest extends BaseIntegrationTest {
             .body("days[0].activities", hasSize(1))
             .body("days[0].activities[0].activity", equalTo(
                 itineraryDTO.days().get(0).activities().get(0).activity()
-            ));
+            ))
+            .body("permissions", notNullValue())
+            .body("permissions.view", is(true))
+            .body("permissions.edit", is(true))
+            .body("permissions.delete", is(true));
     }
 
     @Test
@@ -97,7 +101,11 @@ public class ItineraryEndpointsTest extends BaseIntegrationTest {
             .body("itemsPerPage", equalTo(10))
             .body("totalItems", greaterThanOrEqualTo(1))
             .body("totalPages", greaterThanOrEqualTo(1))
-            .body("isLastPage", is(true));
+            .body("isLastPage", is(true))
+            .body("page[0].permissions", notNullValue())
+            .body("page[0].permissions.view", is(true))
+            .body("page[0].permissions.edit", is(true))
+            .body("page[0].permissions.delete", is(true));
     }
 
     @Test
@@ -182,7 +190,11 @@ public class ItineraryEndpointsTest extends BaseIntegrationTest {
             .statusCode(200)
             .body("id", equalTo(itineraryId.intValue()))
             .body("place", equalTo(itineraryDTO.place()))
-            .body("place", equalTo("Paris"));
+            .body("place", equalTo("Paris"))
+            .body("permissions", notNullValue())
+            .body("permissions.view", is(true))
+            .body("permissions.edit", is(true))
+            .body("permissions.delete", is(true));
     }
 
     @Test

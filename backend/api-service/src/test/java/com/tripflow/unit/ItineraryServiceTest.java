@@ -14,7 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
 
 import com.tripflow.dto.itinerary.ExtendedItineraryDTO;
+import com.tripflow.dto.itinerary.ExtendedItineraryResponseDTO;
 import com.tripflow.dto.itinerary.ItineraryDTO;
+import com.tripflow.dto.itinerary.ItineraryResponseDTO;
 import com.tripflow.dto.itinerary.ItineraryDayDTO;
 import com.tripflow.dto.shared.PaginatedDTO;
 import com.tripflow.mappers.ItineraryMapper;
@@ -84,9 +86,12 @@ public class ItineraryServiceTest {
         ExtendedItineraryDTO expectedDTO = mock(ExtendedItineraryDTO.class);
         when(itineraryMapper.toExtendedDTO(savedItinerary)).thenReturn(expectedDTO);
 
-        ExtendedItineraryDTO result = itineraryService.createItinerary(dto);
+        ExtendedItineraryResponseDTO result = itineraryService.createItinerary(dto);
 
-        assertEquals(expectedDTO, result);
+        assertEquals(expectedDTO, result.itinerary());
+        assertTrue(result.permissions().view());
+        assertTrue(result.permissions().edit());
+        assertTrue(result.permissions().delete());
         verify(itineraryRepository).save(any(Itinerary.class));
         verify(itineraryDayService).createItineraryDayEntity(any(), any());
         verify(user).addItinerary(any(Itinerary.class));
@@ -111,8 +116,11 @@ public class ItineraryServiceTest {
 
         ItineraryDTO itineraryDTO = mock(ItineraryDTO.class);
         when(itineraryMapper.toDTOs(itineraryList)).thenReturn(List.of(itineraryDTO));
+        when(itineraryPermissionService.canView(itinerary, user)).thenReturn(true);
+        when(itineraryPermissionService.canEdit(itinerary, user)).thenReturn(true);
+        when(itineraryPermissionService.canDelete(itinerary, user)).thenReturn(false);
 
-        PaginatedDTO<ItineraryDTO> result = itineraryService.getAllItineraries(pageable, null);
+        PaginatedDTO<ItineraryResponseDTO> result = itineraryService.getAllItineraries(pageable, null);
 
         assertEquals(1, result.page().size());
         assertEquals(0, result.currentPage());
@@ -152,9 +160,10 @@ public class ItineraryServiceTest {
         ExtendedItineraryDTO expectedDTO = mock(ExtendedItineraryDTO.class);
         when(itineraryMapper.toExtendedDTO(updatedItinerary)).thenReturn(expectedDTO);
 
-        ExtendedItineraryDTO result = itineraryService.updateItinerary(itineraryId, dto);
+        ExtendedItineraryResponseDTO result = itineraryService.updateItinerary(itineraryId, dto);
 
-        assertEquals(expectedDTO, result);
+        assertEquals(expectedDTO, result.itinerary());
+        assertTrue(result.permissions().edit());
         verify(itineraryDayService).deleteAllDaysByItinerary(itinerary);
         verify(itineraryDayService).createItineraryDayEntity(any(), eq(itinerary));
         verify(itineraryRepository).save(itinerary);
@@ -208,9 +217,10 @@ public class ItineraryServiceTest {
         ExtendedItineraryDTO expectedDTO = mock(ExtendedItineraryDTO.class);
         when(itineraryMapper.toExtendedDTO(itinerary)).thenReturn(expectedDTO);
 
-        ExtendedItineraryDTO result = itineraryService.getItineraryById(1L);
+        ExtendedItineraryResponseDTO result = itineraryService.getItineraryById(1L);
 
-        assertEquals(expectedDTO, result);
+        assertEquals(expectedDTO, result.itinerary());
+        assertTrue(result.permissions().view());
     }
 
     @Test
