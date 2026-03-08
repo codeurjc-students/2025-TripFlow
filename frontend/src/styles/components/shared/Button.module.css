@@ -150,7 +150,7 @@
     }
 }
 
-.tool_bordered {
+.tool_bordered, .bordered {
     --size: 42px;
     height: var(--size);
     width: var(--size);
@@ -188,7 +188,6 @@
     }
 
     &.active {
-        color: var(--primary);
         filter: brightness(1.20);
     }
 
@@ -201,6 +200,11 @@
             filter: none;
         }
     }
+}
+
+.bordered {
+    width: max-content;
+    padding-inline: var(--space-sm);
 }
 
 .inline {

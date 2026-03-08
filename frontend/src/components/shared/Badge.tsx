@@ -4,7 +4,7 @@ import type { ItineraryStatus } from "@/types/itinerary";
 
 import { formatStatus } from "@/utils/formatUtils";
 
-type BadgeStyle = "thin" | "default" | "semi_thin" | "alpha";
+type BadgeStyle = "thin" | "default" | "semi_thin" | "alpha" | "owner" | "editor" | "viewer";
 
 interface BadgeProps {
     style: BadgeStyle[] | BadgeStyle;

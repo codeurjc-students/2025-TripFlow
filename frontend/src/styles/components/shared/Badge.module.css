@@ -35,15 +35,18 @@
         background-color: var(--active);
     }
 
-    &.ongoing {
+    &.ongoing,
+    &.editor {
         background-color: var(--info);
     }
 
-    &.completed {
+    &.completed,
+    &.owner {
         background-color: var(--done);
     }
 
-    &.draft {
+    &.draft,
+    &.viewer {
         background-color: var(--draft);
     }
 

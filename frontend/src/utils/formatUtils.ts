@@ -1,4 +1,5 @@
 import type { ItineraryStatus } from "@/types/itinerary";
+import type { CollaboratorRole } from "@/types/collaboration";
 
 interface FormatDateOptions {
     excludeDay?: boolean;
@@ -44,4 +45,11 @@ export const formatStatus = (status: ItineraryStatus) => {
 
 export const formatImageAuthorUrl = (username: string) => {
     return `https://unsplash.com/@${username}`;
+};
+
+export const formatCollaboratorRole = (role: CollaboratorRole) => {
+    if (role === "OWNER") return "Propietario";
+    if (role === "EDITOR") return "Editor";
+    if (role === "VIEWER") return "Lector";
+    return role;
 };
