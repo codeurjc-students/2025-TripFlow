@@ -89,7 +89,8 @@ const mockItinerary: ExtendedItinerary = {
         altDescription: "Vista de la Torre Eiffel",
         imageUrl: "https://example.com/torre-eiffel.jpg",
         authorUsername: "usuario_ejemplo"
-    }
+    },
+    permissions: { view: true, edit: true, delete: true }
 };
 
 const mockEmptyItinerary: ExtendedItinerary = {
@@ -107,7 +108,8 @@ const mockEmptyItinerary: ExtendedItinerary = {
         altDescription: "",
         imageUrl: "",
         authorUsername: "",
-    }
+    },
+    permissions: { view: true, edit: true, delete: true }
 };
 
 describe("ItineraryEditForm Component", () => {

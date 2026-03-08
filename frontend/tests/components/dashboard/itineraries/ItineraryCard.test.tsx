@@ -29,7 +29,8 @@ describe("ItineraryCard Component", () => {
             altDescription: "Una hermosa vista de la Torre Eiffel",
             imageUrl: "https://example.com/eiffel-tower.jpg",
             authorUsername: "photographer789",
-        }
+        },
+        permissions: { view: true, edit: true, delete: true }
     };
 
     it("renders itinerary information", () => {

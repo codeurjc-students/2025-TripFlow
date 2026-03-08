@@ -63,7 +63,8 @@ const mockItineraries = [
             altDescription: "Tokyo cityscape",
             imageUrl: "https://example.com/tokyo.jpg",
             authorUsername: "photographer1"
-        }
+        },
+        permissions: { view: true, edit: true, delete: true }
     },
     {
         id: 2,
@@ -80,7 +81,8 @@ const mockItineraries = [
             altDescription: "Cusco mountains",
             imageUrl: "https://example.com/cusco.jpg",
             authorUsername: "photographer2"
-        }
+        },
+        permissions: { view: true, edit: true, delete: true }
     },
 ];
 

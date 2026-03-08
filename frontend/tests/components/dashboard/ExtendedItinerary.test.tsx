@@ -81,7 +81,8 @@ const mockItinerary: ExtendedItineraryType = {
         altDescription: "Vista del Monte Fuji",
         imageUrl: "https://example.com/monte-fuji.jpg",
         authorUsername: "fotografo123",
-    }
+    },
+    permissions: { view: true, edit: true, delete: true }
 };
 
 describe("ExtendedItinerary Component", () => {

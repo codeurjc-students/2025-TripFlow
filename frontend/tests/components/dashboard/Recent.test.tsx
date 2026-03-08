@@ -50,7 +50,8 @@ const mockItineraries: PageResponse<Itinerary> = {
         altDescription: "A beautiful view of Mount Fuji",
         imageUrl: "https://example.com/mount-fuji.jpg",
         authorUsername: "photographer123",
-      }
+      },
+      permissions: { view: true, edit: true, delete: true }
     },
     {
       id: 2,
@@ -66,7 +67,8 @@ const mockItineraries: PageResponse<Itinerary> = {
         altDescription: "A beautiful view of Machu Picchu",
         imageUrl: "https://example.com/machu-picchu.jpg",
         authorUsername: "photographer456",
-      }
+      },
+      permissions: { view: true, edit: true, delete: true }
     },
   ],
   currentPage: 0,
