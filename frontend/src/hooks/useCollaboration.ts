@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { Collaborator, CollaboratorRole } from "@/types/collaboration";
 
@@ -10,6 +10,7 @@ import {
 } from "@/services/collaborationService";
 
 import { useNotification } from "@/providers/notificationProvider";
+import { useWebSocketNotifications } from "@/hooks/notifications/useWebSocketNotifications";
 
 /**
  * Custom hook to manage collaboration state and actions for an itinerary.
@@ -20,17 +21,26 @@ export function useCollaboration(itineraryId: number) {
 
     const { notify } = useNotification();
 
-    const fetchCollaborators = async () => {
+    const fetchCollaborators = async (silent = false) => {
         try {
-            setIsLoading(true);
+            if (!silent) setIsLoading(true);
             const data = await getCollaborators(itineraryId);
             setCollaborators(data);
         } catch {
-            notify("Error al cargar los colaboradores", "error");
+            if (!silent) notify("Error al cargar los colaboradores", "error");
         } finally {
-            setIsLoading(false);
+            if (!silent) setIsLoading(false);
         }
     };
+
+    const silentRefresh = useCallback(() => {
+        fetchCollaborators(true);
+    }, [itineraryId]);
+
+    useWebSocketNotifications({
+        types: ["INVITATION_RECEIVED", "INVITATION_ACCEPTED"],
+        onNotification: silentRefresh,
+    });
 
     const inviteCollaborator = async (username: string, role: CollaboratorRole) => {
         try {
@@ -68,6 +78,17 @@ export function useCollaboration(itineraryId: number) {
         }
     };
 
+    const leaveItinerary = async (username: string) => {
+        try {
+            await removeCollaboratorService(itineraryId, username);
+            notify("Has abandonado el itinerario", "info");
+            return true;
+        } catch {
+            notify("Error al abandonar el itinerario", "error");
+            return false;
+        }
+    };
+
     useEffect(() => {
         fetchCollaborators();
     }, [itineraryId]);
@@ -78,5 +99,6 @@ export function useCollaboration(itineraryId: number) {
         inviteCollaborator,
         updateRole,
         removeCollaborator,
+        leaveItinerary,
     };
 }

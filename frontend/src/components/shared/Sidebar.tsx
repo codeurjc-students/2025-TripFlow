@@ -5,6 +5,7 @@ import { useLocation } from "react-router";
 import {
     HomeIcon,
     MapIcon,
+    BellIcon,
     UserIcon,
 } from "lucide-react";
 
@@ -14,6 +15,7 @@ import Logo from "@components/shared/Logo";
 const ROUTES = [
     { path: "/dashboard", label: "Dashboard", icon: <HomeIcon /> },
     { path: "/itineraries", label: "Itinerarios", icon: <MapIcon /> },
+    { path: "/notifications", label: "Notificaciones", icon: <BellIcon /> },
     { path: "/profile", label: "Perfil", icon: <UserIcon /> },
 ];
 

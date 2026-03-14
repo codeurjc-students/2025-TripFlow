@@ -9,8 +9,11 @@ import {
     LockIcon, 
     EyeIcon, 
     EditIcon, 
-    NavigationOffIcon 
+    NavigationOffIcon,
+    LogOutIcon
 } from "lucide-react";
+
+import { useNavigate } from "react-router";
 
 import type { Collaborator, CollaboratorRole } from "@/types/collaboration";
 import { useCollaboration } from "@/hooks/useCollaboration";
@@ -39,6 +42,7 @@ export default function CollaborationModal({
     itineraryId,
 }: CollaborationModalProps) {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [inviteUsername, setInviteUsername] = useState("");
     const [inviteRole, setInviteRole] = useState<CollaboratorRole>("VIEWER");
 
@@ -48,7 +52,17 @@ export default function CollaborationModal({
         inviteCollaborator,
         updateRole,
         removeCollaborator,
+        leaveItinerary,
     } = useCollaboration(itineraryId);
+
+    const handleLeave = async () => {
+        if (!user) return;
+        const success = await leaveItinerary(user.username);
+        if (success) {
+            onClose();
+            navigate("/itineraries");
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -142,6 +156,7 @@ export default function CollaborationModal({
                                         currentUserId={user?.username}
                                         onUpdateRole={updateRole}
                                         onRemove={removeCollaborator}
+                                        onLeave={handleLeave}
                                     />
                                 ))}
                             </div>
@@ -159,6 +174,7 @@ interface CollaboratorListItemProps {
     currentUserId?: string;
     onUpdateRole: (username: string, role: CollaboratorRole) => Promise<boolean>;
     onRemove: (username: string) => Promise<boolean>;
+    onLeave: () => void;
 }
 
 function CollaboratorListItem({
@@ -167,6 +183,7 @@ function CollaboratorListItem({
     currentUserId,
     onUpdateRole,
     onRemove,
+    onLeave,
 }: CollaboratorListItemProps) {
     const isCurrentUser = collaborator.user.username === currentUserId;
     const isPending = collaborator.status === "PENDING";
@@ -204,7 +221,18 @@ function CollaboratorListItem({
                         )}
                     </>
                 ) : !isOwner ? (
-                    <Badge style={["thin", collaborator.role.toLowerCase() as any]} title={formatCollaboratorRole(collaborator.role)} />
+                    <>
+                        <Badge style={["thin", collaborator.role.toLowerCase() as any]} title={formatCollaboratorRole(collaborator.role)} />
+                        {isCurrentUser && collaborator.status === "ACCEPTED" && (
+                            <Button
+                                style={["tool_bordered", "danger"]}
+                                onClick={onLeave}
+                                ariaLabel="Abandonar itinerario"
+                            >
+                                <LogOutIcon size={16} />
+                            </Button>
+                        )}
+                    </>
                 ) : isPending ? (
                     <Button
                         style={["tool_bordered", "danger"]}

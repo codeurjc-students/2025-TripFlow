@@ -1,0 +1,165 @@
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xxl);
+    padding-inline: var(--app-padding);
+}
+
+.loaderContainer {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-largest) 0;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-largest) 0;
+    color: var(--text-tertiary);
+    text-align: center;
+
+    h3 {
+        font-size: var(--font-size-xl);
+        color: var(--text-primary);
+    }
+
+    p {
+        font-size: var(--font-size-sm);
+        color: var(--text-tertiary);
+    }
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.groupLabel {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.invitationList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+/* Card: 3-column layout */
+.card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--space-xl);
+    padding: var(--space-lg);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--border-radius-xl);
+    transition: border-color 0.2s ease;
+
+    @media (hover: hover) {
+        &:hover {
+            border-color: var(--border-subtle);
+        }
+    }
+}
+
+/* Column 1: Avatar */
+.avatarWrapper {
+    position: relative;
+    flex-shrink: 0;
+
+    .iconBadge {
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        width: 20px;
+        height: 20px;
+        border-radius: var(--border-radius-full);
+        background: var(--primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--bg-secondary);
+    }
+}
+
+/* Column 2: Info */
+.cardInfo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    min-width: 0;
+}
+
+.cardTitle {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.cardDescription {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    line-height: 1.5;
+
+    strong {
+        color: var(--text-secondary);
+        font-weight: var(--font-weight-bold);
+    }
+}
+
+/* Column 3: Date + Actions */
+.cardRight {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-lg);
+}
+
+.cardMeta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.timeAgo {
+    font-size: var(--font-size-xxs);
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.unreadDot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--border-radius-full);
+    background-color: var(--primary);
+    flex-shrink: 0;
+}
+
+.cardActions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+@media (max-width: 768px) {
+    .card {
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .cardRight {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
