@@ -7,6 +7,7 @@ import com.tripflow.dto.user.PublicUserDTO;
 public record CollaboratorDTO(
     Long id,
     PublicUserDTO user,
+    String fromUser,
     CollaboratorRoleDTO role,
     InvitationStatusDTO status,
     LocalDateTime invitedAt,

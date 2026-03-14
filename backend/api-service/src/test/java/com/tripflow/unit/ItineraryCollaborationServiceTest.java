@@ -116,7 +116,7 @@ public class ItineraryCollaborationServiceTest {
             ItineraryCollaborator saved = new ItineraryCollaborator(CollaboratorRole.VIEWER, collaboratorUser, itinerary);
             when(itineraryCollaboratorRepository.save(any(ItineraryCollaborator.class))).thenReturn(saved);
 
-            CollaboratorDTO expectedDTO = new CollaboratorDTO(1L, publicCollaboratorDTO, CollaboratorRoleDTO.VIEWER, InvitationStatusDTO.PENDING, LocalDateTime.now(), null, 1L, "Test Trip");
+            CollaboratorDTO expectedDTO = new CollaboratorDTO(1L, publicCollaboratorDTO, "owner", CollaboratorRoleDTO.VIEWER, InvitationStatusDTO.PENDING, LocalDateTime.now(), null, 1L, "Test Trip");
             when(collaboratorMapper.toDTO(saved)).thenReturn(expectedDTO);
 
             CollaboratorDTO result = collaborationService.sendInvitation(1L, request);
@@ -227,7 +227,7 @@ public class ItineraryCollaborationServiceTest {
             ItineraryCollaborator saved = new ItineraryCollaborator(CollaboratorRole.EDITOR, collaboratorUser, itinerary);
             when(itineraryCollaboratorRepository.save(any(ItineraryCollaborator.class))).thenReturn(saved);
 
-            CollaboratorDTO expectedDTO = new CollaboratorDTO(1L, publicCollaboratorDTO, CollaboratorRoleDTO.EDITOR, InvitationStatusDTO.PENDING, LocalDateTime.now(), null, 1L, "Test Trip");
+            CollaboratorDTO expectedDTO = new CollaboratorDTO(1L, publicCollaboratorDTO, "owner", CollaboratorRoleDTO.EDITOR, InvitationStatusDTO.PENDING, LocalDateTime.now(), null, 1L, "Test Trip");
             when(collaboratorMapper.toDTO(saved)).thenReturn(expectedDTO);
 
             CollaboratorDTO result = collaborationService.sendInvitation(1L, request);
@@ -255,7 +255,7 @@ public class ItineraryCollaborationServiceTest {
             when(itineraryCollaboratorRepository.findByItineraryAndUser(itinerary, collaboratorUser)).thenReturn(Optional.of(pending));
             when(itineraryCollaboratorRepository.save(any(ItineraryCollaborator.class))).thenReturn(pending);
 
-            CollaboratorDTO expectedDTO = new CollaboratorDTO(1L, publicCollaboratorDTO, CollaboratorRoleDTO.VIEWER, InvitationStatusDTO.ACCEPTED, LocalDateTime.now(), LocalDateTime.now(), 1L, "Test Trip");
+            CollaboratorDTO expectedDTO = new CollaboratorDTO(1L, publicCollaboratorDTO, "owner", CollaboratorRoleDTO.VIEWER, InvitationStatusDTO.ACCEPTED, LocalDateTime.now(), LocalDateTime.now(), 1L, "Test Trip");
             when(collaboratorMapper.toDTO(any(ItineraryCollaborator.class))).thenReturn(expectedDTO);
 
             CollaboratorDTO result = collaborationService.acceptInvitation(1L, "collaborator");
@@ -416,7 +416,7 @@ public class ItineraryCollaborationServiceTest {
             when(itineraryCollaboratorRepository.findByItineraryAndUser(itinerary, collaboratorUser)).thenReturn(Optional.of(existing));
             when(itineraryCollaboratorRepository.save(any(ItineraryCollaborator.class))).thenReturn(existing);
 
-            CollaboratorDTO expectedDTO = new CollaboratorDTO(1L, publicCollaboratorDTO, CollaboratorRoleDTO.EDITOR, InvitationStatusDTO.ACCEPTED, LocalDateTime.now(), LocalDateTime.now(), 1L, "Test Trip");
+            CollaboratorDTO expectedDTO = new CollaboratorDTO(1L, publicCollaboratorDTO, "owner", CollaboratorRoleDTO.EDITOR, InvitationStatusDTO.ACCEPTED, LocalDateTime.now(), LocalDateTime.now(), 1L, "Test Trip");
             when(collaboratorMapper.toDTO(any(ItineraryCollaborator.class))).thenReturn(expectedDTO);
 
             CollaboratorDTO result = collaborationService.updateCollaboratorRole(1L, "collaborator", request);
@@ -598,7 +598,7 @@ public class ItineraryCollaborationServiceTest {
             collab.setStatus(InvitationStatus.ACCEPTED);
             when(itineraryCollaboratorRepository.findByItinerary(itinerary)).thenReturn(List.of(collab));
 
-            CollaboratorDTO collabDTO = new CollaboratorDTO(2L, publicCollaboratorDTO, CollaboratorRoleDTO.VIEWER, InvitationStatusDTO.ACCEPTED, LocalDateTime.now(), LocalDateTime.now(), 1L, "Test Trip");
+            CollaboratorDTO collabDTO = new CollaboratorDTO(2L, publicCollaboratorDTO, "owner", CollaboratorRoleDTO.VIEWER, InvitationStatusDTO.ACCEPTED, LocalDateTime.now(), LocalDateTime.now(), 1L, "Test Trip");
             when(collaboratorMapper.toDTOs(List.of(collab))).thenReturn(List.of(collabDTO));
 
             List<CollaboratorDTO> result = collaborationService.getCollaborators(1L);
@@ -647,7 +647,7 @@ public class ItineraryCollaborationServiceTest {
             ItineraryCollaborator pending = new ItineraryCollaborator(CollaboratorRole.VIEWER, collaboratorUser, itinerary);
             when(itineraryCollaboratorRepository.findByUserAndStatus(collaboratorUser, InvitationStatus.PENDING)).thenReturn(List.of(pending));
 
-            CollaboratorDTO pendingDTO = new CollaboratorDTO(1L, publicCollaboratorDTO, CollaboratorRoleDTO.VIEWER, InvitationStatusDTO.PENDING, LocalDateTime.now(), null, 1L, "Test Trip");
+            CollaboratorDTO pendingDTO = new CollaboratorDTO(1L, publicCollaboratorDTO, "owner", CollaboratorRoleDTO.VIEWER, InvitationStatusDTO.PENDING, LocalDateTime.now(), null, 1L, "Test Trip");
             when(collaboratorMapper.toDTOs(List.of(pending))).thenReturn(List.of(pendingDTO));
 
             List<CollaboratorDTO> result = collaborationService.getPendingInvitations("collaborator");

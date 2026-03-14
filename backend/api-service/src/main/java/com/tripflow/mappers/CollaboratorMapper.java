@@ -12,6 +12,7 @@ import com.tripflow.model.itinerary.ItineraryCollaborator;
 public interface CollaboratorMapper {
     @Mapping(source = "itinerary.id", target = "itineraryId")
     @Mapping(source = "itinerary.title", target = "itineraryTitle")
+    @Mapping(source = "itinerary.user.username", target = "fromUser")
     CollaboratorDTO toDTO(ItineraryCollaborator collaborator);
 
     List<CollaboratorDTO> toDTOs(List<ItineraryCollaborator> collaborators);
