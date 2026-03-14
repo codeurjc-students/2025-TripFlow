@@ -21,5 +21,17 @@ export const getNotificationDetails = (type: NotificationType): NotificationDeta
                 message: "Hubo un error al generar tu itinerario",
                 type: "error",
             };
+        case "INVITATION_RECEIVED":
+            return {
+                title: "Nueva invitación",
+                message: "Has recibido una invitación para colaborar en un viaje",
+                type: "info",
+            };
+        case "INVITATION_ACCEPTED":
+            return {
+                title: "Invitación aceptada",
+                message: "Un usuario ha aceptado tu invitación de colaboración",
+                type: "success",
+            };
     }
 }

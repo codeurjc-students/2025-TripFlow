@@ -3,6 +3,17 @@ import type { Collaborator, AddCollaboratorRequest, UpdateCollaboratorRequest } 
 import { http } from "@services/httpService";
 
 const BASE_PATH = "/api/v1/itineraries";
+const USERS_PATH = "/api/v1/users";
+
+/**
+ * Retrieves all pending collaboration invitations for a user.
+ *
+ * @param username The username of the user.
+ * @returns A promise that resolves to the list of pending invitations.
+ */
+export async function getPendingInvitations(username: string): Promise<Collaborator[]> {
+    return http<Collaborator[]>(`${USERS_PATH}/${username}/invitations`, "GET");
+}
 
 /**
  * Retrieves all collaborators of an itinerary.

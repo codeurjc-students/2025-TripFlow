@@ -6,6 +6,7 @@ export type InvitationStatus = "PENDING" | "ACCEPTED";
 export interface Collaborator {
     id: number;
     user: PublicUser;
+    fromUser: string;
     role: CollaboratorRole;
     status: InvitationStatus;
     invitedAt: string;
