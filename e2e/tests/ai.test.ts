@@ -82,6 +82,10 @@ test.describe("AI Generation", () => {
         await generateBtn.click();
         
         await expect(page.getByRole("button", { name: /generando/i })).toBeVisible();
-        await expect(page.getByText(/solicitud recibida/i)).toBeVisible({ timeout: 20000 });
+
+        // Accept both success and rate-limit outcomes (3 requests/day limit)
+        const successNotification = page.getByText(/solicitud recibida/i);
+        const rateLimitNotification = page.getByText(/límite diario alcanzado/i);
+        await expect(successNotification.or(rateLimitNotification)).toBeVisible({ timeout: 20000 });
     });
 });

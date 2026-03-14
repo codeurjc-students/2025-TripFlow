@@ -61,29 +61,35 @@ export default function AIGeneration() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        const response = await generateItinerary(form);
 
-        if (response?.aiUsage) {
-            setAiUsage(response.aiUsage);
-        }
+        try {
+            const response = await generateItinerary(form);
 
-        resetForm();
+            if (response?.aiUsage) {
+                setAiUsage(response.aiUsage);
+            }
 
-        // Handle rate limit
-        if (!response || !response.aiUsage) {
-            setRateLimit(true);
-            setIsLoading(false);
-            notify("Has alcanzado el límite diario de generaciones.", "error", {
-                title: "Límite diario alcanzado"
+            resetForm();
+
+            // Handle rate limit
+            if (!response || !response.aiUsage) {
+                setRateLimit(true);
+                setIsLoading(false);
+                notify("Has alcanzado el límite diario de generaciones.", "error", {
+                    title: "Límite diario alcanzado"
+                });
+                return;
+            }
+
+            notify("Tu solicitud se está procesando.", "success", {
+                title: "Solicitud recibida!"
             });
-            return;
+
+            setRateLimit(false);
+        } catch {
+            setIsLoading(false);
+            notify("Error al generar el itinerario. Inténtalo de nuevo.", "error");
         }
-
-        notify("Tu solicitud se está procesando.", "success", {
-            title: "Solicitud recibida!"
-        });
-
-        setRateLimit(false);
     };
 
     return (
