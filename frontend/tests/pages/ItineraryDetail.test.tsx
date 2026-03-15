@@ -24,11 +24,15 @@ vi.mock("@/providers/notificationProvider", async () => {
     };
 });
 
-vi.mock("@react-pdf/renderer", () => ({
-    pdf: vi.fn(() => ({
-        toBlob: mockToBlob,
-    })),
-}));
+vi.mock("@react-pdf/renderer", async () => {
+    const actual = await vi.importActual<typeof import("@react-pdf/renderer")>("@react-pdf/renderer");
+    return {
+        ...actual,
+        pdf: vi.fn(() => ({
+            toBlob: mockToBlob,
+        })),
+    };
+});
 
 // Mock React Router
 vi.mock("react-router", async () => {
