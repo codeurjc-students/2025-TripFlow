@@ -20,6 +20,7 @@ import {
     ChevronLeft,
     ChevronRight,
     ListIcon,
+    Download,
     Maximize2Icon,
     Users2Icon,
 } from "lucide-react";
@@ -32,11 +33,12 @@ import ActivityCard from "@components/dashboard/itineraries/ActivityCard";
 interface ExtendedItineraryProps {
     itinerary: ExtendedItinerary;
     onOpenCollaboration?: () => void;
+    onExportPdf?: () => void;
 }
 
 const ICON_SIZE = 24;
 
-export default function ExtendedItinerary({ itinerary, onOpenCollaboration }: ExtendedItineraryProps) {
+export default function ExtendedItinerary({ itinerary, onOpenCollaboration, onExportPdf }: ExtendedItineraryProps) {
     const [currentDayIndex, setCurrentDayIndex] = useState(0);
     const [isFocusMode, setIsFocusMode] = useState(false);
 
@@ -90,6 +92,16 @@ export default function ExtendedItinerary({ itinerary, onOpenCollaboration }: Ex
                             >
                                 <Maximize2Icon size={20} />
                             </Button>
+
+                            {onExportPdf && (
+                                <Button
+                                    style={["tool_bordered"]}
+                                    onClick={onExportPdf}
+                                    ariaLabel="Exportar itinerario en PDF"
+                                >
+                                    <Download size={20} />
+                                </Button>
+                            )}
 
                             {onOpenCollaboration && (
                                 <Button
