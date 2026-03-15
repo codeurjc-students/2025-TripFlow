@@ -1,14 +1,33 @@
 import ItineraryDetailPage from "@pages/itineraries/ItineraryDetail";
 
-import { render, screen, waitFor } from "@tests/utils/testUtils";
+import { render, screen, waitFor, fireEvent } from "@tests/utils/testUtils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { getItineraryById } from "@/services/itineraryService";
+import { useNotification } from "@/providers/notificationProvider";
+import { pdf } from "@react-pdf/renderer";
 import type { ExtendedItinerary, ItineraryStatus } from "@/types/itinerary";
+
+const mockNotify = vi.fn();
+const mockToBlob = vi.fn();
 
 // Mock service
 vi.mock("@/services/itineraryService", () => ({
     getItineraryById: vi.fn(),
+}));
+
+vi.mock("@/providers/notificationProvider", async () => {
+    const actual = await vi.importActual("@/providers/notificationProvider");
+    return {
+        ...actual,
+        useNotification: vi.fn(),
+    };
+});
+
+vi.mock("@react-pdf/renderer", () => ({
+    pdf: vi.fn(() => ({
+        toBlob: mockToBlob,
+    })),
 }));
 
 // Mock React Router
@@ -31,16 +50,20 @@ vi.mock("@/layouts/AppLayout", () => ({
 }));
 
 vi.mock("@/components/dashboard/headers/InnerTabHeader", () => ({
-    default: ({ title, back }: { title: string; back: { url: string } }) => (
+    default: ({ title, back, right }: { title: string; back: { url: string }; right?: React.ReactNode }) => (
         <header data-testid="inner-tab-header" data-back-url={back?.url}>
             <h1>{title}</h1>
+            {right}
         </header>
     ),
 }));
 
 vi.mock("@/components/dashboard/itineraries/ExtendedItinerary", () => ({
-    default: ({ itinerary }: any) => (
+    default: ({ itinerary, onExportPdf }: any) => (
         <div data-testid="extended-itinerary" data-itinerary-id={itinerary?.id}>
+            <button onClick={onExportPdf} aria-label="Exportar itinerario en PDF">
+                Exportar PDF
+            </button>
         </div>
     ),
 }));
@@ -75,6 +98,18 @@ const mockItinerary: ExtendedItinerary = {
 describe("ItineraryDetail Page", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useNotification).mockReturnValue({ notify: mockNotify });
+        mockToBlob.mockResolvedValue(new Blob(["pdf"], { type: "application/pdf" }));
+
+        Object.defineProperty(globalThis.URL, "createObjectURL", {
+            writable: true,
+            value: vi.fn(() => "blob:mock-pdf"),
+        });
+
+        Object.defineProperty(globalThis.URL, "revokeObjectURL", {
+            writable: true,
+            value: vi.fn(),
+        });
     });
 
     it("renders itinerary detail page", async () => {
@@ -175,5 +210,44 @@ describe("ItineraryDetail Page", () => {
 
         expect(screen.getByTestId("inner-tab-header")).toBeInTheDocument();
         expect(screen.getByTestId("extended-itinerary")).toBeInTheDocument();
+    });
+
+    it("exports itinerary as pdf and notifies success", async () => {
+        vi.mocked(getItineraryById).mockResolvedValue(mockItinerary);
+
+        render(<ItineraryDetailPage />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId("extended-itinerary")).toBeInTheDocument();
+        });
+
+        fireEvent.click(
+            screen.getByRole("button", { name: /exportar itinerario en pdf/i })
+        );
+
+        await waitFor(() => {
+            expect(pdf).toHaveBeenCalled();
+            expect(mockToBlob).toHaveBeenCalled();
+            expect(mockNotify).toHaveBeenCalledWith("Itinerario exportado en PDF", "success");
+        });
+    });
+
+    it("notifies error when pdf export fails", async () => {
+        vi.mocked(getItineraryById).mockResolvedValue(mockItinerary);
+        mockToBlob.mockRejectedValue(new Error("export failed"));
+
+        render(<ItineraryDetailPage />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId("extended-itinerary")).toBeInTheDocument();
+        });
+
+        fireEvent.click(
+            screen.getByRole("button", { name: /exportar itinerario en pdf/i })
+        );
+
+        await waitFor(() => {
+            expect(mockNotify).toHaveBeenCalledWith("No se pudo exportar el itinerario", "error");
+        });
     });
 });
