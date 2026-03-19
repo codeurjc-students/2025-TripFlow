@@ -188,9 +188,9 @@
 
 ### ⚛️ Frontend
 
-- [ ] {Feature} Interactive Maps Integration
-  - [ ] {UI} Map visualization component (Leaflet/Mapbox)
-  - [ ] {UI} Plotting daily itinerary routes
+- [x] {Feature} Interactive Maps Integration
+  - [x] {UI} Map visualization component (Leaflet)
+  - [x] {UI} Plotting daily itinerary routes
 - [ ] {Feature} Collaborative Itineraries UI
   - [ ] {UI} Share Itinerary Modal & Link generation
   - [ ] {UI} Role attribution interface
