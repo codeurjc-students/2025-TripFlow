@@ -88,6 +88,7 @@ export default function ItineraryDetailPage() {
             {itinerary && (
                 <ExtendedItinerary
                     itinerary={itinerary}
+                    itineraryId={itinerary.id}
                     onOpenCollaboration={openModal}
                     onExportPdf={handleExportPdf}
                 />

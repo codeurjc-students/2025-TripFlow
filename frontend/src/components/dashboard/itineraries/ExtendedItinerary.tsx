@@ -1,9 +1,7 @@
 import styles from "@styles/components/dashboard/itineraries/ExtendedItinerary.module.css";
 
-import { useState } from "react";
-
 import type { ExtendedItinerary } from "@/types/itinerary";
-
+import { useState } from "react";
 import {
     formatBudget,
     formatDate,
@@ -12,7 +10,7 @@ import {
     getDate
 } from "@/utils/formatUtils";
 
-import { 
+import {
     CalendarIcon,
     MapPinIcon,
     PiggyBankIcon,
@@ -23,8 +21,8 @@ import {
     Download,
     Maximize2Icon,
     Users2Icon,
+    MapIcon,
 } from "lucide-react";
-
 import Badge from "@components/shared/Badge";
 import Button from "@components/shared/Button";
 import AttributionImage from "@components/shared/AttributionImage";
@@ -32,13 +30,14 @@ import ActivityCard from "@components/dashboard/itineraries/ActivityCard";
 
 interface ExtendedItineraryProps {
     itinerary: ExtendedItinerary;
+    itineraryId?: number;
     onOpenCollaboration?: () => void;
     onExportPdf?: () => void;
 }
 
 const ICON_SIZE = 24;
 
-export default function ExtendedItinerary({ itinerary, onOpenCollaboration, onExportPdf }: ExtendedItineraryProps) {
+export default function ExtendedItinerary({ itinerary, itineraryId, onOpenCollaboration, onExportPdf }: ExtendedItineraryProps) {
     const [currentDayIndex, setCurrentDayIndex] = useState(0);
     const [isFocusMode, setIsFocusMode] = useState(false);
 
@@ -55,83 +54,92 @@ export default function ExtendedItinerary({ itinerary, onOpenCollaboration, onEx
 
     return (
         <section className={styles.extendedItinerary}>
-            
             {!isFocusMode ? (
                 <div key="overview" className={styles.fadeWrapper}>
-                    <AttributionImage
-                        src={itinerary.coverImage.imageUrl}
-                        alt={itinerary.coverImage.altDescription}
-                        attribution={`@${itinerary.coverImage.authorUsername}`}
-                        attributionLink={formatImageAuthorUrl(itinerary.coverImage.authorUsername)}
-                        loading="eager"
-                        className={styles.banner}
-                    >
-                        <Badge
-                            style="semi_thin"
-                            status={itinerary.status}
-                        />
-                    </AttributionImage>
+                    <div className={styles.overviewHeader}>
+                        <AttributionImage
+                            src={itinerary.coverImage.imageUrl}
+                            alt={itinerary.coverImage.altDescription}
+                            attribution={`@${itinerary.coverImage.authorUsername}`}
+                            attributionLink={formatImageAuthorUrl(itinerary.coverImage.authorUsername)}
+                            loading="eager"
+                            className={styles.banner}
+                        >
+                            <Badge
+                                style="semi_thin"
+                                status={itinerary.status}
+                            />
+                        </AttributionImage>
 
-                    {/* Tags & Mode Trigger */}
-                    <div className={styles.tagsRow}>
-                        <div className={styles.tags}>
-                            {itinerary.tags.map((tag, index) => (
-                                <Badge
-                                    key={index}
-                                    style="semi_thin"
-                                    title={tag}
-                                />
-                            ))}
-                        </div>
-
-                        <div className={styles.modeActions}>
-                            <Button 
-                                style={["tool_bordered"]}
-                                onClick={() => setIsFocusMode(true)}
-                                ariaLabel="Ver itinerario día a día"
-                            >
-                                <Maximize2Icon size={20} />
-                            </Button>
-
-                            {onExportPdf && (
-                                <Button
+                        <div className={styles.actionsRow}>
+                            <div className={styles.modeActions}>
+                                <Button 
                                     style={["tool_bordered"]}
-                                    onClick={onExportPdf}
-                                    ariaLabel="Exportar itinerario en PDF"
+                                    to={itineraryId ? `/itineraries/${itineraryId}/map` : undefined}
+                                    ariaLabel="Ver mapa del itinerario"
                                 >
-                                    <Download size={20} />
+                                    <MapIcon size={20} />
                                 </Button>
-                            )}
 
-                            {onOpenCollaboration && (
-                                <Button
+                                <Button 
                                     style={["tool_bordered"]}
-                                    onClick={onOpenCollaboration}
-                                    ariaLabel="Gestionar colaboradores"
+                                    onClick={() => setIsFocusMode(true)}
+                                    ariaLabel="Ver itinerario día a día"
                                 >
-                                    <Users2Icon size={20} />
+                                    <Maximize2Icon size={20} />
                                 </Button>
-                            )}
-                        </div>
-                    </div>
 
-                    {/* Trip Info */}
-                    <div className={styles.tripInfo}>
-                        <div className={styles.item}>
-                            <MapPinIcon size={ICON_SIZE} />
-                            <span>{itinerary.place}</span>
+                                {onExportPdf && (
+                                    <Button
+                                        style={["tool_bordered"]}
+                                        onClick={onExportPdf}
+                                        ariaLabel="Exportar itinerario en PDF"
+                                    >
+                                        <Download size={20} />
+                                    </Button>
+                                )}
+
+                                {onOpenCollaboration && (
+                                    <Button
+                                        style={["tool_bordered"]}
+                                        onClick={onOpenCollaboration}
+                                        ariaLabel="Gestionar colaboradores"
+                                    >
+                                        <Users2Icon size={20} />
+                                    </Button>
+                                )}
+                            </div>
                         </div>
-                        <div className={styles.item}>
-                            <CalendarIcon size={ICON_SIZE} />
-                            <span>{formatDate(itinerary.date, { shortMonth: true })}</span>
+
+                        <div className={styles.tripInfo}>
+                            <div className={styles.item}>
+                                <MapPinIcon size={ICON_SIZE} />
+                                <span>{itinerary.place}</span>
+                            </div>
+                            <div className={styles.item}>
+                                <CalendarIcon size={ICON_SIZE} />
+                                <span>{formatDate(itinerary.date, { shortMonth: true })}</span>
+                            </div>
+                            <div className={styles.item}>
+                                <UsersIcon size={ICON_SIZE} />
+                                <span>{formatPeople(itinerary.people)}</span>
+                            </div>
+                            <div className={styles.item}>
+                                <PiggyBankIcon size={ICON_SIZE} />
+                                <span>{formatBudget(itinerary.budget)}</span>
+                            </div>
                         </div>
-                        <div className={styles.item}>
-                            <UsersIcon size={ICON_SIZE} />
-                            <span>{formatPeople(itinerary.people)}</span>
-                        </div>
-                        <div className={styles.item}>
-                            <PiggyBankIcon size={ICON_SIZE} />
-                            <span>{formatBudget(itinerary.budget)}</span>
+
+                        <div className={styles.tagsRow}>
+                            <div className={styles.tags}>
+                                {itinerary.tags.map((tag, index) => (
+                                    <Badge
+                                        key={index}
+                                        style="semi_thin"
+                                        title={tag}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
 
@@ -176,7 +184,6 @@ export default function ExtendedItinerary({ itinerary, onOpenCollaboration, onEx
                                 <ChevronRight size={24} />
                             </Button>
                         </div>
-                        
                         <div className={styles.navDate}>
                             <span>Día {currentDay.day}</span>
                             <span>{formatDate(currentDate, { excludeYear: true })}</span>
