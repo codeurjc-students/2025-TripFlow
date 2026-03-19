@@ -1,4 +1,5 @@
 import "@styles/globals.css";
+import "leaflet/dist/leaflet.css";
 
 import { createRoot } from "react-dom/client";
 import { AuthProvider } from "@/providers/authProvider";

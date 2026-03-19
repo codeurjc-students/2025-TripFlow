@@ -13,6 +13,7 @@ import ItinerariesPage from "@pages/itineraries/Itineraries";
 import ItineraryDetailPage from "@pages/itineraries/ItineraryDetail";
 import ItineraryNewPage from "@pages/itineraries/ItineraryNew";
 import ItineraryEditPage from "@pages/itineraries/ItineraryEdit";
+import ItineraryMapPage from "@pages/itineraries/ItineraryMap";
 import ProfilePage from "@pages/profile/Profile";
 import ProfileEditPage from "@pages/profile/ProfileEdit";
 import NotificationsPage from "@pages/Notifications";
@@ -85,6 +86,7 @@ export default function Router() {
                         <Route path=":id">
                             <Route index element={<ItineraryDetailPage />} />
                             <Route path="edit" element={<ItineraryEditPage />} />
+                            <Route path="map" element={<ItineraryMapPage />} />
                         </Route>
                         <Route path="new" element={<ItineraryNewPage />} />
                     </Route>

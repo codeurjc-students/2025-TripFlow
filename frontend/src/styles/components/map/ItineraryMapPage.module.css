@@ -1,0 +1,216 @@
+@import url("../../animations.css");
+
+.mapPage {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--bg-primary);
+}
+
+.mapContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    animation: fadeIn 0.35s ease-out;
+}
+
+.mapContainer :global(.leaflet-container) {
+    background: var(--bg-primary);
+}
+
+.mapContainer :global(.leaflet-tile-pane),
+.mapContainer :global(.leaflet-tile) {
+    background: var(--bg-primary);
+}
+
+@media (max-width: 768px) {
+    .mapPage {
+        scrollbar-width: none;
+    }
+
+    .mapPage::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.topBar {
+    position: absolute;
+    top: var(--space-md);
+    left: var(--space-md);
+    right: var(--space-md);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.topBar > * {
+    pointer-events: auto;
+}
+
+.loadingOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-primary);
+}
+
+/* Blue-tint the dark tiles to match app UI palette */
+.mapContainer :global(.leaflet-tile-pane) {
+    filter: brightness(0.9) sepia(0.5) hue-rotate(170deg) saturate(2);
+}
+
+/* Leaflet controls positioning */
+.mapContainer :global(.leaflet-control-container) {
+    z-index: 500;
+}
+
+.mapContainer :global(.leaflet-top.leaflet-right) {
+    top: calc(var(--space-md) + 42px + var(--space-sm));
+    right: var(--space-md);
+}
+
+/* Match Leaflet zoom controls to app tool_bordered buttons */
+.mapContainer :global(.leaflet-control-zoom.leaflet-bar) {
+    display: grid;
+    gap: var(--space-sm);
+    border: none;
+    box-shadow: none;
+    margin: 0;
+}
+
+.mapContainer :global(.leaflet-control-zoom.leaflet-bar a) {
+    --size: 42px;
+    width: var(--size);
+    height: var(--size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--border-secondary);
+    background-color: var(--bg-secondary);
+    color: var(--text-tertiary);
+    line-height: 1;
+    font-size: 24px;
+    font-weight: var(--font-weight-normal);
+    box-shadow: none;
+    border-radius: var(--border-radius-lg);
+    margin: 0;
+}
+
+.mapContainer :global(.leaflet-control-zoom.leaflet-bar a:hover) {
+    filter: brightness(1.2);
+    background-color: var(--bg-secondary);
+    color: var(--text-tertiary);
+}
+
+.mapContainer :global(.leaflet-control-zoom-in) {
+    border-radius: var(--border-radius-lg);
+}
+
+.mapContainer :global(.leaflet-control-zoom-out) {
+    border-radius: var(--border-radius-lg);
+}
+
+/* Themed itinerary markers */
+.mapContainer :global(.itinerary-marker) {
+    background: transparent;
+    border: none;
+}
+
+.mapContainer :global(.itinerary-marker-dot) {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: var(--border-radius-full);
+    border: 2px solid var(--bg-primary);
+    background: var(--primary);
+    box-shadow: 0 2px 10px rgba(16, 25, 34, 0.45);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mapContainer :global(.itinerary-marker-dot::before) {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 3px;
+    width: 7px;
+    height: 7px;
+    transform: translateX(-50%) rotate(45deg);
+    background: var(--primary);
+    border-right: 2px solid var(--bg-primary);
+    border-bottom: 2px solid var(--bg-primary);
+    z-index: -1;
+}
+
+.mapContainer :global(.itinerary-marker-dot::after) {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    transform: translate(-50%, -50%);
+    border-radius: var(--border-radius-full);
+    background: color-mix(in srgb, var(--text-primary) 92%, transparent);
+}
+
+.mapContainer :global(.itinerary-marker-selected .itinerary-marker-dot) {
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 25%, transparent), 0 2px 12px rgba(16, 25, 34, 0.45);
+}
+
+.mapContainer :global(.itinerary-marker-selected .itinerary-marker-dot::before) {
+    border-right-color: var(--text-primary);
+    border-bottom-color: var(--text-primary);
+}
+
+/* Themed popup surface */
+.mapContainer :global(.itinerary-map-popup .leaflet-popup-content-wrapper) {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 2px solid var(--border-secondary);
+    border-radius: var(--border-radius-lg);
+}
+
+.mapContainer :global(.itinerary-map-popup .leaflet-popup-tip) {
+    background: var(--bg-primary);
+    border: 2px solid var(--border-secondary);
+}
+
+.mapContainer :global(.itinerary-map-popup .leaflet-popup-content) {
+    margin: var(--space-sm) var(--space-md);
+}
+
+.mapContainer :global(.itinerary-popup-content) {
+    min-width: 170px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.mapContainer :global(.itinerary-popup-content strong) {
+    font-size: var(--font-size-sm);
+}
+
+.mapContainer :global(.itinerary-popup-location) {
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+}
+
+.mapContainer :global(.itinerary-popup-meta) {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-xxs);
+}
