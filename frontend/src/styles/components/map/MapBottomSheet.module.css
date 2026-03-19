@@ -1,0 +1,253 @@
+@import url("../../animations.css");
+
+.bottomSheet {
+    position: absolute;
+    bottom: var(--space-md);
+    left: var(--space-md);
+    right: var(--space-md);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-xl);
+    border: 2px solid var(--border-secondary);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(8px);
+    overflow: hidden;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.sheetHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--border-secondary);
+}
+
+.headerTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.headerText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.collapseButton {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sheetTitle {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sheetSubtitle {
+    margin: 0;
+    font-size: var(--font-size-xxs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sheetBody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    min-height: 0;
+    max-height: 1000px;
+    opacity: 1;
+    transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
+.warning {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--font-size-xxs);
+    color: var(--warning);
+    white-space: nowrap;
+}
+
+.filters {
+    display: flex;
+    gap: var(--space-xm);
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-shrink: 0;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.chip {
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--border-radius-full);
+    border: 2px solid var(--border-secondary);
+    background: var(--bg-secondary);
+    color: var(--text-tertiary);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-normal);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    font-family: inherit;
+
+    @media (hover: hover) {
+        &:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+}
+
+.chipActive {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+
+    @media (hover: hover) {
+        &:hover {
+            color: white;
+            opacity: 0.9;
+        }
+    }
+}
+
+.cardList {
+    display: flex;
+    gap: var(--space-sm);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    min-height: 0;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--border-secondary);
+        border-radius: var(--border-radius-full);
+    }
+}
+
+.emptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-lg);
+    color: var(--text-muted);
+
+    p {
+        color: var(--text-muted);
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* Desktop */
+@media (min-width: 769px) {
+    .bottomSheet {
+        bottom: var(--space-lg);
+        left: var(--space-lg);
+        right: var(--space-lg);
+        max-width: min(1100px, calc(100% - (var(--space-lg) * 2)));
+        margin-inline: auto;
+        max-height: min(56vh, 460px);
+    }
+
+    .cardList {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        overflow-x: hidden;
+        overflow-y: auto;
+        gap: var(--space-md);
+        align-content: start;
+        padding-right: 2px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .bottomSheet {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+        border-bottom: none;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+        max-height: 48vh;
+        animation: slideUp 0.3s ease;
+        transition: max-height 0.25s ease;
+    }
+
+    .collapseButton {
+        display: inline-flex;
+    }
+
+    .bottomSheet.collapsed {
+        max-height: 96px;
+    }
+
+    .bottomSheet.collapsed .sheetBody {
+        max-height: 0;
+        opacity: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        pointer-events: none;
+    }
+
+    .sheetHeader {
+        padding: var(--space-md);
+    }
+
+    .sheetTitle {
+        font-size: var(--font-size-sm);
+    }
+
+    .sheetSubtitle {
+        font-size: var(--font-size-xs);
+    }
+
+    .chip {
+        font-size: var(--font-size-xxs);
+    }
+
+    .cardList {
+        flex-direction: column;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding-right: 2px;
+        scrollbar-width: none;
+    }
+
+    .cardList::-webkit-scrollbar {
+        display: none;
+    }
+}
