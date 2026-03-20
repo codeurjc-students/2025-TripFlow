@@ -17,6 +17,8 @@ import com.tripflow.dto.itinerary.ItineraryDayDTO;
 import com.tripflow.dto.itinerary.PermissionsDTO;
 import com.tripflow.dto.shared.PaginatedDTO;
 import com.tripflow.kafka.messages.AIGenerationMessage;
+import com.tripflow.kafka.messages.ItineraryChangeMessage;
+import com.tripflow.kafka.messages.ItineraryChangeType;
 import com.tripflow.mappers.ItineraryMapper;
 import com.tripflow.model.ExternalImage;
 import com.tripflow.model.User;
@@ -30,6 +32,7 @@ import com.tripflow.service.UserService;
 import com.tripflow.model.itinerary.ItineraryCollaborator;
 import com.tripflow.model.types.CollaboratorRole;
 import com.tripflow.model.types.InvitationStatus;
+import com.tripflow.service.KafkaService;
 
 import jakarta.transaction.Transactional;
 
@@ -42,6 +45,7 @@ public class ItineraryService {
     private final ItineraryMapper itineraryMapper;
     private final ItineraryPermissionService itineraryPermissionService;
     private final ItineraryCollaboratorRepository itineraryCollaboratorRepository;
+    private final KafkaService kafkaService;
 
     public ItineraryService(
         ItineraryRepository itineraryRepository,
@@ -50,7 +54,8 @@ public class ItineraryService {
         ItineraryDayService itineraryDayService,
         ItineraryMapper itineraryMapper,
         ItineraryPermissionService itineraryPermissionService,
-        ItineraryCollaboratorRepository itineraryCollaboratorRepository
+        ItineraryCollaboratorRepository itineraryCollaboratorRepository,
+        KafkaService kafkaService
     ) {
         this.itineraryRepository = itineraryRepository;
         this.userService = userService;
@@ -59,6 +64,7 @@ public class ItineraryService {
         this.itineraryMapper = itineraryMapper;
         this.itineraryPermissionService = itineraryPermissionService;
         this.itineraryCollaboratorRepository = itineraryCollaboratorRepository;
+        this.kafkaService = kafkaService;
     }
 
     /**
@@ -244,6 +250,12 @@ public class ItineraryService {
 
         // Save and return the updated DTO
         ExtendedItineraryDTO dto = this.itineraryMapper.toExtendedDTO(this.itineraryRepository.save(itinerary));
+
+        this.kafkaService.sendItineraryChangeMessage(new ItineraryChangeMessage(
+            itinerary.getId(),
+            ItineraryChangeType.UPDATED,
+            authenticatedUser.getUsername()
+        ));
         
         PermissionsDTO permissions = new PermissionsDTO(
             true, true, this.itineraryPermissionService.canDelete(itinerary, authenticatedUser)

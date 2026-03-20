@@ -26,6 +26,7 @@ import com.tripflow.model.itinerary.ItineraryDay;
 import com.tripflow.repository.itinerary.ItineraryRepository;
 import com.tripflow.repository.itinerary.ItineraryCollaboratorRepository;
 import com.tripflow.service.ExternalImageService;
+import com.tripflow.service.KafkaService;
 import com.tripflow.service.UserService;
 import com.tripflow.service.itinerary.ItineraryDayService;
 import com.tripflow.service.itinerary.ItineraryService;
@@ -43,6 +44,7 @@ public class ItineraryServiceTest {
     private ItineraryMapper itineraryMapper;
     private ItineraryPermissionService itineraryPermissionService;
     private ItineraryCollaboratorRepository itineraryCollaboratorRepository;
+    private KafkaService kafkaService;
     private ItineraryService itineraryService;
 
     @BeforeEach
@@ -55,11 +57,12 @@ public class ItineraryServiceTest {
         this.itineraryPermissionService = mock(ItineraryPermissionService.class);
 
         this.itineraryCollaboratorRepository = mock(ItineraryCollaboratorRepository.class);
+        this.kafkaService = mock(KafkaService.class);
 
         this.itineraryService = new ItineraryService(
             itineraryRepository, userService, externalImageService,
             itineraryDayService, itineraryMapper, itineraryPermissionService,
-            itineraryCollaboratorRepository
+            itineraryCollaboratorRepository, kafkaService
         );
     }
 

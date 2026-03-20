@@ -19,6 +19,7 @@ import com.tripflow.kafka.messages.AIGenerationMessage;
 import com.tripflow.kafka.messages.AIRequestMessage;
 import com.tripflow.kafka.messages.CollaborationEventMessage;
 import com.tripflow.kafka.messages.EmailMessage;
+import com.tripflow.kafka.messages.ItineraryChangeMessage;
 import com.tripflow.kafka.messages.NotificationMessage;
 
 @Configuration
@@ -88,6 +89,14 @@ public class KafkaConsumerConfig {
     public KafkaListenerContainerFactory<
         ConcurrentMessageListenerContainer<String, CollaborationEventMessage>> collaborationFactory() {
             return genericFactory(CollaborationEventMessage.class);
+    }
+
+    // [Itinerary Change Configs] ====================================
+
+    @Bean
+    public KafkaListenerContainerFactory<
+        ConcurrentMessageListenerContainer<String, ItineraryChangeMessage>> itineraryChangeFactory() {
+            return genericFactory(ItineraryChangeMessage.class);
     }
 
     // [Email Configs] ================================================
