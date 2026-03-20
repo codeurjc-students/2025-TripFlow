@@ -180,7 +180,7 @@
   - [x] {Model} Collaboration entity (User-Itinerary-Role)
   - [x] {API} Invite user endpoint - `POST /api/v1/itineraries/{id}/collaborators`
   - [x] {Access} Permission logic (VIEWER, EDITOR, OWNER)
-  - [ ] {WebSocket} Real-time collaboration updates synchronization
+  - [x] {WebSocket} Real-time collaboration updates synchronization
 - [x] {Feature} Basic Backend Support for Maps
   - [x] {Model} Extension of Location entity to support coordinates (lat/lng)
 - [ ] {Feature} Location Discovery
@@ -194,6 +194,7 @@
 - [ ] {Feature} Collaborative Itineraries UI
   - [x] {UI} Collaboration modal (invite by username)
   - [x] {UI} Role attribution interface
+  - [x] {UI} Real-time itinerary update refresh on collaboration changes
   - [ ] {UI} Share link generation
 - [ ] {PWA} Offline Access
   - [x] {Config} Service Worker configuration
