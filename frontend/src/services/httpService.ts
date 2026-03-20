@@ -101,12 +101,12 @@ export async function http<T>(
   }
 
   // Handle 403 Forbidden
-  if (response.status === 403) {
+  if (response.status === 403 && !isAuthEndpoint(path)) {
     window.location.href = "/";
   }
 
   // Handle 404 Not Found
-  if (response.status === 404) {
+  if (response.status === 404 && !isAuthEndpoint(path)) {
     window.location.href = "/404";
   }
 

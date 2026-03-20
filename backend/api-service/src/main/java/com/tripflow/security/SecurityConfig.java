@@ -56,6 +56,7 @@ public class SecurityConfig {
                 "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
                 "/v3/api-docs.yaml", "/api-docs", "/api-docs/**"
             ).permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/health/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/users").authenticated()

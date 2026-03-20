@@ -12,6 +12,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tripflow.dto.auth.AuthResponse;
@@ -212,10 +213,19 @@ public class AuthService {
         // Retrieve username or email from the request
         String identifier = request.username();
         String username;
-        if (identifier != null && identifier.contains("@")) {
-            username = this.userService.getUserByEmail(identifier).getUsername();
-        } else {
-            username = identifier;
+        try {
+            if (identifier != null && identifier.contains("@")) {
+                username = this.userService.getUserByEmail(identifier).getUsername();
+            } else {
+                username = identifier;
+            }
+        } catch (UsernameNotFoundException e) {
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Invalid credentials",
+                null,
+                null
+            );
         }
 
         // Try to authenticate the user
@@ -237,10 +247,30 @@ public class AuthService {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Retrieve user details and public user information
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+        UserDetails userDetails;
+        try {
+            userDetails = this.userDetailsService.loadUserByUsername(username);
+        } catch (UsernameNotFoundException e) {
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Invalid credentials",
+                null,
+                null
+            );
+        }
         
         // Check if user is verified
-        User user = this.userService.getUserByUsername(username);
+        User user;
+        try {
+            user = this.userService.getUserByUsername(username);
+        } catch (UsernameNotFoundException e) {
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Invalid credentials",
+                null,
+                null
+            );
+        }
         if (!user.getVerified()) {
             this.sendVerificationEmail(user.getEmail());
 
