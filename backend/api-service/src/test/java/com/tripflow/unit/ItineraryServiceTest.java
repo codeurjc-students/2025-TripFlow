@@ -19,6 +19,8 @@ import com.tripflow.dto.itinerary.ItineraryDTO;
 import com.tripflow.dto.itinerary.ItineraryResponseDTO;
 import com.tripflow.dto.itinerary.ItineraryDayDTO;
 import com.tripflow.dto.shared.PaginatedDTO;
+import com.tripflow.kafka.messages.ItineraryChangeMessage;
+import com.tripflow.kafka.messages.ItineraryChangeType;
 import com.tripflow.mappers.ItineraryMapper;
 import com.tripflow.model.User;
 import com.tripflow.model.itinerary.Itinerary;
@@ -31,6 +33,7 @@ import com.tripflow.service.UserService;
 import com.tripflow.service.itinerary.ItineraryDayService;
 import com.tripflow.service.itinerary.ItineraryService;
 import com.tripflow.service.itinerary.ItineraryPermissionService;
+import org.mockito.ArgumentCaptor;
 
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
@@ -139,6 +142,7 @@ public class ItineraryServiceTest {
         Long itineraryId = 1L;
         User user = new User();
         user.setId(1L);
+        user.setUsername("owner");
 
         Itinerary itinerary = new Itinerary();
         itinerary.setUser(user);
@@ -167,6 +171,12 @@ public class ItineraryServiceTest {
 
         assertEquals(expectedDTO, result.itinerary());
         assertTrue(result.permissions().edit());
+        ArgumentCaptor<ItineraryChangeMessage> messageCaptor = ArgumentCaptor.forClass(ItineraryChangeMessage.class);
+        verify(kafkaService).sendItineraryChangeMessage(messageCaptor.capture());
+        ItineraryChangeMessage message = messageCaptor.getValue();
+        assertEquals(itineraryId, message.itineraryId());
+        assertEquals(ItineraryChangeType.UPDATED, message.changeType());
+        assertEquals("owner", message.actorUsername());
         verify(itineraryDayService).deleteAllDaysByItinerary(itinerary);
         verify(itineraryDayService).createItineraryDayEntity(any(), eq(itinerary));
         verify(itineraryRepository).save(itinerary);

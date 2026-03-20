@@ -125,6 +125,7 @@ public class ItineraryCollaborationServiceTest {
             assertEquals(InvitationStatusDTO.PENDING, result.status());
             verify(itineraryCollaboratorRepository).save(any(ItineraryCollaborator.class));
             verify(kafkaService).sendNotificationMessage(any(NotificationMessage.class));
+            verify(kafkaService).sendCollaborationEventMessage(any());
         }
 
         @Test
@@ -264,6 +265,7 @@ public class ItineraryCollaborationServiceTest {
             assertNotNull(result.acceptedAt());
             verify(itineraryCollaboratorRepository).save(any(ItineraryCollaborator.class));
             verify(kafkaService).sendNotificationMessage(any(NotificationMessage.class));
+            verify(kafkaService).sendCollaborationEventMessage(any());
         }
 
         @Test
@@ -339,6 +341,7 @@ public class ItineraryCollaborationServiceTest {
             collaborationService.declineInvitation(1L, "collaborator");
 
             verify(itineraryCollaboratorRepository).delete(pending);
+            verify(kafkaService).sendCollaborationEventMessage(any());
         }
 
         @Test
@@ -423,6 +426,7 @@ public class ItineraryCollaborationServiceTest {
 
             assertEquals(CollaboratorRoleDTO.EDITOR, result.role());
             verify(itineraryCollaboratorRepository).save(any(ItineraryCollaborator.class));
+            verify(kafkaService).sendCollaborationEventMessage(any());
         }
 
         @Test
@@ -523,6 +527,7 @@ public class ItineraryCollaborationServiceTest {
             collaborationService.removeCollaborator(1L, "collaborator");
 
             verify(itineraryCollaboratorRepository).delete(existing);
+            verify(kafkaService).sendCollaborationEventMessage(any());
         }
 
         @Test
@@ -539,6 +544,7 @@ public class ItineraryCollaborationServiceTest {
             collaborationService.removeCollaborator(1L, "collaborator");
 
             verify(itineraryCollaboratorRepository).delete(existing);
+            verify(kafkaService).sendCollaborationEventMessage(any());
         }
 
         @Test
