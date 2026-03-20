@@ -178,6 +178,9 @@ describe("ItineraryMapPage", () => {
             </MemoryRouter>
         );
         await waitFor(() => expect(screen.getByText("Itinerario")).toBeInTheDocument());
+        await waitFor(() =>
+            expect(fakeMap.on).toHaveBeenCalledWith("click", expect.any(Function))
+        );
 
         fireEvent.click(screen.getByRole("button", { name: /Museo - Madrid/ }));
 
