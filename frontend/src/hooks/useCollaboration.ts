@@ -11,6 +11,7 @@ import {
 
 import { useNotification } from "@/providers/notificationProvider";
 import { useWebSocketNotifications } from "@/hooks/notifications/useWebSocketNotifications";
+import { useCollaborationEvents } from "@/hooks/notifications/useCollaborationEvents";
 
 /**
  * Custom hook to manage collaboration state and actions for an itinerary.
@@ -40,6 +41,10 @@ export function useCollaboration(itineraryId: number) {
     useWebSocketNotifications({
         types: ["INVITATION_RECEIVED", "INVITATION_ACCEPTED"],
         onNotification: silentRefresh,
+    });
+
+    useCollaborationEvents(itineraryId, {
+        onEvent: silentRefresh,
     });
 
     const inviteCollaborator = async (username: string, role: CollaboratorRole) => {

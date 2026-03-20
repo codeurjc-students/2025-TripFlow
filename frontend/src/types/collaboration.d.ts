@@ -15,6 +15,22 @@ export interface Collaborator {
     itineraryTitle: string;
 }
 
+export type CollaborationEventType =
+    | "INVITE_SENT"
+    | "INVITE_ACCEPTED"
+    | "INVITE_DECLINED"
+    | "ROLE_UPDATED"
+    | "COLLABORATOR_REMOVED";
+
+export interface CollaborationEvent {
+    itineraryId: number;
+    eventType: CollaborationEventType;
+    actorUsername: string;
+    targetUsername: string;
+    role?: CollaboratorRole;
+    timestamp: string;
+}
+
 export interface AddCollaboratorRequest {
     username: string;
     role: CollaboratorRole;
