@@ -209,7 +209,7 @@
 - [x] {Unit-Backend} Permission service tests (Roles logic)
 - [x] {Integration-Backend} Collaboration endpoints
 - [ ] {E2E} Offline mode behavior
-- [ ] {E2E} Collaborative flow
+- [x] {E2E} Collaborative flow
 
 ---
 
