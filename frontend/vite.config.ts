@@ -13,7 +13,9 @@ export default defineConfig({
         VitePWA({
             registerType: "autoUpdate",
             workbox: {
-                globPatterns: [],
+                globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest}"],
+                navigateFallback: "/index.html",
+                navigateFallbackDenylist: [/^\/api\//, /^\/ws\//],
                 runtimeCaching: [
                     {
                         urlPattern: ({ url }) =>
