@@ -176,13 +176,13 @@
 
 ### 🔧 Backend
 
-- [ ] {Feature} Collaborative Itineraries
-  - [ ] {Model} Collaboration entity (User-Itinerary-Role)
-  - [ ] {API} Invite user endpoint - `POST /api/v1/itineraries/{id}/invite`
-  - [ ] {Access} Permission logic (VIEWER, EDITOR, OWNER)
+- [x] {Feature} Collaborative Itineraries
+  - [x] {Model} Collaboration entity (User-Itinerary-Role)
+  - [x] {API} Invite user endpoint - `POST /api/v1/itineraries/{id}/collaborators`
+  - [x] {Access} Permission logic (VIEWER, EDITOR, OWNER)
   - [ ] {WebSocket} Real-time collaboration updates synchronization
-- [ ] {Feature} Basic Backend Support for Maps
-  - [ ] {Model} Extension of Location entity to support coordinates/GeoJSON
+- [x] {Feature} Basic Backend Support for Maps
+  - [x] {Model} Extension of Location entity to support coordinates (lat/lng)
 - [ ] {Feature} Location Discovery
   - [ ] {Concept} Exploration of nearby places / points of interest (Implementation TBD)
 
@@ -192,20 +192,21 @@
   - [x] {UI} Map visualization component (Leaflet)
   - [x] {UI} Plotting daily itinerary routes
 - [ ] {Feature} Collaborative Itineraries UI
-  - [ ] {UI} Share Itinerary Modal & Link generation
-  - [ ] {UI} Role attribution interface
+  - [x] {UI} Collaboration modal (invite by username)
+  - [x] {UI} Role attribution interface
+  - [ ] {UI} Share link generation
 - [ ] {PWA} Offline Access
-  - [ ] {Config} Service Worker configuration
+  - [x] {Config} Service Worker configuration
   - [ ] {Cache} Caching strategies for itinerary data
   - [ ] {UI} Offline mode indicator and read-only access
-- [ ] {Feature} Client-Side PDF Export
-  - [ ] {Library} Integration with PDF library (e.g., react-pdf / jsPDF)
-  - [ ] {UI} Export button and layout generation
+- [x] {Feature} Client-Side PDF Export
+  - [x] {Library} Integration with PDF library (e.g., react-pdf / jsPDF)
+  - [x] {UI} Export button and layout generation
 
 ### ⚙️ Testing
 
-- [ ] {Unit-Backend} Permission service tests (Roles logic)
-- [ ] {Integration-Backend} Collaboration endpoints
+- [x] {Unit-Backend} Permission service tests (Roles logic)
+- [x] {Integration-Backend} Collaboration endpoints
 - [ ] {E2E} Offline mode behavior
 - [ ] {E2E} Collaborative flow
 

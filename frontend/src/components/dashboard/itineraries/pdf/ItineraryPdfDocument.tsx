@@ -124,6 +124,7 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         paddingHorizontal: 6,
         paddingVertical: 2,
+        textAlign: "center",
     },
     activityMeta: {
         fontSize: 10,
@@ -210,7 +211,11 @@ export default function ItineraryPdfDocument({ itinerary }: ItineraryPdfDocument
                             )}
 
                             {day.activities.map((activity, activityIndex) => (
-                                <View key={`${day.day}-${activityIndex}`} style={styles.activityCard}>
+                                <View
+                                    key={`${day.day}-${activityIndex}`}
+                                    style={styles.activityCard}
+                                    wrap={false}
+                                >
                                     <View style={styles.activityTopRow}>
                                         <Text style={styles.activityTitle}>{activity.activity}</Text>
                                         <Text style={styles.activityTime}>{activity.time || "Sin hora"}</Text>
