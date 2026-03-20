@@ -4,6 +4,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.tripflow.kafka.messages.AIRequestMessage;
+import com.tripflow.kafka.messages.CollaborationEventMessage;
 import com.tripflow.kafka.messages.EmailMessage;
 import com.tripflow.kafka.messages.NotificationMessage;
 
@@ -35,6 +36,15 @@ public class KafkaService {
      */
     public void sendNotificationMessage(NotificationMessage message) {
         this.sendMessage("notification", message);
+    }
+
+    /**
+     * Sends a Collaboration event message to the "collaboration" topic.
+     *
+     * @param message The CollaborationEventMessage to be sent.
+     */
+    public void sendCollaborationEventMessage(CollaborationEventMessage message) {
+        this.sendMessage("collaboration", message);
     }
 
     /**

@@ -21,6 +21,8 @@ import com.tripflow.model.types.InvitationStatus;
 import com.tripflow.repository.itinerary.ItineraryCollaboratorRepository;
 import com.tripflow.repository.itinerary.ItineraryRepository;
 import com.tripflow.dto.notification.NotificationTypeDTO;
+import com.tripflow.kafka.messages.CollaborationEventMessage;
+import com.tripflow.kafka.messages.CollaborationEventType;
 import com.tripflow.kafka.messages.NotificationMessage;
 import com.tripflow.service.KafkaService;
 import com.tripflow.service.UserService;
@@ -135,6 +137,14 @@ public class ItineraryCollaborationService {
             NotificationTypeDTO.INVITATION_RECEIVED
         ));
 
+        this.kafkaService.sendCollaborationEventMessage(new CollaborationEventMessage(
+            itineraryId,
+            CollaborationEventType.INVITE_SENT,
+            authenticatedUser.getUsername(),
+            userToInvite.getUsername(),
+            request.role().name()
+        ));
+
         return result;
     }
 
@@ -172,6 +182,14 @@ public class ItineraryCollaborationService {
             NotificationTypeDTO.INVITATION_ACCEPTED
         ));
 
+        this.kafkaService.sendCollaborationEventMessage(new CollaborationEventMessage(
+            itineraryId,
+            CollaborationEventType.INVITE_ACCEPTED,
+            user.getUsername(),
+            user.getUsername(),
+            collaborator.getRole().name()
+        ));
+
         return result;
     }
 
@@ -199,6 +217,14 @@ public class ItineraryCollaborationService {
         }
 
         this.itineraryCollaboratorRepository.delete(collaborator);
+
+        this.kafkaService.sendCollaborationEventMessage(new CollaborationEventMessage(
+            itineraryId,
+            CollaborationEventType.INVITE_DECLINED,
+            user.getUsername(),
+            user.getUsername(),
+            collaborator.getRole().name()
+        ));
     }
 
     /**
@@ -233,7 +259,17 @@ public class ItineraryCollaborationService {
         }
 
         collaborator.setRole(CollaboratorRole.valueOf(request.role().name()));
-        return this.collaboratorMapper.toDTO(this.itineraryCollaboratorRepository.save(collaborator));
+        CollaboratorDTO result = this.collaboratorMapper.toDTO(this.itineraryCollaboratorRepository.save(collaborator));
+
+        this.kafkaService.sendCollaborationEventMessage(new CollaborationEventMessage(
+            itineraryId,
+            CollaborationEventType.ROLE_UPDATED,
+            authenticatedUser.getUsername(),
+            collaboratorUser.getUsername(),
+            request.role().name()
+        ));
+
+        return result;
     }
 
     /**
@@ -258,6 +294,14 @@ public class ItineraryCollaborationService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found"));
 
         this.itineraryCollaboratorRepository.delete(collaborator);
+
+        this.kafkaService.sendCollaborationEventMessage(new CollaborationEventMessage(
+            itineraryId,
+            CollaborationEventType.COLLABORATOR_REMOVED,
+            authenticatedUser.getUsername(),
+            userToRemove.getUsername(),
+            collaborator.getRole().name()
+        ));
     }
 
     private Itinerary getItineraryOrThrow(Long id) {
