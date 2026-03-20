@@ -49,3 +49,12 @@ export interface Itinerary {
 export interface ExtendedItinerary extends Itinerary {
     days: ItineraryDay[];
 }
+
+export type ItineraryChangeType = "UPDATED";
+
+export interface ItineraryChangeEvent {
+    itineraryId: number;
+    changeType: ItineraryChangeType;
+    actorUsername: string;
+    timestamp: string;
+}

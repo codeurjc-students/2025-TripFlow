@@ -40,7 +40,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         type: NotificationRendererType,
         options?: NotificationOptions
     ) => {
-        if (user && user.notificationsAllowed === false) {
+        if (user && !user.notificationsAllowed) {
             setNotifications([]);
             return;
         }

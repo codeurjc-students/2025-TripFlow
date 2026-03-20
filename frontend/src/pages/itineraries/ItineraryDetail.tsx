@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router";
 import { pdf } from "@react-pdf/renderer";
 
@@ -7,6 +7,7 @@ import type { ExtendedItinerary as Itinerary } from "@/types/itinerary";
 import { getItineraryById } from "@/services/itineraryService";
 import { useModal } from "@/hooks/useModal";
 import { useNotification } from "@/providers/notificationProvider";
+import { useItineraryChangeEvents } from "@/hooks/notifications/useItineraryChangeEvents";
 
 import AppLayout from "@/layouts/AppLayout";
 import Loader from "@/components/shared/Loader";
@@ -27,18 +28,25 @@ export default function ItineraryDetailPage() {
     const itineraryId = Number(id);
     if (isNaN(itineraryId)) return <Navigate to="/itineraries" />;
 
+    const fetchItinerary = useCallback(async () => {
+        setIsLoading(true);
+
+        const itineraryData = await getItineraryById(itineraryId);
+        setItinerary(itineraryData);
+
+        setIsLoading(false);
+    }, [itineraryId]);
+
     useEffect(() => {
-        const fetchItinerary = async () => {
-            setIsLoading(true);
-
-            const itineraryData = await getItineraryById(itineraryId);
-            setItinerary(itineraryData);
-
-            setIsLoading(false);
-        };
-
         fetchItinerary();
-    }, [id]);
+    }, [fetchItinerary]);
+
+    useItineraryChangeEvents(itineraryId, {
+        onEvent: () => {
+            fetchItinerary();
+            notify("Itinerario actualizado por un colaborador", "info");
+        },
+    });
 
     const handleExportPdf = async () => {
         if (!itinerary) {
