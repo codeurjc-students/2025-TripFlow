@@ -568,6 +568,34 @@ public class CollaborationEndpointsTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("Should fail when unauthenticated user requests invitations (401)")
+    public void testGetPendingInvitationsUnauthorized() {
+        String username = "unauth_inv_" + System.currentTimeMillis();
+
+        RestAssured
+            .given()
+            .when()
+                .get("/v1/users/{username}/invitations", username)
+            .then()
+                .statusCode(401);
+    }
+
+    @Test
+    @DisplayName("Should fail when user does not exist (404)")
+    public void testGetPendingInvitationsUserNotFound() {
+        String[] collaborator = createUserWithToken("collab_pi_nf");
+        String missingUser = "missing_user_" + System.currentTimeMillis();
+
+        RestAssured
+            .given()
+                .cookie("auth_token", collaborator[1])
+            .when()
+                .get("/v1/users/{username}/invitations", missingUser)
+            .then()
+                .statusCode(404);
+    }
+
+    @Test
     @DisplayName("Should not include accepted invitations in pending list (200)")
     public void testGetPendingInvitationsExcludesAccepted() {
         String[] owner = createUserWithToken("owner_pi_ea");
