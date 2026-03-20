@@ -181,10 +181,12 @@ describe("ItineraryMapPage", () => {
 
         fireEvent.click(screen.getByRole("button", { name: /Museo - Madrid/ }));
 
-        expect(fakeMap.flyTo).toHaveBeenCalledWith(
-            { lat: 10, lng: 20 },
-            12,
-            expect.objectContaining({ duration: 0.45 })
+        await waitFor(() =>
+            expect(fakeMap.flyTo).toHaveBeenCalledWith(
+                { lat: 10, lng: 20 },
+                12,
+                expect.objectContaining({ duration: 0.45 })
+            )
         );
 
         expect(routeLayerProps.at(-1)?.isHidden).toBe(true);
