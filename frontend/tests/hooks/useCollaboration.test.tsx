@@ -108,4 +108,101 @@ describe("useCollaboration", () => {
 
         await waitFor(() => expect(getCollaboratorsMock).toHaveBeenCalledTimes(3));
     });
+
+    it("should load share links on demand", async () => {
+        const shareLinks = [
+            {
+                id: 99,
+                token: "token_99",
+                createdAt: "2026-03-21T10:00:00Z",
+                expiresAt: "2026-03-28T10:00:00Z",
+                active: true,
+            },
+        ];
+        getShareLinksMock.mockResolvedValueOnce(shareLinks);
+
+        const { result } = renderHook(() => useCollaboration(12));
+        await waitFor(() => expect(getCollaboratorsMock).toHaveBeenCalledTimes(1));
+
+        await act(async () => {
+            await result.current.loadShareLinks();
+        });
+
+        expect(getShareLinksMock).toHaveBeenCalledWith(12);
+        expect(result.current.shareLinks).toEqual(shareLinks);
+    });
+
+    it("should generate share link and refresh share links", async () => {
+        const generated = {
+            id: 101,
+            token: "token_101",
+            createdAt: "2026-03-21T10:00:00Z",
+            expiresAt: "2026-03-28T10:00:00Z",
+            active: true,
+        };
+
+        generateShareLinkMock.mockResolvedValueOnce(generated);
+        getShareLinksMock.mockResolvedValueOnce([generated]);
+
+        const { result } = renderHook(() => useCollaboration(12));
+        await waitFor(() => expect(getCollaboratorsMock).toHaveBeenCalledTimes(1));
+
+        let generatedResult = null;
+        await act(async () => {
+            generatedResult = await result.current.generateShareLink();
+        });
+
+        expect(generateShareLinkMock).toHaveBeenCalledWith(12);
+        expect(getShareLinksMock).toHaveBeenCalledWith(12);
+        expect(generatedResult).toEqual(generated);
+        expect(result.current.shareLinks).toEqual([generated]);
+    });
+
+    it("should show error toast when generating share link fails", async () => {
+        generateShareLinkMock.mockRejectedValueOnce(new Error("fail"));
+
+        const { result } = renderHook(() => useCollaboration(12));
+        await waitFor(() => expect(getCollaboratorsMock).toHaveBeenCalledTimes(1));
+
+        let generatedResult = undefined;
+        await act(async () => {
+            generatedResult = await result.current.generateShareLink();
+        });
+
+        expect(generatedResult).toBeNull();
+        expect(notifyMock).toHaveBeenCalledWith("Error al generar el enlace compartido", "error");
+    });
+
+    it("should revoke share link, refresh list and notify success", async () => {
+        revokeShareLinkMock.mockResolvedValueOnce(undefined);
+        getShareLinksMock.mockResolvedValueOnce([]);
+
+        const { result } = renderHook(() => useCollaboration(12));
+        await waitFor(() => expect(getCollaboratorsMock).toHaveBeenCalledTimes(1));
+
+        let revokeResult = false;
+        await act(async () => {
+            revokeResult = await result.current.revokeShareLink(77);
+        });
+
+        expect(revokeShareLinkMock).toHaveBeenCalledWith(12, 77);
+        expect(getShareLinksMock).toHaveBeenCalledWith(12);
+        expect(revokeResult).toBe(true);
+        expect(notifyMock).toHaveBeenCalledWith("Enlace revocado correctamente", "success");
+    });
+
+    it("should show error toast when revoking share link fails", async () => {
+        revokeShareLinkMock.mockRejectedValueOnce(new Error("fail"));
+
+        const { result } = renderHook(() => useCollaboration(12));
+        await waitFor(() => expect(getCollaboratorsMock).toHaveBeenCalledTimes(1));
+
+        let revokeResult = true;
+        await act(async () => {
+            revokeResult = await result.current.revokeShareLink(77);
+        });
+
+        expect(revokeResult).toBe(false);
+        expect(notifyMock).toHaveBeenCalledWith("Error al revocar el enlace", "error");
+    });
 });
