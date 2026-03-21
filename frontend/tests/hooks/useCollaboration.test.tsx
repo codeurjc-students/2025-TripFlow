@@ -6,12 +6,18 @@ import { useCollaboration } from "../../src/hooks/useCollaboration";
 const {
     notifyMock,
     getCollaboratorsMock,
+    getShareLinksMock,
+    generateShareLinkMock,
+    revokeShareLinkMock,
     sendInvitationMock,
     updateCollaboratorRoleMock,
     removeCollaboratorMock,
 } = vi.hoisted(() => ({
     notifyMock: vi.fn(),
     getCollaboratorsMock: vi.fn(),
+    getShareLinksMock: vi.fn(),
+    generateShareLinkMock: vi.fn(),
+    revokeShareLinkMock: vi.fn(),
     sendInvitationMock: vi.fn(),
     updateCollaboratorRoleMock: vi.fn(),
     removeCollaboratorMock: vi.fn(),
@@ -26,6 +32,9 @@ vi.mock("@/providers/notificationProvider", () => ({
 
 vi.mock("@/services/collaborationService", () => ({
     getCollaborators: getCollaboratorsMock,
+    getShareLinks: getShareLinksMock,
+    generateShareLink: generateShareLinkMock,
+    revokeShareLink: revokeShareLinkMock,
     sendInvitation: sendInvitationMock,
     updateCollaboratorRole: updateCollaboratorRoleMock,
     removeCollaborator: removeCollaboratorMock,
@@ -38,7 +47,7 @@ vi.mock("@/hooks/notifications/useWebSocketNotifications", () => ({
 }));
 
 vi.mock("@/hooks/notifications/useCollaborationEvents", () => ({
-    useCollaborationEvents: (itineraryId: number, options: { onEvent?: () => void }) => {
+    useCollaborationEvents: (_itineraryId: number, options: { onEvent?: () => void }) => {
         collaborationEventOptions = options;
     },
 }));
@@ -47,6 +56,9 @@ describe("useCollaboration", () => {
     beforeEach(() => {
         notifyMock.mockReset();
         getCollaboratorsMock.mockReset();
+        getShareLinksMock.mockReset();
+        generateShareLinkMock.mockReset();
+        revokeShareLinkMock.mockReset();
         sendInvitationMock.mockReset();
         updateCollaboratorRoleMock.mockReset();
         removeCollaboratorMock.mockReset();
@@ -54,6 +66,9 @@ describe("useCollaboration", () => {
         collaborationEventOptions = null;
 
         getCollaboratorsMock.mockResolvedValue([]);
+        getShareLinksMock.mockResolvedValue([]);
+        generateShareLinkMock.mockResolvedValue(undefined);
+        revokeShareLinkMock.mockResolvedValue(undefined);
         sendInvitationMock.mockResolvedValue(undefined);
         updateCollaboratorRoleMock.mockResolvedValue(undefined);
         removeCollaboratorMock.mockResolvedValue(undefined);
@@ -63,6 +78,7 @@ describe("useCollaboration", () => {
         renderHook(() => useCollaboration(12));
 
         await waitFor(() => expect(getCollaboratorsMock).toHaveBeenCalledWith(12));
+        expect(getShareLinksMock).not.toHaveBeenCalled();
     });
 
     it("should send invitation and refresh collaborators", async () => {
