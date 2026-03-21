@@ -21,11 +21,32 @@
     }
 }
 
+.external {
+    .main {
+        padding-left: 0;
+        padding-bottom: var(--space-xxxl);
+    }
+}
+
+.mainExternal {
+    width: 100%;
+    max-width: calc(var(--max-width) + var(--space-xl) * 2);
+    margin-inline: auto;
+    padding-inline: var(--space-xl);
+    align-items: stretch;
+}
+
 @media (max-width: 1024px) {
     .layout {
         .main {
             padding: 0;
             padding-bottom: calc(var(--space-largest) + var(--space-lg));
         }
+    }
+
+    .mainExternal {
+        max-width: 100%;
+        padding-inline: var(--space-md);
+        padding-bottom: var(--space-xxl);
     }
 }

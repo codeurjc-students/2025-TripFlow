@@ -31,13 +31,20 @@ import ActivityCard from "@components/dashboard/itineraries/ActivityCard";
 interface ExtendedItineraryProps {
     itinerary: ExtendedItinerary;
     itineraryId?: number;
+    isExternal?: boolean;
     onOpenCollaboration?: () => void;
     onExportPdf?: () => void;
 }
 
 const ICON_SIZE = 24;
 
-export default function ExtendedItinerary({ itinerary, itineraryId, onOpenCollaboration, onExportPdf }: ExtendedItineraryProps) {
+export default function ExtendedItinerary({
+    itinerary,
+    itineraryId,
+    isExternal = false,
+    onOpenCollaboration,
+    onExportPdf
+}: ExtendedItineraryProps) {
     const [currentDayIndex, setCurrentDayIndex] = useState(0);
     const [isFocusMode, setIsFocusMode] = useState(false);
 
@@ -53,7 +60,9 @@ export default function ExtendedItinerary({ itinerary, itineraryId, onOpenCollab
     const currentDate = getDate(itinerary.date, currentDayIndex);
 
     return (
-        <section className={styles.extendedItinerary}>
+        <section
+            className={`${styles.extendedItinerary} ${isExternal ? styles.external : ""}`}
+        >
             {!isFocusMode ? (
                 <div key="overview" className={styles.fadeWrapper}>
                     <div className={styles.overviewHeader}>
@@ -73,13 +82,15 @@ export default function ExtendedItinerary({ itinerary, itineraryId, onOpenCollab
 
                         <div className={styles.actionsRow}>
                             <div className={styles.modeActions}>
-                                <Button 
-                                    style={["tool_bordered"]}
-                                    to={itineraryId ? `/itineraries/${itineraryId}/map` : undefined}
-                                    ariaLabel="Ver mapa del itinerario"
-                                >
-                                    <MapIcon size={20} />
-                                </Button>
+                                {itineraryId && (
+                                    <Button 
+                                        style={["tool_bordered"]}
+                                        to={`/itineraries/${itineraryId}/map`}
+                                        ariaLabel="Ver mapa del itinerario"
+                                    >
+                                        <MapIcon size={20} />
+                                    </Button>
+                                )}
 
                                 <Button 
                                     style={["tool_bordered"]}

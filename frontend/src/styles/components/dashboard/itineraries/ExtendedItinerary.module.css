@@ -7,6 +7,10 @@
     border-radius: var(--border-radius-xl);
     backdrop-filter: blur(2px);
 
+    &.external {
+        padding-inline: 0;
+    }
+
     .banner {
         min-height: 200px;
         border-radius: var(--border-radius-xl);

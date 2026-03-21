@@ -32,6 +32,16 @@ export async function getItineraryById(itineraryId: number): Promise<ExtendedIti
 }
 
 /**
+ * Retrieves a shared itinerary by token in read-only mode.
+ *
+ * @param token The share token.
+ * @returns A promise that resolves to the shared itinerary details.
+ */
+export async function getSharedItineraryByToken(token: string): Promise<ExtendedItinerary> {
+    return http(`/api/v1/share/${token}`, "GET");
+}
+
+/**
  * Creates a new itinerary with the provided details.
  *
  * @param itinerary The itinerary data to be created.
