@@ -9,6 +9,8 @@ servers:
 security:
 - auth_token: []
 tags:
+- name: Itinerary Share Links
+  description: Endpoints for generating and consuming itinerary share links
 - name: AI Generation
   description: AI generation and processing
 - name: Statistics
@@ -446,6 +448,83 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PublicUserDTO"
+      security:
+      - auth_token: []
+  /api/v1/itineraries/{itineraryId}/share-links:
+    get:
+      tags:
+      - Itinerary Share Links
+      summary: Get Active Share Links
+      description: Returns active share links for an itinerary. Owner and accepted
+        collaborators can view.
+      operationId: getActiveShareLinks
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Share links retrieved
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ShareLinkDTO"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ShareLinkDTO"
+        "404":
+          description: Itinerary not found
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ShareLinkDTO"
+      security:
+      - auth_token: []
+    post:
+      tags:
+      - Itinerary Share Links
+      summary: Generate Share Link
+      description: Generates a public read-only share link with fixed expiration.
+        Only itinerary owner can generate.
+      operationId: generateShareLink
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "201":
+          description: Share link generated
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ShareLinkDTO"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ShareLinkDTO"
+        "404":
+          description: Itinerary not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ShareLinkDTO"
       security:
       - auth_token: []
   /api/v1/itineraries/{itineraryId}/collaborators:
@@ -961,6 +1040,38 @@ paths:
                 $ref: "#/components/schemas/UserStatsDTO"
       security:
       - auth_token: []
+  /api/v1/share/{token}:
+    get:
+      tags:
+      - Itinerary Share Links
+      summary: Get Shared Itinerary
+      description: Returns a read-only itinerary by share token. Public endpoint.
+      operationId: getSharedItinerary
+      parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Shared itinerary retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
+        "403":
+          description: Share link expired or revoked
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
+        "404":
+          description: Share link not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
   /api/v1/ai/status:
     get:
       tags:
@@ -1021,6 +1132,35 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+  /api/v1/itineraries/{itineraryId}/share-links/{shareLinkId}:
+    delete:
+      tags:
+      - Itinerary Share Links
+      summary: Revoke Share Link
+      description: Revokes a share link. Only itinerary owner can revoke.
+      operationId: revokeShareLink
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: shareLinkId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Share link revoked
+        "403":
+          description: Forbidden
+        "404":
+          description: Itinerary or share link not found
+      security:
+      - auth_token: []
   /api/v1/itineraries/{itineraryId}/collaborators/{username}/decline:
     delete:
       tags:
@@ -1301,6 +1441,22 @@ components:
           type: boolean
         delete:
           type: boolean
+    ShareLinkDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        token:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        active:
+          type: boolean
     AddCollaboratorRequest:
       type: object
       properties:
@@ -1348,8 +1504,6 @@ components:
             type: string
           maxItems: 20
           minItems: 0
-      required:
-      - destination
     AIResponse:
       type: object
       properties:
