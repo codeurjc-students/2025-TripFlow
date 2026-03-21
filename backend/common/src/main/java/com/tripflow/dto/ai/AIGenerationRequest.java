@@ -2,7 +2,6 @@ package com.tripflow.dto.ai;
 
 import java.util.List;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
@@ -10,7 +9,6 @@ public record AIGenerationRequest(
     @Size(max = 2000, message = "AI prompt must not exceed 2000 characters")
     String aiPrompt,
 
-    @NotBlank(message = "Destination is required")
     @Size(max = 200, message = "Destination must not exceed 200 characters")
     String destination,
 

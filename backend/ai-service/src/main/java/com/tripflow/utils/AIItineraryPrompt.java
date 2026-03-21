@@ -1,5 +1,8 @@
 package com.tripflow.utils;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.tripflow.dto.ai.AIGenerationRequest;
 
 public class AIItineraryPrompt {
@@ -75,16 +78,31 @@ public class AIItineraryPrompt {
      * @return an AIPromptResult with distinct system and user messages
      */
     public static AIPromptResult generatePrompt(AIGenerationRequest request) {
-        String systemMessage = SYSTEM_PROMPT
-            .replace("{{place}}", request.destination())
-            .replace("{{style}}", request.style())
-            .replace("{{budget}}", request.budget().toString())
-            .replace("{{lodging}}", request.lodging())
-            .replace("{{duration}}", request.duration())
-            .replace("{{interests}}", request.interests().toString());
+        String destination = safeText(request.destination(), "Destino por definir");
+        String style = safeText(request.style(), "Flexible");
+        String lodging = safeText(request.lodging(), "hotel");
+        String duration = safeText(request.duration(), "3 días");
+        List<String> interests = request.interests() == null ? Collections.emptyList() : request.interests();
+        Double budget = request.budget() == null ? 500.0 : request.budget();
 
-        String userMessage = AIInputSanitizer.sanitize(request.aiPrompt());
+        String systemMessage = SYSTEM_PROMPT
+            .replace("{{place}}", destination)
+            .replace("{{style}}", style)
+            .replace("{{budget}}", budget.toString())
+            .replace("{{lodging}}", lodging)
+            .replace("{{duration}}", duration)
+            .replace("{{interests}}", interests.toString());
+
+        String userMessage = AIInputSanitizer.sanitize(safeText(request.aiPrompt(), "Genera un itinerario útil y detallado."));
 
         return new AIPromptResult(systemMessage, userMessage);
+    }
+
+    private static String safeText(String value, String fallback) {
+        if (value == null || value.trim().isEmpty()) {
+            return fallback;
+        }
+
+        return value;
     }
 }
