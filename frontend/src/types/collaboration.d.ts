@@ -39,3 +39,11 @@ export interface AddCollaboratorRequest {
 export interface UpdateCollaboratorRequest {
     role: CollaboratorRole;
 }
+
+export interface ShareLink {
+    id: number;
+    token: string;
+    createdAt: string;
+    expiresAt: string;
+    active: boolean;
+}

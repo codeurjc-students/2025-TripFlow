@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 
-import type { Collaborator, CollaboratorRole } from "@/types/collaboration";
+import type { Collaborator, CollaboratorRole, ShareLink } from "@/types/collaboration";
 
 import {
     getCollaborators,
+    getShareLinks,
+    generateShareLink as generateShareLinkService,
+    revokeShareLink as revokeShareLinkService,
     sendInvitation,
     updateCollaboratorRole,
     removeCollaborator as removeCollaboratorService,
@@ -18,11 +21,13 @@ import { useCollaborationEvents } from "@/hooks/notifications/useCollaborationEv
  */
 export function useCollaboration(itineraryId: number) {
     const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+    const [shareLinks, setShareLinks] = useState<ShareLink[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isShareLinksLoading, setIsShareLinksLoading] = useState(false);
 
     const { notify } = useNotification();
 
-    const fetchCollaborators = async (silent = false) => {
+    const fetchCollaborators = useCallback(async (silent = false) => {
         try {
             if (!silent) setIsLoading(true);
             const data = await getCollaborators(itineraryId);
@@ -32,11 +37,23 @@ export function useCollaboration(itineraryId: number) {
         } finally {
             if (!silent) setIsLoading(false);
         }
-    };
+    }, [itineraryId, notify]);
+
+    const fetchShareLinks = useCallback(async (silent = false) => {
+        try {
+            if (!silent) setIsShareLinksLoading(true);
+            const data = await getShareLinks(itineraryId);
+            setShareLinks(data);
+        } catch {
+            if (!silent) notify("Error al cargar los enlaces compartidos", "error");
+        } finally {
+            if (!silent) setIsShareLinksLoading(false);
+        }
+    }, [itineraryId, notify]);
 
     const silentRefresh = useCallback(() => {
         fetchCollaborators(true);
-    }, [itineraryId]);
+    }, [fetchCollaborators]);
 
     useWebSocketNotifications({
         types: ["INVITATION_RECEIVED", "INVITATION_ACCEPTED"],
@@ -94,16 +111,44 @@ export function useCollaboration(itineraryId: number) {
         }
     };
 
+    const generateShareLink = async () => {
+        try {
+            const newShareLink = await generateShareLinkService(itineraryId);
+            await fetchShareLinks(true);
+            return newShareLink;
+        } catch {
+            notify("Error al generar el enlace compartido", "error");
+            return null;
+        }
+    };
+
+    const revokeShareLink = async (shareLinkId: number) => {
+        try {
+            await revokeShareLinkService(itineraryId, shareLinkId);
+            await fetchShareLinks(true);
+            notify("Enlace revocado correctamente", "success");
+            return true;
+        } catch {
+            notify("Error al revocar el enlace", "error");
+            return false;
+        }
+    };
+
     useEffect(() => {
         fetchCollaborators();
-    }, [itineraryId]);
+    }, [fetchCollaborators]);
 
     return {
         collaborators,
+        shareLinks,
         isLoading,
+        isShareLinksLoading,
         inviteCollaborator,
         updateRole,
         removeCollaborator,
         leaveItinerary,
+        generateShareLink,
+        revokeShareLink,
+        loadShareLinks: fetchShareLinks,
     };
 }

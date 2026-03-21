@@ -1,6 +1,6 @@
 import styles from "@styles/components/dashboard/itineraries/CollaborationModal.module.css";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
     XIcon, 
     Trash2Icon, 
@@ -10,7 +10,10 @@ import {
     EyeIcon, 
     EditIcon, 
     NavigationOffIcon,
-    LogOutIcon
+    LogOutIcon,
+    LinkIcon,
+    CopyIcon,
+    BanIcon,
 } from "lucide-react";
 
 import { useNavigate } from "react-router";
@@ -18,6 +21,7 @@ import { useNavigate } from "react-router";
 import type { Collaborator, CollaboratorRole } from "@/types/collaboration";
 import { useCollaboration } from "@/hooks/useCollaboration";
 import { useAuth } from "@/providers/authProvider";
+import { useNotification } from "@/providers/notificationProvider";
 
 import Button from "@components/shared/Button";
 import Loader from "@components/shared/Loader";
@@ -42,18 +46,42 @@ export default function CollaborationModal({
     itineraryId,
 }: CollaborationModalProps) {
     const { user } = useAuth();
+    const { notify } = useNotification();
     const navigate = useNavigate();
     const [inviteUsername, setInviteUsername] = useState("");
     const [inviteRole, setInviteRole] = useState<CollaboratorRole>("VIEWER");
 
     const {
         collaborators,
+        shareLinks,
         isLoading,
+        isShareLinksLoading,
         inviteCollaborator,
         updateRole,
         removeCollaborator,
         leaveItinerary,
+        generateShareLink,
+        revokeShareLink,
+        loadShareLinks,
     } = useCollaboration(itineraryId);
+
+    const buildShareUrl = (token: string) => `${window.location.origin}/share/${token}`;
+
+    const handleGenerateShareLink = async () => {
+        const created = await generateShareLink();
+        if (created?.token) {
+            await handleCopyShareLink(created.token);
+        }
+    };
+
+    const handleCopyShareLink = async (token: string) => {
+        try {
+            await navigator.clipboard.writeText(buildShareUrl(token));
+            notify("Enlace copiado al portapapeles", "success");
+        } catch {
+            notify("No se pudo copiar el enlace", "error");
+        }
+    };
 
     const handleLeave = async () => {
         if (!user) return;
@@ -64,10 +92,15 @@ export default function CollaborationModal({
         }
     };
 
-    if (!isOpen) return null;
-
     const currentOwner = collaborators?.find((c) => c.role === "OWNER");
     const isOwner = user?.username === currentOwner?.user.username;
+
+    useEffect(() => {
+        if (!isOpen || !isOwner) return;
+        loadShareLinks();
+    }, [isOpen, isOwner, loadShareLinks]);
+
+    if (!isOpen) return null;
 
     const handleInvite = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -128,6 +161,55 @@ export default function CollaborationModal({
                                         </Button>
                                     </div>
                                 </form>
+                            </section>
+
+                            <div className={styles.divider} />
+
+                            <section className={styles.shareSection}>
+                                <span className={styles.sectionTitle}>Compartir enlace</span>
+                                <Button
+                                    style={["secondary"]}
+                                    label="Generar enlace"
+                                    onClick={handleGenerateShareLink}
+                                    ariaLabel="Generar enlace para compartir"
+                                >
+                                    <LinkIcon size={16} strokeWidth={2} />
+                                </Button>
+
+                                <div className={styles.shareLinksList}>
+                                    {isShareLinksLoading ? (
+                                        <Loader size={20} variant="dots" />
+                                    ) : shareLinks.length === 0 ? (
+                                        <p className={styles.shareEmpty}>Sin enlaces activos</p>
+                                    ) : (
+                                        shareLinks.map((shareLink) => (
+                                            <div key={shareLink.id} className={styles.shareLinkItem}>
+                                                <div className={styles.shareInfo}>
+                                                    <span className={styles.shareUrl}>{buildShareUrl(shareLink.token)}</span>
+                                                    <span className={styles.shareExpiry}>
+                                                        Expira: {new Date(shareLink.expiresAt).toLocaleString()}
+                                                    </span>
+                                                </div>
+                                                <div className={styles.shareActions}>
+                                                    <Button
+                                                        style={["tool_bordered"]}
+                                                        onClick={() => handleCopyShareLink(shareLink.token)}
+                                                        ariaLabel="Copiar enlace compartido"
+                                                    >
+                                                        <CopyIcon size={16} />
+                                                    </Button>
+                                                    <Button
+                                                        style={["tool_bordered", "danger"]}
+                                                        onClick={() => revokeShareLink(shareLink.id)}
+                                                        ariaLabel="Revocar enlace compartido"
+                                                    >
+                                                        <BanIcon size={16} />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
                             </section>
 
                             <div className={styles.divider} />

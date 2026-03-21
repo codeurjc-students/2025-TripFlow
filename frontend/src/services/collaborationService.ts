@@ -1,4 +1,9 @@
-import type { Collaborator, AddCollaboratorRequest, UpdateCollaboratorRequest } from "@/types/collaboration";
+import type {
+    Collaborator,
+    AddCollaboratorRequest,
+    UpdateCollaboratorRequest,
+    ShareLink,
+} from "@/types/collaboration";
 
 import { http } from "@services/httpService";
 
@@ -95,4 +100,35 @@ export async function removeCollaborator(
     username: string
 ): Promise<void> {
     return http<void>(`${BASE_PATH}/${itineraryId}/collaborators/${username}`, "DELETE");
+}
+
+/**
+ * Generates a new share link for an itinerary.
+ *
+ * @param itineraryId The unique identifier of the itinerary.
+ * @returns A promise that resolves to the generated share link metadata.
+ */
+export async function generateShareLink(itineraryId: number): Promise<ShareLink> {
+    return http<ShareLink>(`${BASE_PATH}/${itineraryId}/share-links`, "POST");
+}
+
+/**
+ * Gets the active share links of an itinerary.
+ *
+ * @param itineraryId The unique identifier of the itinerary.
+ * @returns A promise that resolves to active share links.
+ */
+export async function getShareLinks(itineraryId: number): Promise<ShareLink[]> {
+    return http<ShareLink[]>(`${BASE_PATH}/${itineraryId}/share-links`, "GET");
+}
+
+/**
+ * Revokes an existing share link.
+ *
+ * @param itineraryId The unique identifier of the itinerary.
+ * @param shareLinkId The unique identifier of the share link.
+ * @returns A promise that resolves when the link is revoked.
+ */
+export async function revokeShareLink(itineraryId: number, shareLinkId: number): Promise<void> {
+    return http<void>(`${BASE_PATH}/${itineraryId}/share-links/${shareLinkId}`, "DELETE");
 }

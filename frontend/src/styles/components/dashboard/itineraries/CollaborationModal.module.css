@@ -123,6 +123,67 @@
     }
 }
 
+/* --- Share Links --- */
+
+.shareSection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.shareLinksList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.shareLinkItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-secondary);
+    padding: var(--space-sm);
+
+    @media (max-width: 520px) {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.shareInfo {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.shareUrl {
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.shareExpiry {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+}
+
+.shareActions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.shareEmpty {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+}
+
 /* --- Collaborator List --- */
 
 .listContainer {
