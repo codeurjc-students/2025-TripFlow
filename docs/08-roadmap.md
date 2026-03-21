@@ -178,9 +178,24 @@
 
 - [x] {Feature} Collaborative Itineraries
   - [x] {Model} Collaboration entity (User-Itinerary-Role)
-  - [x] {API} Invite user endpoint - `POST /api/v1/itineraries/{id}/collaborators`
-  - [x] {Access} Permission logic (VIEWER, EDITOR, OWNER)
-  - [x] {WebSocket} Real-time collaboration updates synchronization
+  - [x] {API} Invite user endpoint - `POST /api/v1/itineraries/{itineraryId}/collaborators`
+  - [x] {API} Accept invitation endpoint - `PUT /api/v1/itineraries/{itineraryId}/collaborators/{username}/accept`
+  - [x] {API} Decline invitation endpoint - `DELETE /api/v1/itineraries/{itineraryId}/collaborators/{username}/decline`
+  - [x] {API} Pending invitations endpoint - `GET /api/v1/users/{username}/invitations`
+  - [x] {API} Get collaborators endpoint - `GET /api/v1/itineraries/{itineraryId}/collaborators`
+  - [x] {API} Update collaborator role endpoint - `PUT /api/v1/itineraries/{itineraryId}/collaborators/{username}`
+  - [x] {API} Remove collaborator endpoint - `DELETE /api/v1/itineraries/{itineraryId}/collaborators/{username}`
+  - [x] {Access} Permission logic (VIEWER, EDITOR, OWNER + invitation status PENDING/ACCEPTED)
+  - [x] {Event} Collaboration events and notifications (invite, accept, decline)
+  - [x] {WebSocket} Real-time collaboration refresh synchronization
+  - [x] {Feature} Share Links
+    - [x] {Model} Share link entity (token + expiration + revocation)
+    - [x] {API} Generate share link endpoint - `POST /api/v1/itineraries/{itineraryId}/share-links`
+    - [x] {API} Get active share links endpoint - `GET /api/v1/itineraries/{itineraryId}/share-links`
+    - [x] {API} Revoke share link endpoint - `DELETE /api/v1/itineraries/{itineraryId}/share-links/{shareLinkId}`
+    - [x] {API} Public shared itinerary endpoint - `GET /api/v1/share/{token}`
+    - [x] {Security} Public read-only access via token + owner-only link management
+    - [x] {Config} Fixed TTL policy for shared links
 - [x] {Feature} Basic Backend Support for Maps
   - [x] {Model} Extension of Location entity to support coordinates (lat/lng)
 - [ ] {Feature} Location Discovery
@@ -191,11 +206,15 @@
 - [x] {Feature} Interactive Maps Integration
   - [x] {UI} Map visualization component (Leaflet)
   - [x] {UI} Plotting daily itinerary routes
-- [ ] {Feature} Collaborative Itineraries UI
-  - [x] {UI} Collaboration modal (invite by username)
-  - [x] {UI} Role attribution interface
-  - [x] {UI} Real-time itinerary update refresh on collaboration changes
-  - [ ] {UI} Share link generation
+- [x] {Feature} Collaborative Itineraries UI
+  - [x] {UI} Collaboration modal (invite, role update, remove/leave)
+  - [x] {UI} Invitations center (pending invitations list + accept/decline)
+  - [x] {UI} Real-time itinerary refresh on collaboration changes
+  - [x] {UI} Share link generation
+  - [x] {UI} Share link listing + revocation controls
+  - [x] {UI} Copy share link action
+  - [x] {Route} Public shared itinerary page - `/share/{token}`
+  - [x] {Access} Read-only shared itinerary view
 - [ ] {PWA} Offline Access
   - [x] {Config} Service Worker configuration
   - [ ] {Cache} Caching strategies for itinerary data
@@ -207,7 +226,12 @@
 ### ⚙️ Testing
 
 - [x] {Unit-Backend} Permission service tests (Roles logic)
-- [x] {Integration-Backend} Collaboration endpoints
+- [x] {Unit-Backend} Collaboration service tests (invitations and role management)
+- [x] {Integration-Backend} Collaboration endpoints (invite, accept, decline, list, update role, remove)
+- [x] {Integration-Backend} Share link endpoints (generate/list/revoke/public access)
+- [x] {Security} Share link expiration and revocation behavior
+- [x] {Unit-Frontend} Collaboration hook tests for share links (list/generate/revoke flows)
+- [x] {E2E} Share link lifecycle (generate, open in read-only mode, revoke)
 - [ ] {E2E} Offline mode behavior
 - [x] {E2E} Collaborative flow
 
