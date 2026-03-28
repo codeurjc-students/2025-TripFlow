@@ -4,6 +4,7 @@ import { Client, type IMessage, type StompSubscription } from "@stomp/stompjs";
 import { WS_BASE_URL } from "@/config/environment";
 import { useAuth } from "@/providers/authProvider";
 import { useDemo } from "./demoProvider";
+import { useOfflineMode } from "@/hooks/useOfflineMode";
 
 interface WebSocketContextType {
     client: Client | null;
@@ -21,9 +22,10 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
     const { user } = useAuth();
     const { demo } = useDemo();
+    const { isOffline } = useOfflineMode();
 
     useEffect(() => {
-        if (!user || demo) return;
+        if (!user || demo || isOffline) return;
 
         const stompClient = new Client({
             brokerURL: `${WS_BASE_URL}/ws/notifications`,
@@ -46,7 +48,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
             }
             setIsConnected(false);
         };
-    }, [user, demo]);
+    }, [user, demo, isOffline]);
 
     const subscribe = useCallback((
         destination: string,

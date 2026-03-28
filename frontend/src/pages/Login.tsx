@@ -72,7 +72,7 @@ export default function LoginPage() {
     };
 
     return (
-        <Layout single>
+        <Layout single centerContent>
             <AuthForm
                 active="login"
                 fields={[

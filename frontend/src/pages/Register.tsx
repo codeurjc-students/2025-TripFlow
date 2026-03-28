@@ -63,7 +63,7 @@ export default function RegisterPage() {
     };
 
     return (
-        <Layout single>
+        <Layout single centerContent>
             <AuthForm
                 active="signup"
                 fields={[

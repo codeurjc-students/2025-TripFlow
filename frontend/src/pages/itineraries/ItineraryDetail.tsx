@@ -5,9 +5,11 @@ import { pdf } from "@react-pdf/renderer";
 import type { ExtendedItinerary as Itinerary } from "@/types/itinerary";
 
 import { getItineraryById } from "@/services/itineraryService";
+import { OfflineNoCacheError } from "@/services/httpService";
 import { useModal } from "@/hooks/useModal";
 import { useNotification } from "@/providers/notificationProvider";
 import { useItineraryChangeEvents } from "@/hooks/notifications/useItineraryChangeEvents";
+import { useOfflineMode } from "@/hooks/useOfflineMode";
 
 import AppLayout from "@/layouts/AppLayout";
 import Loader from "@/components/shared/Loader";
@@ -23,6 +25,7 @@ export default function ItineraryDetailPage() {
 
     const { isOpen, openModal, closeModal } = useModal();
     const { notify } = useNotification();
+    const { readOnly } = useOfflineMode();
 
     const { id } = useParams<{ id: string }>();
     const itineraryId = Number(id);
@@ -31,11 +34,24 @@ export default function ItineraryDetailPage() {
     const fetchItinerary = useCallback(async () => {
         setIsLoading(true);
 
-        const itineraryData = await getItineraryById(itineraryId);
-        setItinerary(itineraryData);
-
-        setIsLoading(false);
-    }, [itineraryId]);
+        try {
+            const itineraryData = await getItineraryById(itineraryId);
+            setItinerary(itineraryData);
+        } catch (error) {
+            if (error instanceof OfflineNoCacheError) {
+                notify("Sin conexion y sin cache para este itinerario.", "info", {
+                    title: "Modo offline",
+                });
+                setItinerary(null);
+            } else {
+                notify("No se pudo cargar el itinerario.", "error", {
+                    title: "Error",
+                });
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }, [itineraryId, notify]);
 
     useEffect(() => {
         fetchItinerary();
@@ -83,7 +99,7 @@ export default function ItineraryDetailPage() {
                 title={itinerary?.title || ""}
                 back={{ url: "/itineraries", label: "Volver" }}
                 right={
-                    itinerary?.permissions?.edit ? (
+                    itinerary?.permissions?.edit && !readOnly ? (
                         <Button
                             style={["inline"]}
                             to={`/itineraries/${itinerary?.id}/edit`}

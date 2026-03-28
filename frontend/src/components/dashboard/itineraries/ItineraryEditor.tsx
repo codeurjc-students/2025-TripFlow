@@ -26,6 +26,7 @@ interface ItineraryEditorProps {
         label: string;
     };
     isSaving?: boolean;
+    readOnly?: boolean;
 }
 
 export default function ItineraryEditor({
@@ -34,7 +35,8 @@ export default function ItineraryEditor({
     onSave,
     onDelete,
     back,
-    isSaving
+    isSaving,
+    readOnly = false,
 }: ItineraryEditorProps) {
     let title = "";
     if (type === "edit") title = "Editar Itinerario";
@@ -92,8 +94,8 @@ export default function ItineraryEditor({
                         <Button
                             onClick={handleSave}
                             style={["inline"]}
-                            label={isSaving ? "Guardando..." : "Guardar"}
-                            disabled={isSaving}
+                            label={readOnly ? "Solo lectura" : isSaving ? "Guardando..." : "Guardar"}
+                            disabled={isSaving || readOnly}
                         />
                     ) : undefined
                 }
@@ -117,13 +119,14 @@ export default function ItineraryEditor({
                     onTagsChange={handleTagsChange}
                     onDaysChange={handleDaysChange}
                     onAddNewDay={handleAddNewDay}
-                    onDelete={type === "edit" ? openModal : undefined}
+                    onDelete={type === "edit" && !readOnly ? openModal : undefined}
+                    readOnly={readOnly}
                 />
             ) : (
                 <AIGeneration />
             )}
 
-            {type === "edit" && (
+            {type === "edit" && !readOnly && (
                 <Modal
                     isOpen={isOpen}
                     title="Eliminar Itinerario"
