@@ -15,6 +15,7 @@ interface ItineraryEditFormProps {
     onDaysChange: (newDays: any[]) => void;
     onAddNewDay: () => void;
     onDelete?: () => void;
+    readOnly?: boolean;
 }
 
 export default function ItineraryEditForm({
@@ -23,10 +24,16 @@ export default function ItineraryEditForm({
     onTagsChange,
     onDaysChange,
     onAddNewDay,
-    onDelete
+    onDelete,
+    readOnly = false,
 }: ItineraryEditFormProps) {
     return (
-        <div className={styles.editForm}>
+        <div className={`${styles.editForm} ${readOnly ? styles.readOnly : ""}`}>
+            {readOnly && (
+                <p className={styles.readOnlyNotice}>
+                    Modo offline: este itinerario esta disponible solo para lectura.
+                </p>
+            )}
             <BasicInfoSection
                 itinerary={itinerary}
                 onUpdateBasicInfo={onUpdateBasicInfo}
@@ -40,7 +47,7 @@ export default function ItineraryEditForm({
                 onAddNewDay={onAddNewDay}
             />
 
-            {onDelete && itinerary.permissions.delete && (
+            {onDelete && itinerary.permissions.delete && !readOnly && (
                 <div className={styles.formFooter}>
                     <Button
                         onClick={onDelete}
