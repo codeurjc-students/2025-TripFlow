@@ -161,6 +161,19 @@ describe("ItineraryEditForm Component", () => {
         expect(deleteButton).not.toBeInTheDocument();
     });
 
+    it("does not render delete button in read-only mode", () => {
+        render(<ItineraryEditForm itinerary={mockItinerary} {...mockHandlers} readOnly />);
+
+        const deleteButton = screen.queryByText("Eliminar Itinerario");
+        expect(deleteButton).not.toBeInTheDocument();
+    });
+
+    it("renders read-only notice in read-only mode", () => {
+        render(<ItineraryEditForm itinerary={mockItinerary} {...mockHandlers} readOnly />);
+
+        expect(screen.getByText(/modo offline: este itinerario esta disponible solo para lectura/i)).toBeInTheDocument();
+    });
+
     it("calls onDelete when delete button is clicked", () => {
         render(<ItineraryEditForm itinerary={mockItinerary} {...mockHandlers} />);
 

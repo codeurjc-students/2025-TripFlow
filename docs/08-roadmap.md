@@ -215,10 +215,10 @@
   - [x] {UI} Copy share link action
   - [x] {Route} Public shared itinerary page - `/share/{token}`
   - [x] {Access} Read-only shared itinerary view
-- [ ] {PWA} Offline Access
+- [x] {PWA} Offline Access
   - [x] {Config} Service Worker configuration
-  - [ ] {Cache} Caching strategies for itinerary data
-  - [ ] {UI} Offline mode indicator and read-only access
+  - [x] {Cache} Caching strategies for itinerary data
+  - [x] {UI} Read-only access in offline mode
 - [x] {Feature} Client-Side PDF Export
   - [x] {Library} Integration with PDF library (e.g., react-pdf / jsPDF)
   - [x] {UI} Export button and layout generation

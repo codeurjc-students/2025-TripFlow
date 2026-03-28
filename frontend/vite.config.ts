@@ -38,6 +38,23 @@ export default defineConfig({
                             },
                         },
                     },
+                    {
+                        urlPattern: ({ url }) =>
+                            url.hostname === "images.unsplash.com" ||
+                            url.hostname === "source.unsplash.com" ||
+                            url.hostname === "plus.unsplash.com",
+                        handler: "CacheFirst",
+                        options: {
+                            cacheName: "unsplash-images",
+                            cacheableResponse: {
+                                statuses: [0, 200],
+                            },
+                            expiration: {
+                                maxEntries: 200,
+                                maxAgeSeconds: 60 * 60 * 24 * 30,
+                            },
+                        },
+                    },
                 ],
                 cleanupOutdatedCaches: true,
                 skipWaiting: true,
