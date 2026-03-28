@@ -4,9 +4,20 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class AILog {
     
     @Id
@@ -42,15 +53,9 @@ public class AILog {
     @Column(nullable = false)
     private Boolean success = false;
 
+    @CreatedDate
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = Instant.now();
-        }
-    }
 
     // [Constructors] =================================================
 
