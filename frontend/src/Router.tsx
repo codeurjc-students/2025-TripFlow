@@ -23,7 +23,9 @@ import NotFound from "@pages/NotFound";
 
 import { useAuth } from "@/providers/authProvider";
 import { useDemo } from "@/providers/demoProvider";
+import { useOfflineMode } from "@/hooks/useOfflineMode";
 import { useNotifications } from "@/hooks/notifications/useNotifications";
+import { useNotification } from "@/providers/notificationProvider";
 
 function PrivateWrapper() {
     const { demo } = useDemo();
@@ -40,6 +42,25 @@ function AdminWrapper() {
 
     if (!user) return <Navigate to="/login" replace />;
     if (user.role !== "ADMIN") return <Navigate to="/dashboard" replace />;
+
+    return <Outlet />;
+}
+
+function OfflineReadOnlyWrapper({ fallbackPath }: { fallbackPath: string }) {
+    const { readOnly } = useOfflineMode();
+    const { notify } = useNotification();
+
+    useEffect(() => {
+        if (readOnly) {
+            notify("Sin conexión: solo lectura disponible.", "info", {
+                title: "Modo offline",
+            });
+        }
+    }, [readOnly, notify]);
+
+    if (readOnly) {
+        return <Navigate to={fallbackPath} replace />;
+    }
 
     return <Outlet />;
 }
@@ -87,21 +108,29 @@ export default function Router() {
                         <Route index element={<ItinerariesPage />} />
                         <Route path=":id">
                             <Route index element={<ItineraryDetailPage />} />
-                            <Route path="edit" element={<ItineraryEditPage />} />
                             <Route path="map" element={<ItineraryMapPage />} />
+                            <Route element={<OfflineReadOnlyWrapper fallbackPath="/itineraries" />}>
+                                <Route path="edit" element={<ItineraryEditPage />} />
+                            </Route>
                         </Route>
-                        <Route path="new" element={<ItineraryNewPage />} />
+                        <Route element={<OfflineReadOnlyWrapper fallbackPath="/itineraries" />}>
+                            <Route path="new" element={<ItineraryNewPage />} />
+                        </Route>
                     </Route>
                     <Route path="/notifications" element={<NotificationsPage />} />
                     <Route path="/profile">
                         <Route index element={<ProfilePage />} />
-                        <Route path="edit" element={<ProfileEditPage />} />
+                        <Route element={<OfflineReadOnlyWrapper fallbackPath="/profile" />}>
+                            <Route path="edit" element={<ProfileEditPage />} />
+                        </Route>
                     </Route>
                 </Route>
 
                 {/* Admin routes */}
                 <Route element={<AdminWrapper />}>
-                    <Route path="/admin" element={<AdminPage />} />
+                    <Route element={<OfflineReadOnlyWrapper fallbackPath="/dashboard" />}>
+                        <Route path="/admin" element={<AdminPage />} />
+                    </Route>
                 </Route>
 
                 {/* Catch-all route for 404 Not Found */}
