@@ -154,9 +154,11 @@ async function inviteFromOwner(ownerPage: Page, username: string) {
 
 async function acceptInvitation(page: Page, username: string, itineraryTitle: string) {
     await login(page, username);
-    await page.goto(`${FRONTEND_URL}/notifications`);
+    await page.goto(`${FRONTEND_URL}/dashboard/notifications`);
 
-    const invitationCard = page.locator("div").filter({ hasText: new RegExp(itineraryTitle, "i") }).first();
+    await expect(page.getByRole("heading", { name: /notificaciones/i })).toBeVisible({ timeout: 15000 });
+
+    const invitationCard = page.locator('[class*="card"]').filter({ hasText: new RegExp(itineraryTitle, "i") }).first();
     await expect(invitationCard).toBeVisible({ timeout: 20000 });
 
     await Promise.all([
@@ -173,9 +175,11 @@ async function acceptInvitation(page: Page, username: string, itineraryTitle: st
 
 async function declineInvitation(page: Page, username: string, itineraryTitle: string) {
     await login(page, username);
-    await page.goto(`${FRONTEND_URL}/notifications`);
+    await page.goto(`${FRONTEND_URL}/dashboard/notifications`);
 
-    const invitationCard = page.locator("div").filter({ hasText: new RegExp(itineraryTitle, "i") }).first();
+    await expect(page.getByRole("heading", { name: /notificaciones/i })).toBeVisible({ timeout: 15000 });
+
+    const invitationCard = page.locator('[class*="card"]').filter({ hasText: new RegExp(itineraryTitle, "i") }).first();
     await expect(invitationCard).toBeVisible({ timeout: 20000 });
 
     await Promise.all([
