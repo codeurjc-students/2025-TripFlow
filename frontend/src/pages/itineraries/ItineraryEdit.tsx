@@ -106,7 +106,7 @@ export default function ItineraryEdit() {
     }, [id]);
 
     return (
-        <AppLayout>
+        <AppLayout innerPage>
             {isLoading && <Loader size={32} variant="dots" />}
             {itinerary && (
                 <ItineraryEditor

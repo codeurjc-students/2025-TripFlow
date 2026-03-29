@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 
-import { useItineraryMapData } from "./useItineraryMapData";
+import { useItineraryMapData } from "@/hooks/useItineraryMapData";
 import type { ExtendedItinerary } from "@/types/itinerary";
 
 function makeItinerary(

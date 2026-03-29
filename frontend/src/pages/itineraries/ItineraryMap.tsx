@@ -11,18 +11,21 @@ import { FIT_BOUNDS_PADDING } from "@/utils/mapGeometry";
 
 import { ChevronLeft, LocateFixedIcon } from "lucide-react";
 
-import LeafletMapView, { useRecenter } from "@/components/map/LeafletMapView";
+import { useRecenter } from "@/components/map/LeafletMapView";
 import ItineraryMarkersLayer from "@/components/map/ItineraryMarkersLayer";
 import ItineraryRouteLayer from "@/components/map/ItineraryRouteLayer";
 import MapBottomSheet from "@/components/map/MapBottomSheet";
+import MapPageShell from "@/components/map/MapPageShell";
 import Button from "@/components/shared/Button";
 import Loader from "@/components/shared/Loader";
+import AppLayout from "@/layouts/AppLayout";
 
 export default function ItineraryMapPage() {
     const [itinerary, setItinerary] = useState<ExtendedItinerary | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
     const [isRouteHidden, setIsRouteHidden] = useState(false);
+    const [isBottomPanelCollapsed, setIsBottomPanelCollapsed] = useState(false);
 
     const { id } = useParams<{ id: string }>();
     const itineraryId = Number(id);
@@ -121,13 +124,13 @@ export default function ItineraryMapPage() {
     }
 
     return (
-        <div className={styles.mapPage}>
-            <LeafletMapView
+        <AppLayout immersive innerPage>
+            <MapPageShell
+                className={styles.mapPage}
+                mapClassName={styles.mapContainer}
                 bounds={mapData.bounds}
                 onMapReady={handleMapReady}
-                className={styles.mapContainer}
-            >
-                {(map) => (
+                renderLayers={(map) => (
                     <>
                         <ItineraryMarkersLayer
                             map={map}
@@ -142,35 +145,40 @@ export default function ItineraryMapPage() {
                         />
                     </>
                 )}
-            </LeafletMapView>
-
-            <div className={styles.topBar}>
-                <Button
-                    style={["tool_bordered"]}
-                    to={`/itineraries/${itineraryId}`}
-                    ariaLabel="Volver al detalle del itinerario"
-                >
-                    <ChevronLeft size={20} />
-                </Button>
-                <Button
-                    style={["tool_bordered"]}
-                    onClick={recenter}
-                    ariaLabel="Recentrar mapa"
-                >
-                    <LocateFixedIcon size={18} />
-                </Button>
-            </div>
-
-            <MapBottomSheet
-                waypoints={mapData.filteredWaypoints}
-                dayNumbers={mapData.dayNumbers}
-                selectedDay={mapData.selectedDay}
-                onDayChange={mapData.setSelectedDay}
-                selectedWaypointIndex={mapData.selectedWaypointIndex}
-                onSelectWaypoint={handleCardSelect}
-                invalidCount={mapData.invalidCount}
-                itineraryTitle={itinerary.title}
+                topBar={(
+                    <div className={styles.topBar}>
+                        <Button
+                            style={["tool_bordered"]}
+                            to={`/itineraries/${itineraryId}`}
+                            ariaLabel="Volver al detalle del itinerario"
+                        >
+                            <ChevronLeft size={20} />
+                        </Button>
+                        <Button
+                            style={["tool_bordered"]}
+                            onClick={recenter}
+                            ariaLabel="Recentrar mapa"
+                        >
+                            <LocateFixedIcon size={18} />
+                        </Button>
+                    </div>
+                )}
+                bottomPanel={(
+                    <MapBottomSheet
+                        waypoints={mapData.filteredWaypoints}
+                        dayNumbers={mapData.dayNumbers}
+                        selectedDay={mapData.selectedDay}
+                        onDayChange={mapData.setSelectedDay}
+                        selectedWaypointIndex={mapData.selectedWaypointIndex}
+                        onSelectWaypoint={handleCardSelect}
+                        invalidCount={mapData.invalidCount}
+                        itineraryTitle={itinerary.title}
+                        isCollapsed={isBottomPanelCollapsed}
+                        onToggleCollapse={() => setIsBottomPanelCollapsed((value) => !value)}
+                        offsetForMobileNav={false}
+                    />
+                )}
             />
-        </div>
+        </AppLayout>
     );
 }

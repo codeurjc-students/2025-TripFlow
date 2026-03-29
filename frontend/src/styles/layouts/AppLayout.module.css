@@ -36,6 +36,17 @@
     align-items: stretch;
 }
 
+.immersive {
+    .main {
+        padding-top: 0;
+        padding-right: 0;
+        padding-bottom: 0;
+        padding-left: var(--sidebar-width);
+        gap: 0;
+        overflow: hidden;
+    }
+}
+
 @media (max-width: 1024px) {
     .layout {
         .main {
@@ -48,5 +59,12 @@
         max-width: 100%;
         padding-inline: var(--space-md);
         padding-bottom: var(--space-xxl);
+    }
+
+    .immersive {
+        .main {
+            padding: 0;
+            overflow: hidden;
+        }
     }
 }

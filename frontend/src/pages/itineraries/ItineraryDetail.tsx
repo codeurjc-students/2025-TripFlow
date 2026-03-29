@@ -94,7 +94,7 @@ export default function ItineraryDetailPage() {
     };
 
     return (
-        <AppLayout>
+        <AppLayout innerPage>
             <InnerTabHeader
                 title={itinerary?.title || ""}
                 back={{ url: "/itineraries", label: "Volver" }}

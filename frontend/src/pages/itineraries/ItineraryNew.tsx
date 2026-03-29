@@ -61,7 +61,7 @@ export default function ItineraryNewPage() {
     };
 
     return (
-        <AppLayout>
+        <AppLayout innerPage>
             <ItineraryEditor
                 key={editorType}
                 type={editorType}

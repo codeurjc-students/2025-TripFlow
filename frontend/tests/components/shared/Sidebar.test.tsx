@@ -18,6 +18,7 @@ describe("Sidebar Component", () => {
         render(<Sidebar />);
         expect(screen.getByRole("link", { name: /dashboard/i })).toBeInTheDocument();
         expect(screen.getByRole("link", { name: /itinerarios/i })).toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /explorar/i })).toBeInTheDocument();
         expect(screen.getByRole("link", { name: /perfil/i })).toBeInTheDocument();
     });
 

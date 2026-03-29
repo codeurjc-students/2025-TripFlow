@@ -7,7 +7,7 @@ import type { Collaborator } from "@/types/collaboration";
 import { useNotifications } from "@/hooks/useNotifications";
 
 import AppLayout from "@/layouts/AppLayout";
-import NotificationsHeader from "@/components/dashboard/headers/NotificationsHeader";
+import InnerTabHeader from "@/components/dashboard/headers/InnerTabHeader";
 import InvitationGroup from "@/components/dashboard/notifications/InvitationGroup";
 import Loader from "@/components/shared/Loader";
 
@@ -50,8 +50,14 @@ export default function NotificationsPage() {
     const grouped = groupByDate(invitations);
 
     return (
-        <AppLayout>
-            <NotificationsHeader count={invitations.length} />
+        <AppLayout innerPage>
+            <InnerTabHeader
+                title="Notificaciones"
+                back={{
+                    url: "/dashboard",
+                    label: "Volver",
+                }}
+            />
             <div className={styles.container}>
                 {isLoading ? (
                     <div className={styles.loaderContainer}>

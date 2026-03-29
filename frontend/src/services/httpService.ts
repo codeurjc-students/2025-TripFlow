@@ -13,6 +13,7 @@ const CACHE_TTL_LONG_MS = 30 * 60 * 1000;
 const GET_CACHE_TTL: Array<{ match: (path: string) => boolean; ttlMs: number }> = [
   { match: (path) => path.startsWith("/api/v1/itineraries"), ttlMs: CACHE_TTL_LONG_MS },
   { match: (path) => path.startsWith("/api/v1/share/"), ttlMs: CACHE_TTL_LONG_MS },
+  { match: (path) => path.startsWith("/api/v1/maps/search/"), ttlMs: CACHE_TTL_DEFAULT_MS },
   { match: (path) => path.startsWith("/api/v1/users"), ttlMs: CACHE_TTL_DEFAULT_MS },
 ];
 
@@ -37,7 +38,7 @@ let failedQueue: Array<{
 }> = [];
 
 const isAuthEndpoint = (path: string): boolean => {
-    return path.startsWith("/api/auth/") || path === "/api/auth";
+  return path.startsWith("/api/auth");
 }
 
 const processQueue = (error: Error | null) => {

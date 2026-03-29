@@ -15,6 +15,7 @@ import SharedItineraryPage from "@pages/itineraries/SharedItinerary";
 import ItineraryNewPage from "@pages/itineraries/ItineraryNew";
 import ItineraryEditPage from "@pages/itineraries/ItineraryEdit";
 import ItineraryMapPage from "@pages/itineraries/ItineraryMap";
+import MapExplorePage from "@pages/map/MapExplore";
 import ProfilePage from "@pages/profile/Profile";
 import ProfileEditPage from "@pages/profile/ProfileEdit";
 import NotificationsPage from "@pages/Notifications";
@@ -117,7 +118,8 @@ export default function Router() {
                             <Route path="new" element={<ItineraryNewPage />} />
                         </Route>
                     </Route>
-                    <Route path="/notifications" element={<NotificationsPage />} />
+                    <Route path="/dashboard/notifications" element={<NotificationsPage />} />
+                    <Route path="/map/explore" element={<MapExplorePage />} />
                     <Route path="/profile">
                         <Route index element={<ProfilePage />} />
                         <Route element={<OfflineReadOnlyWrapper fallbackPath="/profile" />}>
