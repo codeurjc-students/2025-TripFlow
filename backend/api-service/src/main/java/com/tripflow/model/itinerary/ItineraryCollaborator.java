@@ -104,10 +104,6 @@ public class ItineraryCollaborator {
         return invitedAt;
     }
 
-    public void setInvitedAt(LocalDateTime invitedAt) {
-        this.invitedAt = invitedAt;
-    }
-
     public LocalDateTime getAcceptedAt() {
         return acceptedAt;
     }
