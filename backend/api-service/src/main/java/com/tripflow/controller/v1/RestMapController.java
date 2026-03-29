@@ -58,11 +58,10 @@ public class RestMapController {
         @RequestParam(required = false) Double lat,
         @RequestParam(required = false) Double lon,
         @RequestParam(required = false) Integer radiusKm,
-        @RequestParam(required = false) String types,
         @RequestParam(required = false) String category
     ) {
         return ResponseEntity.ok(this.mapsService.suggest(
-            new MapSuggestQueryDTO(q, language, limit, proximity, bbox, country, lat, lon, radiusKm, types, category)
+            new MapSuggestQueryDTO(q, language, limit, proximity, bbox, country, lat, lon, radiusKm, category)
         ));
     }
 

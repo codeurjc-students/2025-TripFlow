@@ -5,6 +5,7 @@ import java.util.List;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,10 @@ public class MapTilerSearchProvider implements MapsSearchProvider {
     private static final double EARTH_RADIUS_KM = 6371.0;
     private static final int DEFAULT_RADIUS_KM = 5;
     private static final String DEFAULT_DISCOVERY_QUERY = "poi";
-    private static final int DEFAULT_SUGGEST_LIMIT = 8;
+    private static final int DEFAULT_SUGGEST_LIMIT = 15;
+    private static final Set<String> POI_FEATURE_TYPES = Set.of(
+        "poi", "place", "restaurant", "cafe", "bar", "museum", "hotel", "attraction", "park", "shop"
+    );
 
     private final RestTemplate mapsRestTemplate;
     private final ObjectMapper objectMapper;
@@ -109,6 +113,7 @@ public class MapTilerSearchProvider implements MapsSearchProvider {
         UriComponentsBuilder requestBuilder = UriComponentsBuilder
             .fromUriString(this.mapTilerProperties.getGeocodingBaseUrl() + "/" + UriUtils.encodePathSegment(context.effectiveQuery(), StandardCharsets.UTF_8) + ".json")
             .queryParam("autocomplete", true)
+            .queryParam("types", "poi")
             .queryParam("limit", query.limit() != null ? query.limit() : DEFAULT_SUGGEST_LIMIT)
             .queryParam("key", this.mapTilerProperties.getApiKey());
 
@@ -116,7 +121,6 @@ public class MapTilerSearchProvider implements MapsSearchProvider {
         this.addQueryParamIfPresent(requestBuilder, "proximity", context.proximity());
         this.addQueryParamIfPresent(requestBuilder, "bbox", context.bbox());
         this.addQueryParamIfPresent(requestBuilder, "country", query.country());
-        this.addQueryParamIfPresent(requestBuilder, "types", query.types());
 
         return requestBuilder.build().toUriString();
     }
@@ -129,7 +133,7 @@ public class MapTilerSearchProvider implements MapsSearchProvider {
             + "|" + context.proximity()
             + "|" + context.bbox()
             + "|" + query.country()
-            + "|" + query.types();
+            + "|" + query.category();
         return MapsCacheService.buildCacheKey(rawKey);
     }
 
@@ -141,7 +145,7 @@ public class MapTilerSearchProvider implements MapsSearchProvider {
             if (features.isArray()) {
                 for (JsonNode feature : features) {
                     MapSuggestionDTO suggestion = this.toSuggestion(feature);
-                    if (this.isWithinRadius(suggestion, context)) {
+                    if (this.isUsefulSuggestion(suggestion, context)) {
                         suggestions.add(suggestion);
                     }
                 }
@@ -238,10 +242,7 @@ public class MapTilerSearchProvider implements MapsSearchProvider {
             return new SuggestRequestContext(
                 effectiveQuery,
                 this.normalizeBlankToNull(query.proximity()),
-                this.normalizeBlankToNull(query.bbox()),
-                null,
-                null,
-                null
+                this.normalizeBlankToNull(query.bbox())
             );
         }
 
@@ -251,7 +252,7 @@ public class MapTilerSearchProvider implements MapsSearchProvider {
         String proximity = String.format(Locale.US, "%s,%s", lon, lat);
         String bbox = this.buildBboxFromRadius(lat, lon, radiusKm);
 
-        return new SuggestRequestContext(effectiveQuery, proximity, bbox, lat, lon, radiusKm);
+        return new SuggestRequestContext(effectiveQuery, proximity, bbox);
     }
 
     private String buildBboxFromRadius(double lat, double lon, int radiusKm) {
@@ -293,46 +294,52 @@ public class MapTilerSearchProvider implements MapsSearchProvider {
         return Math.max(min, Math.min(max, value));
     }
 
-    private boolean isWithinRadius(MapSuggestionDTO suggestion, SuggestRequestContext context) {
-        if (context.centerLat() == null || context.centerLon() == null || context.radiusKm() == null) {
-            return true;
-        }
-
-        MapCoordinateDTO center = suggestion.center();
-        if (center == null) {
+    private boolean isUsefulSuggestion(MapSuggestionDTO suggestion, SuggestRequestContext context) {
+        if (this.isBlank(suggestion.id()) || this.isBlank(suggestion.name()) || this.isBlank(suggestion.fullAddress())) {
             return false;
         }
 
-        double distanceKm = this.haversineDistanceKm(
-            context.centerLat(),
-            context.centerLon(),
-            center.latitude(),
-            center.longitude()
-        );
-        return distanceKm <= context.radiusKm();
+        if ("-".equals(suggestion.name().trim()) || "-".equals(suggestion.fullAddress().trim())) {
+            return false;
+        }
+
+        if (suggestion.center() == null) {
+            return false;
+        }
+
+        if (!this.isPoiIntent(context)) {
+            return true;
+        }
+
+        String featureType = this.normalize(suggestion.featureType());
+        if (POI_FEATURE_TYPES.contains(featureType)) {
+            return true;
+        }
+
+        return suggestion.categories() != null
+            && suggestion.categories().stream()
+            .filter(Objects::nonNull)
+            .map(this::normalize)
+            .anyMatch(category -> !category.isBlank() && !"address".equals(category) && !"street".equals(category));
     }
 
-    private double haversineDistanceKm(double lat1, double lon1, double lat2, double lon2) {
-        double lat1Rad = Math.toRadians(lat1);
-        double lat2Rad = Math.toRadians(lat2);
-        double deltaLatRad = Math.toRadians(lat2 - lat1);
-        double deltaLonRad = Math.toRadians(lon2 - lon1);
+    private boolean isPoiIntent(SuggestRequestContext context) {
+        return context.effectiveQuery() != null
+            && context.effectiveQuery().toLowerCase(Locale.ROOT).contains(DEFAULT_DISCOVERY_QUERY);
+    }
 
-        double a = Math.sin(deltaLatRad / 2) * Math.sin(deltaLatRad / 2)
-            + Math.cos(lat1Rad) * Math.cos(lat2Rad)
-            * Math.sin(deltaLonRad / 2) * Math.sin(deltaLonRad / 2);
+    private String normalize(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
+    }
 
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return EARTH_RADIUS_KM * c;
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 
     private record SuggestRequestContext(
         String effectiveQuery,
         String proximity,
-        String bbox,
-        Double centerLat,
-        Double centerLon,
-        Integer radiusKm
+        String bbox
     ) {
     }
 

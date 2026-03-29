@@ -44,13 +44,6 @@ public record MapSuggestQueryDTO(
     @Max(value = 50, message = "radiusKm must be between 5 and 50")
     Integer radiusKm,
 
-    @Pattern(
-        regexp = "^$|^[a-z_]+(?:,[a-z_]+)*$",
-        message = "types must be a comma-separated list"
-    )
-    @Size(max = 128, message = "types must not exceed 128 characters")
-    String types,
-
     @Size(max = 64, message = "category must not exceed 64 characters")
     String category
 ) {

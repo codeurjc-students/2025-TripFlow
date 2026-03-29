@@ -212,7 +212,10 @@
 - [x] {Feature} Interactive Maps Integration
   - [x] {UI} Map visualization component (Leaflet)
   - [x] {UI} Plotting daily itinerary routes
-  - [ ] {UI} Full wiring to backend nearby discovery + directions workflow
+  - [x] {UI} New map explore screen with geolocation-first nearby discovery (`/map/explore`)
+  - [x] {UI} Search UX for nearby points of interest (query + radius)
+  - [ ] {UI} Full route geometry wiring in explore flow (`route from me`)
+  - [ ] {UI} Add recommendation directly into itinerary day from explore screen
 - [x] {Feature} Collaborative Itineraries UI
   - [x] {UI} Collaboration modal (invite, role update, remove/leave)
   - [x] {UI} Invitations center (pending invitations list + accept/decline)
@@ -237,7 +240,8 @@
 - [x] {Integration-Backend} Collaboration endpoints (invite, accept, decline, list, update role, remove)
 - [x] {Integration-Backend} Share link endpoints (generate/list/revoke/public access)
 - [x] {Unit-Backend} Maps provider resolver and directions cache key tests
-- [x] {Unit-Backend} Strict radius filtering tests for maps suggestions
+- [x] {Unit-Backend} POI relevance filtering tests for maps suggestions
+- [x] {Unit-Frontend} Maps service tests (suggest/retrieve/directions integration)
 - [ ] {Integration-Backend} Full Docker-backed map endpoints suite in CI environment
 - [x] {Security} Share link expiration and revocation behavior
 - [x] {Unit-Frontend} Collaboration hook tests for share links (list/generate/revoke flows)
