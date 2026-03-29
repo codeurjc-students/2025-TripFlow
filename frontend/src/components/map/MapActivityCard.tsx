@@ -2,6 +2,7 @@ import styles from "@styles/components/map/MapActivityCard.module.css";
 
 import type { MapWaypoint } from "@/utils/mapGeometry";
 import { Clock3 } from "lucide-react";
+import MapInfoCardBase from "@/components/map/MapInfoCardBase";
 
 interface MapActivityCardProps {
     waypoint: MapWaypoint;
@@ -20,35 +21,21 @@ export default function MapActivityCard({
     const hasAddress = activity.location.address && activity.location.address.trim().length > 0;
 
     return (
-        <button
-            className={`${styles.card} ${isSelected ? styles.cardSelected : ""}`}
-            onClick={onClick}
-            aria-label={`${activity.activity} - ${activity.location.name}${hasAddress ? ` - ${activity.location.address}` : ""}${hasTime ? ` - ${activity.time}` : ""}`}
-            aria-pressed={isSelected}
-            type="button"
-        >
-            <div className={styles.cardContent}>
-                <div className={styles.topRow}>
-                    <span className={styles.cardTitle}>{activity.activity}</span>
-                    <span className={styles.timePill}>{hasTime ? activity.time : "Sin hora"}</span>
-                </div>
-
-                {hasAddress && (
-                    <p className={styles.cardAddress}>{activity.location.address}</p>
-                )}
-
-                <div className={styles.metaRow}>
-                    {hasDuration && (
-                        <span className={styles.metaItem}>
-                            <Clock3 size={13} className={styles.metaIcon} aria-hidden="true" />
-                            <span className={styles.cardDuration}>{activity.duration}</span>
-                        </span>
-                    )}
+        <MapInfoCardBase
+            title={activity.activity}
+            subtitle={hasAddress ? activity.location.address : undefined}
+            badge={hasTime ? activity.time : "Sin hora"}
+            meta={
+                hasDuration && (
                     <span className={styles.metaItem}>
-                        <span className={styles.dayText}>Dia {waypoint.dayNumber}</span>
+                        <Clock3 size={13} className={styles.metaIcon} aria-hidden="true" />
+                        <span className={styles.cardDuration}>{activity.duration}</span>
                     </span>
-                </div>
-            </div>
-        </button>
+                )
+            }
+            isSelected={isSelected}
+            onClick={onClick}
+            ariaLabel={`${activity.activity} - ${activity.location.name}${hasAddress ? ` - ${activity.location.address}` : ""}${hasTime ? ` - ${activity.time}` : ""}`}
+        />
     );
 }

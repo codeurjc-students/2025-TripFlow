@@ -1,4 +1,5 @@
 @import url("../../animations.css");
+@import url("./MapTheme.module.css");
 
 .mapPage {
     position: relative;
@@ -17,15 +18,6 @@
     bottom: 0;
     z-index: 1;
     animation: fadeIn 0.35s ease-out;
-}
-
-.mapContainer :global(.leaflet-container) {
-    background: var(--bg-primary);
-}
-
-.mapContainer :global(.leaflet-tile-pane),
-.mapContainer :global(.leaflet-tile) {
-    background: var(--bg-primary);
 }
 
 @media (max-width: 768px) {
@@ -65,62 +57,6 @@
     align-items: center;
     justify-content: center;
     background: var(--bg-primary);
-}
-
-/* Blue-tint the dark tiles to match app UI palette */
-.mapContainer :global(.leaflet-tile-pane) {
-    filter: brightness(0.9) sepia(0.5) hue-rotate(170deg) saturate(2);
-}
-
-/* Leaflet controls positioning */
-.mapContainer :global(.leaflet-control-container) {
-    z-index: 500;
-}
-
-.mapContainer :global(.leaflet-top.leaflet-right) {
-    top: calc(var(--space-md) + 42px + var(--space-sm));
-    right: var(--space-md);
-}
-
-/* Match Leaflet zoom controls to app tool_bordered buttons */
-.mapContainer :global(.leaflet-control-zoom.leaflet-bar) {
-    display: grid;
-    gap: var(--space-sm);
-    border: none;
-    box-shadow: none;
-    margin: 0;
-}
-
-.mapContainer :global(.leaflet-control-zoom.leaflet-bar a) {
-    --size: 42px;
-    width: var(--size);
-    height: var(--size);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--border-secondary);
-    background-color: var(--bg-secondary);
-    color: var(--text-tertiary);
-    line-height: 1;
-    font-size: 24px;
-    font-weight: var(--font-weight-normal);
-    box-shadow: none;
-    border-radius: var(--border-radius-lg);
-    margin: 0;
-}
-
-.mapContainer :global(.leaflet-control-zoom.leaflet-bar a:hover) {
-    filter: brightness(1.2);
-    background-color: var(--bg-secondary);
-    color: var(--text-tertiary);
-}
-
-.mapContainer :global(.leaflet-control-zoom-in) {
-    border-radius: var(--border-radius-lg);
-}
-
-.mapContainer :global(.leaflet-control-zoom-out) {
-    border-radius: var(--border-radius-lg);
 }
 
 /* Themed itinerary markers */
@@ -178,39 +114,3 @@
 }
 
 /* Themed popup surface */
-.mapContainer :global(.itinerary-map-popup .leaflet-popup-content-wrapper) {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    border: 2px solid var(--border-secondary);
-    border-radius: var(--border-radius-lg);
-}
-
-.mapContainer :global(.itinerary-map-popup .leaflet-popup-tip) {
-    background: var(--bg-primary);
-    border: 2px solid var(--border-secondary);
-}
-
-.mapContainer :global(.itinerary-map-popup .leaflet-popup-content) {
-    margin: var(--space-sm) var(--space-md);
-}
-
-.mapContainer :global(.itinerary-popup-content) {
-    min-width: 170px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.mapContainer :global(.itinerary-popup-content strong) {
-    font-size: var(--font-size-sm);
-}
-
-.mapContainer :global(.itinerary-popup-location) {
-    color: var(--text-secondary);
-    font-size: var(--font-size-xs);
-}
-
-.mapContainer :global(.itinerary-popup-meta) {
-    color: var(--text-tertiary);
-    font-size: var(--font-size-xxs);
-}
