@@ -11,6 +11,8 @@ security:
 tags:
 - name: Itinerary Share Links
   description: Endpoints for generating and consuming itinerary share links
+- name: Map Integration
+  description: Map search and directions proxy endpoints
 - name: AI Generation
   description: AI generation and processing
 - name: Statistics
@@ -448,6 +450,46 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PublicUserDTO"
+      security:
+      - auth_token: []
+  /api/v1/maps/directions:
+    post:
+      tags:
+      - Map Integration
+      summary: Get route directions
+      description: Returns optimized route geometry and summary from ordered waypoints.
+      operationId: directions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MapDirectionsRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: Directions retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapDirectionsResponseDTO"
+        "400":
+          description: Invalid request payload
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapDirectionsResponseDTO"
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapDirectionsResponseDTO"
+        "503":
+          description: Map service unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapDirectionsResponseDTO"
       security:
       - auth_token: []
   /api/v1/itineraries/{itineraryId}/share-links:
@@ -1072,6 +1114,145 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
+  /api/v1/maps/search/suggest:
+    get:
+      tags:
+      - Map Integration
+      summary: Suggest places
+      description: Returns autocomplete location suggestions through backend map proxy.
+      operationId: suggest
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: language
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: proximity
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: bbox
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: country
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: lat
+        in: query
+        required: false
+        schema:
+          type: number
+          format: double
+      - name: lon
+        in: query
+        required: false
+        schema:
+          type: number
+          format: double
+      - name: radiusKm
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: types
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: category
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Suggestions retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapSuggestResponseDTO"
+        "400":
+          description: Invalid query parameters
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapSuggestResponseDTO"
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapSuggestResponseDTO"
+        "503":
+          description: Map service unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapSuggestResponseDTO"
+      security:
+      - auth_token: []
+  /api/v1/maps/search/retrieve/{id}:
+    get:
+      tags:
+      - Map Integration
+      summary: Retrieve place details
+      description: Returns place details and coordinates from selected suggestion.
+      operationId: retrieve
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: language
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Place details retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapPlaceDTO"
+        "400":
+          description: Invalid query parameters
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapPlaceDTO"
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapPlaceDTO"
+        "404":
+          description: Place not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapPlaceDTO"
+      security:
+      - auth_token: []
   /api/v1/ai/status:
     get:
       tags:
@@ -1441,6 +1622,80 @@ components:
           type: boolean
         delete:
           type: boolean
+    MapCoordinateDTO:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          maximum: 90.0
+          minimum: -90.0
+        longitude:
+          type: number
+          format: double
+          maximum: 180.0
+          minimum: -180.0
+      required:
+      - latitude
+      - longitude
+    MapDirectionsRequestDTO:
+      type: object
+      properties:
+        profile:
+          type: string
+          enum:
+          - DRIVING
+          - DRIVING_TRAFFIC
+          - WALKING
+          - CYCLING
+        waypoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapCoordinateDTO"
+          maxItems: 25
+          minItems: 2
+        alternatives:
+          type: boolean
+        steps:
+          type: boolean
+      required:
+      - profile
+      - waypoints
+    MapDirectionsResponseDTO:
+      type: object
+      properties:
+        routes:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapRouteDTO"
+    MapRouteDTO:
+      type: object
+      properties:
+        distance:
+          type: number
+          format: double
+        duration:
+          type: number
+          format: double
+        geometry:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapCoordinateDTO"
+        legs:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapRouteLegDTO"
+    MapRouteLegDTO:
+      type: object
+      properties:
+        distance:
+          type: number
+          format: double
+        duration:
+          type: number
+          format: double
+        summary:
+          type: string
     ShareLinkDTO:
       type: object
       properties:
@@ -1648,6 +1903,51 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/StatDTO"
+    MapSuggestResponseDTO:
+      type: object
+      properties:
+        suggestions:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapSuggestionDTO"
+    MapSuggestionDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        fullAddress:
+          type: string
+        placeFormatted:
+          type: string
+        featureType:
+          type: string
+        center:
+          $ref: "#/components/schemas/MapCoordinateDTO"
+        categories:
+          type: array
+          items:
+            type: string
+    MapPlaceDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        fullAddress:
+          type: string
+        placeFormatted:
+          type: string
+        featureType:
+          type: string
+        center:
+          $ref: "#/components/schemas/MapCoordinateDTO"
+        categories:
+          type: array
+          items:
+            type: string
     ItineraryResponseDTO:
       type: object
       properties:
