@@ -1171,11 +1171,6 @@ paths:
         schema:
           type: integer
           format: int32
-      - name: types
-        in: query
-        required: false
-        schema:
-          type: string
       - name: category
         in: query
         required: false
