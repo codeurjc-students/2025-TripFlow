@@ -30,7 +30,16 @@ npm install @redocly/cli -g
 
 # Download OpenAPI specification from the running API
 echo "[+] Downloading OpenAPI specification..."
-curl -o "$PROJECT_ROOT/docs/api/api-docs.yaml" "$API_URL/v3/api-docs.yaml"
+DOCS_TARGET="$PROJECT_ROOT/docs/api/api-docs.yaml"
+
+if ! curl --fail --location --silent --show-error \
+  -o "$DOCS_TARGET" \
+  "$API_URL/v3/api-docs.yaml"; then
+  echo "[!] YAML endpoint unavailable, falling back to JSON endpoint..."
+  curl --fail --location --silent --show-error \
+    -o "$DOCS_TARGET" \
+    "$API_URL/v3/api-docs"
+fi
 
 # Generate API documentation using Redocly
 echo "[+] Generating API documentation..."

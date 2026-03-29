@@ -30,16 +30,30 @@ call npm install @redocly/cli -g
 
 REM Download OpenAPI specification from the running API
 echo [+] Downloading OpenAPI specification...
-call curl -o "%PROJECT_ROOT%\docs\api\api-docs.yaml" "%API_URL%/v3/api-docs.yaml"
+set DOCS_TARGET=%PROJECT_ROOT%\docs\api\api-docs.yaml
+call curl --fail --location --silent --show-error -o "%DOCS_TARGET%" "%API_URL%/v3/api-docs.yaml"
+if errorlevel 1 (
+  echo [!] YAML endpoint unavailable, falling back to JSON endpoint...
+  call curl --fail --location --silent --show-error -o "%DOCS_TARGET%" "%API_URL%/v3/api-docs"
+  if errorlevel 1 (
+    echo [-] Failed to download OpenAPI specification from both YAML and JSON endpoints.
+    goto cleanup
+  )
+)
 
 REM Generate API documentation using Redocly
 echo [+] Generating API documentation...
-call redocly build-docs "%PROJECT_ROOT%\docs\api\api-docs.yaml" --output "%PROJECT_ROOT%\docs\api\api-docs.html"
+call redocly build-docs "%DOCS_TARGET%" --output "%PROJECT_ROOT%\docs\api\api-docs.html"
+if errorlevel 1 (
+  echo [-] Failed to generate API documentation with Redocly.
+  goto cleanup
+)
 
 REM Stop and remove test containers
+:cleanup
 echo [+] Stopping and removing test containers...
 cd /d "%PROJECT_ROOT%"
-call docker compose -f docker\docker-compose.test.yaml down
+call docker compose --env-file docker\.env.example -f docker\docker-compose.test.yaml down
 
 echo [+] API Docs generation finished!
 cd /d "%SCRIPT_DIR%"
