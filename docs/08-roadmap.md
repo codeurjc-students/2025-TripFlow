@@ -198,14 +198,21 @@
     - [x] {Config} Fixed TTL policy for shared links
 - [x] {Feature} Basic Backend Support for Maps
   - [x] {Model} Extension of Location entity to support coordinates (lat/lng)
-- [ ] {Feature} Location Discovery
-  - [ ] {Concept} Exploration of nearby places / points of interest (Implementation TBD)
+  - [x] {API} Suggest places endpoint - `GET /api/v1/maps/search/suggest`
+  - [x] {API} Retrieve place details endpoint - `GET /api/v1/maps/search/retrieve/{id}`
+  - [x] {API} Directions endpoint - `POST /api/v1/maps/directions`
+  - [x] {Architecture} Provider-agnostic map service (mock + real providers)
+  - [x] {Cache} Persisted map cache for search/retrieve/directions responses
+  - [x] {Validation} Nearby discovery with optional query and strict radius filtering
+- [x] {Feature} Location Discovery
+  - [x] {Backend} Nearby places / points of interest support via maps suggest API
 
 ### ⚛️ Frontend
 
 - [x] {Feature} Interactive Maps Integration
   - [x] {UI} Map visualization component (Leaflet)
   - [x] {UI} Plotting daily itinerary routes
+  - [ ] {UI} Full wiring to backend nearby discovery + directions workflow
 - [x] {Feature} Collaborative Itineraries UI
   - [x] {UI} Collaboration modal (invite, role update, remove/leave)
   - [x] {UI} Invitations center (pending invitations list + accept/decline)
@@ -229,10 +236,12 @@
 - [x] {Unit-Backend} Collaboration service tests (invitations and role management)
 - [x] {Integration-Backend} Collaboration endpoints (invite, accept, decline, list, update role, remove)
 - [x] {Integration-Backend} Share link endpoints (generate/list/revoke/public access)
+- [x] {Unit-Backend} Maps provider resolver and directions cache key tests
+- [x] {Unit-Backend} Strict radius filtering tests for maps suggestions
+- [ ] {Integration-Backend} Full Docker-backed map endpoints suite in CI environment
 - [x] {Security} Share link expiration and revocation behavior
 - [x] {Unit-Frontend} Collaboration hook tests for share links (list/generate/revoke flows)
 - [x] {E2E} Share link lifecycle (generate, open in read-only mode, revoke)
-- [ ] {E2E} Offline mode behavior
 - [x] {E2E} Collaborative flow
 
 ---

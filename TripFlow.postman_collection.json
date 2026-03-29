@@ -599,6 +599,189 @@
           ]
         },
         {
+          "name": "Maps",
+          "item": [
+            {
+              "name": "Suggest places",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/maps/search/suggest?q=prado",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "maps",
+                    "search",
+                    "suggest"
+                  ],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "prado"
+                    },
+                    {
+                      "key": "language",
+                      "value": "en",
+                      "disabled": true
+                    },
+                    {
+                      "key": "limit",
+                      "value": "5",
+                      "disabled": true
+                    },
+                    {
+                      "key": "lat",
+                      "value": "40.4168",
+                      "disabled": true
+                    },
+                    {
+                      "key": "lon",
+                      "value": "-3.7038",
+                      "disabled": true
+                    },
+                    {
+                      "key": "radiusKm",
+                      "value": "5",
+                      "disabled": true
+                    },
+                    {
+                      "key": "types",
+                      "value": "poi",
+                      "disabled": true
+                    },
+                    {
+                      "key": "category",
+                      "value": "restaurant",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Suggest nearby (10km)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/maps/search/suggest?lat={{MAP_LAT}}&lon={{MAP_LON}}&radiusKm=10&types=poi&category=restaurant",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "maps",
+                    "search",
+                    "suggest"
+                  ],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "coffee",
+                      "disabled": true
+                    },
+                    {
+                      "key": "lat",
+                      "value": "{{MAP_LAT}}"
+                    },
+                    {
+                      "key": "lon",
+                      "value": "{{MAP_LON}}"
+                    },
+                    {
+                      "key": "radiusKm",
+                      "value": "10"
+                    },
+                    {
+                      "key": "types",
+                      "value": "poi"
+                    },
+                    {
+                      "key": "category",
+                      "value": "restaurant"
+                    },
+                    {
+                      "key": "language",
+                      "value": "en",
+                      "disabled": true
+                    },
+                    {
+                      "key": "limit",
+                      "value": "5",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Retrieve place",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/maps/search/retrieve/{{MAP_PLACE_ID}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "maps",
+                    "search",
+                    "retrieve",
+                    "{{MAP_PLACE_ID}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "language",
+                      "value": "en",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get directions",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"profile\": \"DRIVING\",\r\n  \"waypoints\": [\r\n    {\r\n      \"latitude\": 40.4168,\r\n      \"longitude\": -3.7038\r\n    },\r\n    {\r\n      \"latitude\": 40.4138,\r\n      \"longitude\": -3.6921\r\n    }\r\n  ],\r\n  \"alternatives\": false,\r\n  \"steps\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/maps/directions",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "maps",
+                    "directions"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
           "name": "Users",
           "item": [
             {
@@ -836,7 +1019,11 @@
         "type": "text/javascript",
         "packages": {},
         "exec": [
-          ""
+          "if ((pm.info.requestName === 'Suggest places' || pm.info.requestName === 'Suggest nearby (10km)') && pm.response.code === 200) {",
+          "    const json = pm.response.json();",
+          "    const first = json && json.suggestions && json.suggestions[0];",
+          "    if (first && first.id) pm.collectionVariables.set('MAP_PLACE_ID', first.id);",
+          "}"
         ]
       }
     }
@@ -845,6 +1032,21 @@
     {
       "key": "BASE_URL",
       "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "MAP_PLACE_ID",
+      "value": "mock-place-id",
+      "type": "string"
+    },
+    {
+      "key": "MAP_LAT",
+      "value": "40.4168",
+      "type": "string"
+    },
+    {
+      "key": "MAP_LON",
+      "value": "-3.7038",
       "type": "string"
     }
   ]
