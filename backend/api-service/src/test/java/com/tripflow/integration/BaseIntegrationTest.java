@@ -25,7 +25,7 @@ import com.tripflow.integration.config.UnsplashTestConfig;
 import io.restassured.RestAssured;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(UnsplashTestConfig.class)
+@Import({UnsplashTestConfig.class})
 @Testcontainers
 @ActiveProfiles("dev")
 @TestInstance(Lifecycle.PER_CLASS)
@@ -33,7 +33,9 @@ import io.restassured.RestAssured;
 @TestPropertySource(properties = {
     "jwt.secret=VGhpcyBpcyBhIHZlcnkgc2VjdXJlIGRldmVsb3BtZW50IHNlY3JldCEyMw==",
     "unsplash.api.key=dummy_test_key",
-    "POSTGRES_PASSWORD=test",
+    "maps.enabled=true",
+    "maps.provider=mock",
+    "maptiler.api.key=dummy_maptiler_key",
     "admin.email=admin@admin.com",
     "admin.username=admin",
     "admin.password=secure_password",
