@@ -1,5 +1,7 @@
 import styles from "@styles/components/form/Form.module.css";
 
+import CustomSelect from "@/components/shared/CustomSelect";
+
 export type Field = {
     name: string;
     label?: string;
@@ -24,7 +26,10 @@ export default function FormGroup({ field, index, handleChange, errors, fullWidt
 }) {
 
     const renderInput = () => {
-        const inputClassName = field.icon ? styles.inputWithIcon : "";
+        const hasLeadingIcon = Boolean(field.icon);
+        const inputClassName = hasLeadingIcon ? styles.inputWithIcon : "";
+        const isSelectField = field.type === "select";
+        const selectClassName = hasLeadingIcon ? styles.selectWithIcon : "";
         const baseProps = {
             id: field.name,
             disabled: field.disabled,
@@ -42,20 +47,25 @@ export default function FormGroup({ field, index, handleChange, errors, fullWidt
         } else if (field.type === "number" || field.type === "date" || field.type === "time") {
             inputElement = <input {...baseProps} type={field.type} min={field.min} max={field.max} step={field.step} />;
         } else if (field.type === "select") {
+            const selectValue = String(field.value ?? "");
             inputElement = (
-                <select
-                    id={field.name}
-                    name={field.name}
-                    value={field.value || ""}
-                    onChange={handleChange}
-                    className={inputClassName}
-                >
-                    {field.options?.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
+                <CustomSelect
+                    className={selectClassName}
+                    value={selectValue}
+                    disabled={field.disabled}
+                    leadingIcon={field.icon}
+                    onChange={(nextValue) => handleChange({
+                        target: {
+                            name: field.name,
+                            value: nextValue,
+                        },
+                    } as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>)}
+                    options={(field.options || []).map((option) => ({
+                        value: String(option.value),
+                        label: option.label,
+                    }))}
+                    placeholder={field.placeholder || "Seleccionar..."}
+                />
             );
         } else {
             inputElement = <input {...baseProps} type={field.type || "text"} />;
@@ -64,7 +74,7 @@ export default function FormGroup({ field, index, handleChange, errors, fullWidt
         return (
             <div className={styles.inputWrapper}>
                 {inputElement}
-                {field.icon && (
+                {field.icon && !isSelectField && (
                     <div className={styles.inputIcon}>
                         {field.icon}
                     </div>

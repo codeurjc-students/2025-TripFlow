@@ -105,6 +105,10 @@
     padding-left: 2.5rem;
     padding-right: var(--space-sm);
   }
+
+  .selectWithIcon {
+    width: 100%;
+  }
 }
 
 .alternative {
