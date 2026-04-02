@@ -50,6 +50,7 @@ export default function FormGroup({ field, index, handleChange, errors, fullWidt
             const selectValue = String(field.value ?? "");
             inputElement = (
                 <CustomSelect
+                    id={field.name}
                     className={selectClassName}
                     value={selectValue}
                     disabled={field.disabled}
