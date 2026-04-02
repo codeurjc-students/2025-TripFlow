@@ -45,6 +45,29 @@ public class MapEndpointsTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("Retrieve endpoint requires authentication")
+    public void testRetrieveUnauthorized() {
+        RestAssured
+            .when()
+                .get(RETRIEVE_ENDPOINT, "mock-place-id")
+            .then()
+                .statusCode(401);
+    }
+
+    @Test
+    @DisplayName("Directions endpoint requires authentication")
+    public void testDirectionsUnauthorized() {
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+                .body(DEFAULT_DIRECTIONS_BODY)
+            .when()
+                .post(DIRECTIONS_ENDPOINT)
+            .then()
+                .statusCode(401);
+    }
+
+    @Test
     @DisplayName("Suggest endpoint returns suggestions for authenticated user")
     public void testSuggestSuccess() {
         String authToken = AuthTestUtils.authenticateUserAndGetToken("map_user");
@@ -93,5 +116,47 @@ public class MapEndpointsTest extends BaseIntegrationTest {
                 .statusCode(200)
                 .body("routes", hasSize(1))
                 .body("routes[0].geometry", hasSize(2));
+    }
+
+    @Test
+    @DisplayName("Suggest endpoint validates coordinate pair")
+    public void testSuggestBadRequestWhenOnlyLatProvided() {
+        String authToken = AuthTestUtils.authenticateUserAndGetToken("map_suggest_bad_request_user");
+
+        RestAssured
+            .given()
+                .cookie(AUTH_COOKIE, authToken)
+                .param("lat", 40.4168)
+            .when()
+                .get(SUGGEST_ENDPOINT)
+            .then()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("Directions endpoint validates waypoint count")
+    public void testDirectionsBadRequestWhenWaypointCountIsInvalid() {
+        String authToken = AuthTestUtils.authenticateUserAndGetToken("map_directions_bad_request_user");
+
+        String invalidDirectionsBody = """
+            {
+              "profile": "DRIVING",
+              "waypoints": [
+                {"latitude": 40.4168, "longitude": -3.7038}
+              ],
+              "alternatives": false,
+              "steps": false
+            }
+            """;
+
+        RestAssured
+            .given()
+                .cookie(AUTH_COOKIE, authToken)
+                .contentType(ContentType.JSON)
+                .body(invalidDirectionsBody)
+            .when()
+                .post(DIRECTIONS_ENDPOINT)
+            .then()
+                .statusCode(400);
     }
 }
