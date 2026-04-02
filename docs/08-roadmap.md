@@ -214,8 +214,10 @@
   - [x] {UI} Plotting daily itinerary routes
   - [x] {UI} New map explore screen with geolocation-first nearby discovery (`/map/explore`)
   - [x] {UI} Search UX for nearby points of interest (query + radius)
-  - [ ] {UI} Full route geometry wiring in explore flow (`route from me`)
-  - [ ] {UI} Add recommendation directly into itinerary day from explore screen
+  - [x] {UI} Add recommendation directly into itinerary day from explore screen
+  - [x] {UI} Explore popup actions prioritized for add-to-trip (`Agregar al viaje` / `Navegar`)
+  - [x] {UI} Travel mode parity for external navigation URLs (driving/walking/cycling mapping)
+  - [x] {UI} Post-add success flow with stay-in-explore default (`Seguir explorando` / `Ver viaje`)
 - [x] {Feature} Collaborative Itineraries UI
   - [x] {UI} Collaboration modal (invite, role update, remove/leave)
   - [x] {UI} Invitations center (pending invitations list + accept/decline)
@@ -242,7 +244,9 @@
 - [x] {Unit-Backend} Maps provider resolver and directions cache key tests
 - [x] {Unit-Backend} POI relevance filtering tests for maps suggestions
 - [x] {Unit-Frontend} Maps service tests (suggest/retrieve/directions integration)
-- [ ] {Integration-Backend} Full Docker-backed map endpoints suite in CI environment
+- [x] {Unit-Frontend} Map navigation URL mapping tests by profile (DRIVING/WALKING/CYCLING)
+- [x] {Unit-Frontend} Add-to-trip hook tests (append activity + persisted itinerary/day defaults)
+- [x] {Integration-Backend} Full Docker-backed map endpoints suite in CI environment
 - [x] {Security} Share link expiration and revocation behavior
 - [x] {Unit-Frontend} Collaboration hook tests for share links (list/generate/revoke flows)
 - [x] {E2E} Share link lifecycle (generate, open in read-only mode, revoke)
@@ -255,7 +259,7 @@
 - [ ] {Feature} Route Optimization Algorithms (TSP)
 - [ ] {Feature} Travel Achievements & Gamification
 - [ ] {Feature} User Travel Preferences
-- [ ] {Feature} Advanced Location Discovery (Filters, Categories)
+- [x] {Feature} Advanced Location Discovery (Filters, Categories)
 
 ---
 
