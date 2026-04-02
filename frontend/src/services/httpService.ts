@@ -41,6 +41,10 @@ const isAuthEndpoint = (path: string): boolean => {
   return path.startsWith("/api/auth");
 }
 
+const isApiPath = (path: string): boolean => {
+  return path.startsWith("/api/");
+}
+
 const processQueue = (error: Error | null) => {
   failedQueue.forEach((prom) => {
     if (error) {
@@ -51,6 +55,10 @@ const processQueue = (error: Error | null) => {
   });
   failedQueue = [];
 };
+
+function redirectTo(path: string): void {
+  window.location.assign(path);
+}
 
 function isOffline(): boolean {
   return !navigator.onLine;
@@ -158,26 +166,26 @@ export async function http<T>(
         processQueue(new Error("Session expired"));
         isRefreshing = false;
         removeFromLocalStorage(STORAGE_KEYS.AUTH);
-        window.location.href = "/login";
+        redirectTo("/login");
         throw new Error("Session expired");
       }
     } catch (error) {
       processQueue(error as Error);
       isRefreshing = false;
       removeFromLocalStorage(STORAGE_KEYS.AUTH);
-      window.location.href = "/login";
+      redirectTo("/login");
       throw error;
     }
   }
 
   // Handle 403 Forbidden
   if (response.status === 403 && !isAuthEndpoint(path)) {
-    window.location.href = "/";
+    redirectTo("/");
   }
 
-  // Handle 404 Not Found
-  if (response.status === 404 && !isAuthEndpoint(path)) {
-    window.location.href = "/404";
+  // Handle 404 Not Found only for non-API navigation requests.
+  if (response.status === 404 && !isAuthEndpoint(path) && !isApiPath(path)) {
+    redirectTo("/404");
   }
 
   try {

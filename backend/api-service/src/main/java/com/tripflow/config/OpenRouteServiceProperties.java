@@ -17,6 +17,15 @@ public class OpenRouteServiceProperties {
     }
 
     public String getDirectionsBaseUrl() {
-        return this.directionsBaseUrl;
+        String baseUrl = this.directionsBaseUrl == null ? "" : this.directionsBaseUrl.trim();
+        if (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+
+        if (baseUrl.endsWith("/directions")) {
+            return baseUrl;
+        }
+
+        return baseUrl + "/directions";
     }
 }
