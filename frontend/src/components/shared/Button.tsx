@@ -10,6 +10,7 @@ type Rel = "noopener noreferrer" | "nofollow" | "noopener" | "noreferrer";
 interface ButtonProps {
     style: ButtonStyle[];
     size?: "default" | "small";
+    id?: string;
     label?: string;
     type?: "button" | "submit" | "reset";
     onClick?: (e?: React.MouseEvent) => void;
@@ -25,7 +26,7 @@ interface ButtonProps {
 /**
  * Button component for rendering unified styled buttons or links.
  */
-export default function Button({ label, onClick, style, size = "default", type, to, target, rel, ariaLabel, disabled, children, noGap }: ButtonProps) {
+export default function Button({ id, label, onClick, style, size = "default", type, to, target, rel, ariaLabel, disabled, children, noGap }: ButtonProps) {
     let customStyles = `${styles.button}` + (children && label && !noGap ? ` ${styles.withChildren}` : ``);
     style.map(s => customStyles += ` ${styles[s]}`);
     if (size === "small") customStyles += ` ${styles.small}`;
@@ -37,6 +38,6 @@ export default function Button({ label, onClick, style, size = "default", type, 
         </>
     )
 
-    if (to) return <NavLink to={to} className={customStyles} target={target} rel={rel} aria-label={ariaLabel}>{body}</NavLink>;
-    else return <button className={customStyles} type={type} onClick={onClick} aria-label={ariaLabel} disabled={disabled}>{body}</button>;
+    if (to) return <NavLink id={id} to={to} className={customStyles} target={target} rel={rel} aria-label={ariaLabel}>{body}</NavLink>;
+    else return <button id={id} className={customStyles} type={type} onClick={onClick} aria-label={ariaLabel} disabled={disabled}>{body}</button>;
 }
