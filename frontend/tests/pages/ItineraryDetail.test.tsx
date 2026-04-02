@@ -105,6 +105,11 @@ describe("ItineraryDetail Page", () => {
         vi.mocked(useNotification).mockReturnValue({ notify: mockNotify });
         mockToBlob.mockResolvedValue(new Blob(["pdf"], { type: "application/pdf" }));
 
+        Object.defineProperty(HTMLAnchorElement.prototype, "click", {
+            configurable: true,
+            value: vi.fn(),
+        });
+
         Object.defineProperty(globalThis.URL, "createObjectURL", {
             writable: true,
             value: vi.fn(() => "blob:mock-pdf"),

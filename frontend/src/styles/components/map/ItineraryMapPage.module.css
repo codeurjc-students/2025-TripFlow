@@ -46,6 +46,22 @@
     pointer-events: auto;
 }
 
+.topBarLeftGroup {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.routeModeTrigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--text-primary);
+}
+
 .loadingOverlay {
     position: absolute;
     top: 0;
@@ -111,6 +127,26 @@
 .mapContainer :global(.itinerary-marker-selected .itinerary-marker-dot::before) {
     border-right-color: var(--text-primary);
     border-bottom-color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .topBar {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+    }
+
+    .topBarLeftGroup {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .routeModeTrigger {
+        min-width: 0;
+        max-width: 9.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 
 /* Themed popup surface */

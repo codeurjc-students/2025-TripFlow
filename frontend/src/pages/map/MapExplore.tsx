@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { LocateFixedIcon } from "lucide-react";
 import type L from "leaflet";
 
-import type { MapSuggestion } from "@/types/map";
 import { MAP_TOPIC_OPTIONS } from "@/constants/mapTopics";
-import { suggestPlaces } from "@/services/mapsService";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useMapExploreSearch } from "@/hooks/useMapExploreSearch";
+import { useMapExplorePoiActions } from "@/hooks/useMapExplorePoiActions";
 import { useNotification } from "@/providers/notificationProvider";
 
 import AppLayout from "@/layouts/AppLayout";
@@ -15,6 +15,7 @@ import MapPageShell from "@/components/map/MapPageShell";
 import ExploreMarkersLayer from "@/components/map/ExploreMarkersLayer";
 import CurrentLocationLayer from "@/components/map/CurrentLocationLayer";
 import NearbyResultsSheet from "@/components/map/NearbyResultsSheet";
+import AddPoiToTripModal from "@/components/map/AddPoiToTripModal";
 import Button from "@/components/shared/Button";
 import Searchbar from "@/components/shared/Searchbar";
 
@@ -24,19 +25,40 @@ export default function MapExplorePage() {
     const geolocation = useGeolocation();
 
     const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [submittedSearchTerm, setSubmittedSearchTerm] = useState("");
-    const [radiusKm, setRadiusKm] = useState(10);
-    const [isLoading, setIsLoading] = useState(false);
-    const [places, setPlaces] = useState<MapSuggestion[]>([]);
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [isBottomPanelCollapsed, setIsBottomPanelCollapsed] = useState(false);
-    const [selectedTopicKey, setSelectedTopicKey] = useState<string | null>(null);
-
-    const normalizedSearchTerm = searchTerm.trim();
-    const hasActiveCriteria = Boolean(selectedTopicKey || normalizedSearchTerm.length > 0);
 
     const activeOriginCoords = geolocation.coords;
+
+    const {
+        places,
+        isLoading,
+        radiusKm,
+        selectedTopicKey,
+        searchTerm,
+        hasActiveCriteria,
+        setSearchTerm,
+        setRadiusKm,
+        handleSubmitSearch,
+        handleClearSearch,
+        handleSelectTopic,
+    } = useMapExploreSearch({ originCoords: activeOriginCoords });
+
+    const {
+        isSubmitting,
+        isAddModalOpen,
+        selectedPoiForAdd,
+        editableItineraries,
+        isLoadingItineraries,
+        addFlowStep,
+        openAddToTripModal,
+        closeAddModal,
+        handleConfirmAdd,
+        handleNavigateToPoi,
+        handleModalNavigate,
+        handleStayExploring,
+        handleViewTrip,
+    } = useMapExplorePoiActions({ places, originCoords: activeOriginCoords });
 
     const center = useMemo<[number, number]>(() => {
         if (!activeOriginCoords) {
@@ -56,57 +78,6 @@ export default function MapExplorePage() {
             });
         }
     }, [geolocation.status, notify]);
-
-    const fetchSuggestions = useCallback(async (submittedSearch: string) => {
-        if (!activeOriginCoords) {
-            return;
-        }
-
-        const normalizedSubmittedSearch = submittedSearch.trim();
-        const topic = MAP_TOPIC_OPTIONS.find((entry) => entry.key === selectedTopicKey);
-        if (!topic && normalizedSubmittedSearch.length === 0) {
-            return;
-        }
-
-        setIsLoading(true);
-        setSelectedIndex(null);
-
-        try {
-            const query = topic
-                ? (normalizedSubmittedSearch.length > 0 ? `${topic.query} ${normalizedSubmittedSearch}` : topic.query)
-                : normalizedSubmittedSearch;
-
-            const response = await suggestPlaces({
-                q: query,
-                category: topic?.category,
-                lat: activeOriginCoords.latitude,
-                lon: activeOriginCoords.longitude,
-                radiusKm,
-                limit: 10
-            });
-
-            setPlaces(response.suggestions.filter((suggestion) => suggestion.center !== null));
-        } catch (error) {
-            console.error("Error fetching map suggestions:", error);
-            notify("No pudimos cargar recomendaciones cercanas.", "error", {
-                title: "Mapa",
-            });
-            setPlaces([]);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [activeOriginCoords, selectedTopicKey, radiusKm, notify]);
-
-    useEffect(() => {
-        if (!activeOriginCoords) {
-            return;
-        }
-        const currentTerm = submittedSearchTerm.trim();
-        if (!selectedTopicKey && currentTerm.length === 0) {
-            return;
-        }
-        void fetchSuggestions(currentTerm);
-    }, [radiusKm, selectedTopicKey, activeOriginCoords, fetchSuggestions]);
 
     useEffect(() => {
         if (!mapInstance || !activeOriginCoords) {
@@ -132,6 +103,10 @@ export default function MapExplorePage() {
         });
     }, [places, mapInstance]);
 
+    useEffect(() => {
+        setSelectedIndex(null);
+    }, [places]);
+
     const handleRecenter = useCallback(() => {
         if (!mapInstance) {
             return;
@@ -142,34 +117,6 @@ export default function MapExplorePage() {
             duration: 0.5,
         });
     }, [mapInstance, center]);
-
-    const handleSubmitSearch = useCallback(() => {
-        if (!hasActiveCriteria) {
-            notify("Escribe una búsqueda o selecciona un tema para iniciar.", "info", {
-                title: "Mapa",
-            });
-            return;
-        }
-        const nextSubmittedSearch = searchTerm.trim();
-        setSubmittedSearchTerm(nextSubmittedSearch);
-        void fetchSuggestions(nextSubmittedSearch);
-    }, [hasActiveCriteria, notify, fetchSuggestions, searchTerm]);
-
-    const handleClearSearch = useCallback(() => {
-        setSearchTerm("");
-        setSubmittedSearchTerm("");
-    }, []);
-
-    const handleSelectTopic = useCallback((topicKey: string) => {
-        setSelectedTopicKey((current) => {
-            const next = current === topicKey ? null : topicKey;
-            if (next === null) {
-                setPlaces([]);
-                setSelectedIndex(null);
-            }
-            return next;
-        });
-    }, []);
 
     return (
         <AppLayout immersive>
@@ -192,6 +139,8 @@ export default function MapExplorePage() {
                             places={places}
                             selectedIndex={selectedIndex}
                             onSelect={handleSelectPlace}
+                            onAddToTrip={openAddToTripModal}
+                            onNavigate={handleNavigateToPoi}
                             userCoords={activeOriginCoords}
                         />
                     </>
@@ -245,6 +194,20 @@ export default function MapExplorePage() {
                         hasActiveCriteria={hasActiveCriteria}
                     />
                 )}
+            />
+
+            <AddPoiToTripModal
+                isOpen={isAddModalOpen}
+                poi={selectedPoiForAdd}
+                itineraries={editableItineraries}
+                isLoadingItineraries={isLoadingItineraries}
+                isSubmitting={isSubmitting}
+                flowStep={addFlowStep}
+                onClose={closeAddModal}
+                onConfirmAdd={handleConfirmAdd}
+                onNavigate={handleModalNavigate}
+                onStayExploring={handleStayExploring}
+                onViewTrip={handleViewTrip}
             />
         </AppLayout>
     );

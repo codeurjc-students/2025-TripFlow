@@ -16,7 +16,12 @@ const FEATURE_LABELS: Record<string, string> = {
     neighborhood: "Barrio",
 };
 
-export default function MapPoiCard({ place, isSelected, onClick, distanceKm }: MapPoiCardProps) {
+export default function MapPoiCard({
+    place,
+    isSelected,
+    onClick,
+    distanceKm,
+}: MapPoiCardProps) {
     const hasAddress = Boolean((place.fullAddress || place.placeFormatted).trim());
     const featureType = (place.featureType || "poi").toLowerCase();
     const featureLabel = FEATURE_LABELS[featureType] || featureType;

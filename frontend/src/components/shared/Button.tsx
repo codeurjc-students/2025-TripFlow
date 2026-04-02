@@ -9,6 +9,7 @@ type Rel = "noopener noreferrer" | "nofollow" | "noopener" | "noreferrer";
 
 interface ButtonProps {
     style: ButtonStyle[];
+    size?: "default" | "small";
     label?: string;
     type?: "button" | "submit" | "reset";
     onClick?: (e?: React.MouseEvent) => void;
@@ -24,9 +25,10 @@ interface ButtonProps {
 /**
  * Button component for rendering unified styled buttons or links.
  */
-export default function Button({ label, onClick, style, type, to, target, rel, ariaLabel, disabled, children, noGap }: ButtonProps) {
+export default function Button({ label, onClick, style, size = "default", type, to, target, rel, ariaLabel, disabled, children, noGap }: ButtonProps) {
     let customStyles = `${styles.button}` + (children && label && !noGap ? ` ${styles.withChildren}` : ``);
     style.map(s => customStyles += ` ${styles[s]}`);
+    if (size === "small") customStyles += ` ${styles.small}`;
 
     const body = (
         <>

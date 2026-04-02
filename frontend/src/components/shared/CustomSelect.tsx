@@ -14,14 +14,17 @@ export interface Option {
 }
 
 export interface CustomSelectProps {
+    id?: string;
     value: string;
     onChange: (value: string) => void;
     options: Option[];
     placeholder?: string;
     className?: string;
+    disabled?: boolean;
+    leadingIcon?: ReactNode;
 }
 
-export default function CustomSelect({ value, onChange, options, placeholder, className }: CustomSelectProps) {
+export default function CustomSelect({ id, value, onChange, options, placeholder, className, disabled = false, leadingIcon }: CustomSelectProps) {
     const selectedOption = options.find((opt) => opt.value === value);
 
     const menuItems: ContextMenuItem[] = options.map((opt) => ({
@@ -35,8 +38,11 @@ export default function CustomSelect({ value, onChange, options, placeholder, cl
             className={className}
             items={menuItems}
             triggerStyle={["bordered", "full"]}
+            disabled={disabled}
+            triggerId={id}
             trigger={
                 <div className={styles.triggerContent}>
+                    {leadingIcon && <span className={styles.leadingIcon}>{leadingIcon}</span>}
                     <span className={styles.label}>
                         {selectedOption ? selectedOption.label : placeholder || "Seleccionar..."}
                     </span>
