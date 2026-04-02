@@ -275,7 +275,8 @@ describe("FormGroup Component", () => {
 
         render(<FormGroup field={selectField} handleChange={vi.fn()} />);
 
-        expect(screen.getByRole("button", { name: /planificado/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /estado/i })).toBeInTheDocument();
+        expect(screen.getByText(/planificado/i)).toBeInTheDocument();
     });
 
     it("calls handleChange when selecting custom select option", () => {
@@ -293,7 +294,7 @@ describe("FormGroup Component", () => {
 
         render(<FormGroup field={selectField} handleChange={mockHandleChange} />);
 
-        fireEvent.click(screen.getByRole("button", { name: /borrador/i }));
+        fireEvent.click(screen.getByRole("button", { name: /estado/i }));
         fireEvent.click(screen.getByRole("menuitem", { name: /planificado/i }));
 
         expect(mockHandleChange).toHaveBeenCalledTimes(1);
