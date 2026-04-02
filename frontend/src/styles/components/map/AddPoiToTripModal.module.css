@@ -36,6 +36,9 @@
 
 .headerText {
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
 }
 
 .title {
@@ -50,6 +53,23 @@
     font-size: var(--font-size-sm);
 }
 
+.poiChip {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    max-width: 100%;
+    padding: 3px 8px;
+    border-radius: var(--border-radius-full);
+    border: 1px solid var(--border-secondary);
+    background: color-mix(in srgb, var(--bg-secondary) 75%, transparent);
+    color: var(--text-tertiary);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-normal);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .body {
     flex: 1;
     overflow-y: auto;
@@ -60,6 +80,24 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
+}
+
+.successContent {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+    border: 1px solid color-mix(in srgb, var(--active) 40%, var(--border-secondary));
+    border-radius: var(--border-radius-lg);
+    background: color-mix(in srgb, var(--active-bg) 80%, transparent);
+}
+
+.successTitle {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--gradient-primary-text);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .stepTitle {

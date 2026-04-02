@@ -50,11 +50,14 @@ export default function MapExplorePage() {
         selectedPoiForAdd,
         editableItineraries,
         isLoadingItineraries,
+        addFlowStep,
         openAddToTripModal,
         closeAddModal,
         handleConfirmAdd,
         handleNavigateToPoi,
         handleModalNavigate,
+        handleStayExploring,
+        handleViewTrip,
     } = useMapExplorePoiActions({ places, originCoords: activeOriginCoords });
 
     const center = useMemo<[number, number]>(() => {
@@ -199,9 +202,12 @@ export default function MapExplorePage() {
                 itineraries={editableItineraries}
                 isLoadingItineraries={isLoadingItineraries}
                 isSubmitting={isSubmitting}
+                flowStep={addFlowStep}
                 onClose={closeAddModal}
                 onConfirmAdd={handleConfirmAdd}
                 onNavigate={handleModalNavigate}
+                onStayExploring={handleStayExploring}
+                onViewTrip={handleViewTrip}
             />
         </AppLayout>
     );

@@ -18,9 +18,12 @@ interface AddPoiToTripModalProps {
     itineraries: EditableItineraryOption[];
     isLoadingItineraries: boolean;
     isSubmitting: boolean;
+    flowStep: "form" | "success";
     onClose: () => void;
     onConfirmAdd: (payload: { itineraryId: number; dayNumber: number; time?: string; duration?: string }) => Promise<void>;
     onNavigate: () => void;
+    onStayExploring: () => void;
+    onViewTrip: () => void;
 }
 
 export default function AddPoiToTripModal({
@@ -29,9 +32,12 @@ export default function AddPoiToTripModal({
     itineraries,
     isLoadingItineraries,
     isSubmitting,
+    flowStep,
     onClose,
     onConfirmAdd,
     onNavigate,
+    onStayExploring,
+    onViewTrip,
 }: AddPoiToTripModalProps) {
     const [step, setStep] = useState<ModalStep>("itinerary");
     const [selectedItineraryId, setSelectedItineraryId] = useState<number | null>(null);
@@ -110,7 +116,7 @@ export default function AddPoiToTripModal({
                 <header className={styles.header}>
                     <div className={styles.headerText}>
                         <h2 className={styles.title}>Agregar punto al viaje</h2>
-                        <p className={styles.subtitle}>{poi.name}</p>
+                        <span className={styles.poiChip}>{poi.name}</span>
                     </div>
                     <Button style={["tool_bordered"]} onClick={onClose} ariaLabel="Cerrar modal">
                         <XIcon size={18} />
@@ -118,7 +124,13 @@ export default function AddPoiToTripModal({
                 </header>
 
                 <main className={styles.body}>
-                    {isLoadingItineraries ? (
+                    {flowStep === "success" ? (
+                        <div className={styles.successContent}>
+                            <span className={styles.successTitle}>LUGAR AÑADIDO</span>
+                            <p className={styles.message}>Se ha agregado correctamente a tu itinerario.</p>
+                            <p className={styles.supportText}>Puedes seguir explorando y guardar mas lugares rapido.</p>
+                        </div>
+                    ) : isLoadingItineraries ? (
                         <p className={styles.message}>Cargando tus viajes...</p>
                     ) : !hasEditableItineraries ? (
                         <p className={styles.message}>No tienes viajes editables para agregar este lugar.</p>
@@ -190,7 +202,11 @@ export default function AddPoiToTripModal({
                 </main>
 
                 <footer className={styles.footer}>
-                    {step === "details" && hasEditableItineraries ? (
+                    {flowStep === "success" ? (
+                        <Button style={["secondary"]} onClick={onViewTrip}>
+                            Ver viaje
+                        </Button>
+                    ) : step === "details" && hasEditableItineraries ? (
                         <Button style={["secondary"]} onClick={() => setStep("itinerary")}>
                             <ChevronLeftIcon size={16} />
                             Volver
@@ -202,7 +218,11 @@ export default function AddPoiToTripModal({
                         </Button>
                     )}
 
-                    {step === "itinerary" ? (
+                    {flowStep === "success" ? (
+                        <Button style={["primary"]} onClick={onStayExploring}>
+                            Seguir explorando
+                        </Button>
+                    ) : step === "itinerary" ? (
                         <Button
                             style={["primary"]}
                             onClick={handleContinue}
