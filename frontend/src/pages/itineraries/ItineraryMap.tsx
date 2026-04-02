@@ -1,115 +1,55 @@
 import styles from "@styles/components/map/ItineraryMapPage.module.css";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import { Navigate, useParams } from "react-router";
-import type L from "leaflet";
+import { useItineraryMapPage } from "@/hooks/useItineraryMapPage";
+import { MAP_DIRECTIONS_PROFILE_OPTIONS } from "@/constants/mapDirectionsProfiles";
 
-import type { ExtendedItinerary } from "@/types/itinerary";
-import { getItineraryById } from "@/services/itineraryService";
-import { useItineraryMapData } from "@/hooks/useItineraryMapData";
-import { FIT_BOUNDS_PADDING } from "@/utils/mapGeometry";
+import {
+    BikeIcon,
+    CarIcon,
+    CheckIcon,
+    ChevronLeft,
+    FootprintsIcon,
+    LocateFixedIcon,
+    TrafficConeIcon,
+} from "lucide-react";
 
-import { ChevronLeft, LocateFixedIcon } from "lucide-react";
-
-import { useRecenter } from "@/components/map/LeafletMapView";
 import ItineraryMarkersLayer from "@/components/map/ItineraryMarkersLayer";
 import ItineraryRouteLayer from "@/components/map/ItineraryRouteLayer";
 import MapBottomSheet from "@/components/map/MapBottomSheet";
 import MapPageShell from "@/components/map/MapPageShell";
 import Button from "@/components/shared/Button";
+import ContextMenu from "@/components/shared/ContextMenu";
 import Loader from "@/components/shared/Loader";
 import AppLayout from "@/layouts/AppLayout";
 
-export default function ItineraryMapPage() {
-    const [itinerary, setItinerary] = useState<ExtendedItinerary | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
-    const [isRouteHidden, setIsRouteHidden] = useState(false);
-    const [isBottomPanelCollapsed, setIsBottomPanelCollapsed] = useState(false);
+function getDirectionsProfileIcon(profile: string) {
+    if (profile === "WALKING") return <FootprintsIcon size={16} />;
+    if (profile === "CYCLING") return <BikeIcon size={16} />;
+    if (profile === "DRIVING_TRAFFIC") return <TrafficConeIcon size={16} />;
+    return <CarIcon size={16} />;
+}
 
+export default function ItineraryMapPage() {
     const { id } = useParams<{ id: string }>();
     const itineraryId = Number(id);
     if (isNaN(itineraryId)) return <Navigate to="/itineraries" />;
 
-    const mapData = useItineraryMapData(itinerary);
-    const recenter = useRecenter(mapInstance, mapData.bounds);
-    const prevSelectedDayRef = useRef<number | null>(null);
-
-    useEffect(() => {
-        const fetchItinerary = async () => {
-            setIsLoading(true);
-            try {
-                const data = await getItineraryById(itineraryId);
-                setItinerary(data);
-            } catch {
-                setItinerary(null);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchItinerary();
-    }, [id]);
-
-    const handleMapReady = useCallback((map: L.Map) => {
-        setMapInstance(map);
-    }, []);
-
-    const handleMarkerClick = useCallback((index: number) => {
-        mapData.selectWaypoint(index);
-    }, [mapData.selectWaypoint]);
-
-    const handleCardSelect = useCallback((index: number | null) => {
-        mapData.selectWaypoint(index);
-        if (index !== null && mapData.filteredWaypoints[index] && mapInstance) {
-            const zoom = mapInstance.getZoom();
-            const size = mapInstance.getSize();
-            const isMobile = size.x <= 768;
-            const offsetY = Math.round(size.y * (isMobile ? 0.25 : 0.15));
-            const targetPoint = mapInstance.project(mapData.filteredWaypoints[index].position, zoom);
-            const offsetPoint = targetPoint.add([0, offsetY]);
-            const offsetLatLng = mapInstance.unproject(offsetPoint, zoom);
-
-            setIsRouteHidden(true);
-            mapInstance.once("moveend", () => setIsRouteHidden(false));
-
-            mapInstance.flyTo(offsetLatLng, zoom, {
-                animate: true,
-                duration: 0.45,
-            });
-        }
-    }, [mapData.selectWaypoint, mapData.filteredWaypoints, mapInstance]);
-
-    useEffect(() => {
-        if (!mapInstance) return;
-
-        const handleMapClick = (event: L.LeafletMouseEvent) => {
-            if (event.sourceTarget !== mapInstance) return;
-            mapData.selectWaypoint(null);
-            mapInstance.closePopup();
-        };
-
-        mapInstance.on("click", handleMapClick);
-
-        return () => {
-            mapInstance.off("click", handleMapClick);
-        };
-    }, [mapInstance, mapData.selectWaypoint]);
-
-    useEffect(() => {
-        if (!mapInstance || !mapData.bounds) return;
-
-        const prevDay = prevSelectedDayRef.current;
-        if (prevDay === mapData.selectedDay) return;
-
-        prevSelectedDayRef.current = mapData.selectedDay;
-        mapInstance.flyToBounds(mapData.bounds, {
-            padding: FIT_BOUNDS_PADDING,
-            maxZoom: 16,
-            animate: true,
-            duration: 0.6,
-        });
-    }, [mapInstance, mapData.bounds, mapData.selectedDay]);
+    const {
+        itinerary,
+        isLoading,
+        mapData,
+        directionsRoute,
+        isRouteHidden,
+        isBottomPanelCollapsed,
+        directionsProfile,
+        setDirectionsProfile,
+        setMapInstance,
+        recenter,
+        handleMarkerClick,
+        handleCardSelect,
+        toggleBottomPanel,
+    } = useItineraryMapPage(itineraryId);
 
     if (isLoading) {
         return (
@@ -123,13 +63,16 @@ export default function ItineraryMapPage() {
         return <Navigate to="/itineraries" />;
     }
 
+    const selectedProfileLabel = MAP_DIRECTIONS_PROFILE_OPTIONS.find((option) => option.value === directionsProfile)?.label
+        || "Coche";
+
     return (
         <AppLayout immersive innerPage>
             <MapPageShell
                 className={styles.mapPage}
                 mapClassName={styles.mapContainer}
                 bounds={mapData.bounds}
-                onMapReady={handleMapReady}
+                onMapReady={setMapInstance}
                 renderLayers={(map) => (
                     <>
                         <ItineraryMarkersLayer
@@ -140,20 +83,38 @@ export default function ItineraryMapPage() {
                         />
                         <ItineraryRouteLayer
                             map={map}
-                            path={mapData.routePath}
+                            path={directionsRoute.routePath}
                             isHidden={isRouteHidden}
                         />
                     </>
                 )}
                 topBar={(
                     <div className={styles.topBar}>
-                        <Button
-                            style={["tool_bordered"]}
-                            to={`/itineraries/${itineraryId}`}
-                            ariaLabel="Volver al detalle del itinerario"
-                        >
-                            <ChevronLeft size={20} />
-                        </Button>
+                        <div className={styles.topBarLeftGroup}>
+                            <Button
+                                style={["tool_bordered"]}
+                                to={`/itineraries/${itineraryId}`}
+                                ariaLabel="Volver al detalle del itinerario"
+                            >
+                                <ChevronLeft size={20} />
+                            </Button>
+                            <ContextMenu
+                                triggerStyle={["secondary"]}
+                                trigger={(
+                                    <span className={styles.routeModeTrigger}>
+                                        {getDirectionsProfileIcon(directionsProfile)}
+                                        {selectedProfileLabel}
+                                    </span>
+                                )}
+                                items={MAP_DIRECTIONS_PROFILE_OPTIONS.map((option) => ({
+                                    label: option.label,
+                                    icon: option.value === directionsProfile
+                                        ? <CheckIcon size={14} />
+                                        : getDirectionsProfileIcon(option.value),
+                                    onClick: () => setDirectionsProfile(option.value),
+                                }))}
+                            />
+                        </div>
                         <Button
                             style={["tool_bordered"]}
                             onClick={recenter}
@@ -174,7 +135,7 @@ export default function ItineraryMapPage() {
                         invalidCount={mapData.invalidCount}
                         itineraryTitle={itinerary.title}
                         isCollapsed={isBottomPanelCollapsed}
-                        onToggleCollapse={() => setIsBottomPanelCollapsed((value) => !value)}
+                        onToggleCollapse={toggleBottomPanel}
                         offsetForMobileNav={false}
                     />
                 )}
