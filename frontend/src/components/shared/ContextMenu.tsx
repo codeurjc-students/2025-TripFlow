@@ -23,13 +23,14 @@ interface ContextMenuProps {
     triggerStyle?: any[];
     className?: string;
     disabled?: boolean;
+    triggerId?: string;
 }
 
 /**
  * A highly reusable and responsive ContextMenu component.
  * Uses React Portals for positioning to avoid clipping by parent containers.
  */
-export default function ContextMenu({ items, trigger, triggerStyle, className, disabled = false }: ContextMenuProps) {
+export default function ContextMenu({ items, trigger, triggerStyle, className, disabled = false, triggerId }: ContextMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
     
@@ -121,6 +122,7 @@ export default function ContextMenu({ items, trigger, triggerStyle, className, d
                 }}
                 aria-haspopup="menu"
                 aria-expanded={isOpen}
+                id={triggerId}
                 disabled={disabled}
             >
                 {trigger || <MoreVertical size={16} strokeWidth={2.5} />}
