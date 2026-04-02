@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { retrievePlace, suggestPlaces } from "@/services/mapsService";
+import { getDirections, retrievePlace, suggestPlaces } from "@/services/mapsService";
 
 const httpMock = vi.fn();
 
@@ -26,5 +26,33 @@ describe("mapsService", () => {
         await retrievePlace("abc/123", "es");
 
         expect(httpMock).toHaveBeenCalledWith("/api/v1/maps/search/retrieve/abc%2F123?language=es", "GET");
+    });
+
+    it("calls directions endpoint with post body", async () => {
+        httpMock.mockResolvedValue({ routes: [] });
+
+        await getDirections({
+            profile: "DRIVING",
+            waypoints: [
+                { latitude: 40.4, longitude: -3.7 },
+                { latitude: 41.4, longitude: -2.7 },
+            ],
+            alternatives: false,
+            steps: false,
+        });
+
+        expect(httpMock).toHaveBeenCalledWith(
+            "/api/v1/maps/directions",
+            "POST",
+            {
+                profile: "DRIVING",
+                waypoints: [
+                    { latitude: 40.4, longitude: -3.7 },
+                    { latitude: 41.4, longitude: -2.7 },
+                ],
+                alternatives: false,
+                steps: false,
+            }
+        );
     });
 });

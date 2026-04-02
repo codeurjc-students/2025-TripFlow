@@ -15,6 +15,12 @@ console.error = vi.fn((message, ...args) => {
   ) {
     return
   }
+  if (
+    typeof message === 'string' &&
+    message.includes('Not implemented: navigation (except hash changes)')
+  ) {
+    return
+  }
   originalConsoleError(message, ...args)
 })
 
