@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import L from "leaflet";
 
 import type { MapSuggestion } from "@/types/map";
+import buttonStyles from "@styles/components/shared/Button.module.css";
 
 function escapeHtml(value: string) {
     return value
@@ -17,6 +18,8 @@ interface ExploreMarkersLayerProps {
     places: MapSuggestion[];
     selectedIndex: number | null;
     onSelect: (index: number) => void;
+    onAddToTrip: (index: number) => void;
+    onNavigate: (index: number) => void;
     userCoords?: { latitude: number; longitude: number } | null;
 }
 
@@ -39,6 +42,8 @@ export default function ExploreMarkersLayer({
     places,
     selectedIndex,
     onSelect,
+    onAddToTrip,
+    onNavigate,
     userCoords,
 }: ExploreMarkersLayerProps) {
     const markersRef = useRef<L.Marker[]>([]);
@@ -77,15 +82,42 @@ export default function ExploreMarkersLayer({
                 const marker = L.marker([place.center.latitude, place.center.longitude], { icon })
                     .addTo(map)
                     .bindPopup(
-                        `<div class="itinerary-popup-content">
-                            <strong>${title}</strong>
-                            <span class="itinerary-popup-location">${address}</span>
-                            ${distanceLabel ? `<span class="itinerary-popup-meta">${escapeHtml(distanceLabel)}</span>` : ""}
+                        `<div class="explore-popup-card" data-popup-index="${index}">
+                            <div class="explore-popup-head">
+                                <strong>${title}</strong>
+                            </div>
+                            <span class="explore-popup-location">${address}</span>
+                            <div class="explore-popup-extra">
+                                ${distanceLabel ? `<span class="explore-popup-meta">${escapeHtml(distanceLabel)}</span>` : ""}
+                            </div>
+                            <div class="explore-popup-actions">
+                                <button type="button" class="${buttonStyles.button} ${buttonStyles.small} ${buttonStyles.primary} explore-popup-action-primary" data-popup-add="${index}">Agregar al viaje</button>
+                                <button type="button" class="${buttonStyles.button} ${buttonStyles.small} ${buttonStyles.secondary} explore-popup-action-secondary" data-popup-nav="${index}">Navegar</button>
+                            </div>
                         </div>`,
-                        { closeButton: true, autoPan: true, className: "itinerary-map-popup" }
+                        { closeButton: false, autoPan: true, className: "explore-map-popup" }
                     );
 
                 marker.on("click", () => onSelect(index));
+                marker.on("popupopen", () => {
+                    const popupRoot = marker.getPopup()?.getElement();
+                    if (!popupRoot) return;
+
+                    const addButton = popupRoot.querySelector<HTMLButtonElement>(`[data-popup-add="${index}"]`);
+                    const navButton = popupRoot.querySelector<HTMLButtonElement>(`[data-popup-nav="${index}"]`);
+
+                    addButton && (addButton.onclick = (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onAddToTrip(index);
+                    });
+
+                    navButton && (navButton.onclick = (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onNavigate(index);
+                    });
+                });
                 marker.setZIndexOffset(selectedIndex === index ? 1200 : 700);
                 return marker;
             })
@@ -95,7 +127,7 @@ export default function ExploreMarkersLayer({
             markersRef.current.forEach((marker) => marker.remove());
             markersRef.current = [];
         };
-    }, [map, places, selectedIndex, onSelect, userCoords]);
+    }, [map, places, selectedIndex, onSelect, onAddToTrip, onNavigate, userCoords]);
 
     useEffect(() => {
         if (selectedIndex === null) {
