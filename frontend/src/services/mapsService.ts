@@ -1,4 +1,6 @@
 import type {
+    MapDirectionsRequest,
+    MapDirectionsResponse,
     MapPlace,
     MapSuggestParams,
     MapSuggestResponse,
@@ -7,6 +9,7 @@ import type {
 import { http } from "@services/httpService";
 
 const SEARCH_BASE_PATH = "/api/v1/maps/search";
+const DIRECTIONS_PATH = "/api/v1/maps/directions";
 
 function buildQueryString(params: MapSuggestParams): string {
     const search = new URLSearchParams();
@@ -32,4 +35,8 @@ export async function suggestPlaces(params: MapSuggestParams): Promise<MapSugges
 export async function retrievePlace(id: string, language?: string): Promise<MapPlace> {
     const query = language ? `?language=${encodeURIComponent(language)}` : "";
     return http<MapPlace>(`${SEARCH_BASE_PATH}/retrieve/${encodeURIComponent(id)}${query}`, "GET");
+}
+
+export async function getDirections(request: MapDirectionsRequest): Promise<MapDirectionsResponse> {
+    return http<MapDirectionsResponse>(DIRECTIONS_PATH, "POST", request);
 }

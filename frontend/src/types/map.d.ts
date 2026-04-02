@@ -39,3 +39,29 @@ export interface MapSuggestParams {
     radiusKm?: number;
     category?: string;
 }
+
+export type MapDirectionsProfile = "DRIVING" | "DRIVING_TRAFFIC" | "WALKING" | "CYCLING";
+
+export interface MapDirectionsRequest {
+    profile: MapDirectionsProfile;
+    waypoints: MapCoordinate[];
+    alternatives?: boolean;
+    steps?: boolean;
+}
+
+export interface MapRouteLeg {
+    distance: number;
+    duration: number;
+    summary: string;
+}
+
+export interface MapRoute {
+    distance: number;
+    duration: number;
+    geometry: MapCoordinate[];
+    legs: MapRouteLeg[];
+}
+
+export interface MapDirectionsResponse {
+    routes: MapRoute[];
+}

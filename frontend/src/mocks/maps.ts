@@ -1,4 +1,9 @@
-import type { MapPlace, MapSuggestion } from "@/types/map";
+import type {
+  MapDirectionsRequest,
+  MapDirectionsResponse,
+  MapPlace,
+  MapSuggestion,
+} from "@/types/map";
 
 const BASE_SUGGESTIONS: MapSuggestion[] = [
   {
@@ -115,6 +120,50 @@ export const mockMaps = {
       featureType: found.featureType,
       center: found.center || { latitude: 40.4168, longitude: -3.7038 },
       categories: found.categories,
+    };
+  },
+
+  "/api/v1/maps/directions": async (
+    method: string,
+    body?: unknown,
+  ): Promise<MapDirectionsResponse> => {
+    if (method !== "POST") {
+      throw new Error(`Method ${method} not allowed on /api/v1/maps/directions`);
+    }
+
+    const request = (body || {}) as Partial<MapDirectionsRequest>;
+    const rawWaypoints = Array.isArray(request.waypoints) ? request.waypoints : [];
+    const geometry = rawWaypoints
+      .filter((point) => (
+        typeof point?.latitude === "number"
+        && Number.isFinite(point.latitude)
+        && typeof point?.longitude === "number"
+        && Number.isFinite(point.longitude)
+      ))
+      .map((point) => ({ latitude: point.latitude, longitude: point.longitude }));
+
+    if (geometry.length < 2) {
+      throw new Error("At least two valid waypoints are required");
+    }
+
+    const estimatedDistanceMeters = Math.max(geometry.length - 1, 1) * 1200;
+    const estimatedDurationSeconds = Math.max(geometry.length - 1, 1) * 780;
+
+    return {
+      routes: [
+        {
+          distance: estimatedDistanceMeters,
+          duration: estimatedDurationSeconds,
+          geometry,
+          legs: [
+            {
+              distance: estimatedDistanceMeters,
+              duration: estimatedDurationSeconds,
+              summary: "Mock route",
+            },
+          ],
+        },
+      ],
     };
   },
 };
