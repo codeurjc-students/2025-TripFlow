@@ -52,7 +52,7 @@ describe("AuthForm Component", () => {
       />
     );
 
-    const logoButton = screen.getByRole("link");
+    const logoButton = screen.getByRole("link", { name: /TripFlow Logo/i });
     expect(logoButton).toBeInTheDocument();
     expect(logoButton).toHaveAttribute("href", "/");
   });
