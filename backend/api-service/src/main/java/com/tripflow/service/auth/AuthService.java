@@ -2,6 +2,8 @@ package com.tripflow.service.auth;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -37,6 +39,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class AuthService {
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -112,6 +116,7 @@ public class AuthService {
                 null
             );
         } catch (Exception e) {
+            log.error("Unexpected error during registration for username {}", request.username(), e);
             return new AuthResponse(
                 AuthStatus.FAILURE,
                 null,
@@ -156,6 +161,7 @@ public class AuthService {
                 null
             );
         } catch (Exception e) {
+            log.error("Unexpected error during account verification for username {}", request.username(), e);
             return new AuthResponse(
                 AuthStatus.FAILURE,
                 "Verification failed",
@@ -193,6 +199,7 @@ public class AuthService {
                 null
             );
         } catch (Exception e) {
+            log.error("Unexpected error while resending verification code for username {}", username, e);
             return new AuthResponse(
                 AuthStatus.FAILURE,
                 "Failed to resend verification code",
@@ -345,6 +352,7 @@ public class AuthService {
                 publicUser
             );
         } catch (Exception e) {
+            log.warn("Refresh token validation failed", e);
             return new AuthResponse(
                 AuthStatus.FAILURE,
                 "Invalid refresh token",

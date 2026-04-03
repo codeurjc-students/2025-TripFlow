@@ -8,11 +8,15 @@ import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtils {
+    private static final Logger log = LoggerFactory.getLogger(JwtUtils.class);
+
     private final SecretKey jwtSecretKey;
     private final JwtParser jwtParser;
 
@@ -43,6 +47,7 @@ public class JwtUtils {
             Claims claims = validateToken(token);
             return !isTokenExpired(claims);
         } catch (Exception e) {
+            log.debug("JWT token validation failed", e);
             return false;
         }
     }

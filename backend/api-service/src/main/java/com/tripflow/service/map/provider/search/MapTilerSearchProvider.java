@@ -7,6 +7,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -32,6 +34,8 @@ import com.tripflow.service.map.provider.support.MapProviderExceptionMapper;
 
 @Service
 public class MapTilerSearchProvider implements MapsSearchProvider {
+    private static final Logger log = LoggerFactory.getLogger(MapTilerSearchProvider.class);
+
 
     private static final String ENDPOINT_SUGGEST = "search_suggest";
     private static final String ENDPOINT_RETRIEVE = "search_retrieve";
@@ -152,6 +156,7 @@ public class MapTilerSearchProvider implements MapsSearchProvider {
             }
             return new MapSuggestResponseDTO(suggestions);
         } catch (Exception ex) {
+            log.warn("Failed to parse suggest response from map provider", ex);
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Invalid map provider response");
         }
     }
@@ -184,6 +189,7 @@ public class MapTilerSearchProvider implements MapsSearchProvider {
         } catch (ResponseStatusException ex) {
             throw ex;
         } catch (Exception ex) {
+            log.warn("Failed to parse retrieve response from map provider", ex);
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Invalid map provider response");
         }
     }
@@ -227,6 +233,7 @@ public class MapTilerSearchProvider implements MapsSearchProvider {
         } catch (HttpStatusCodeException ex) {
             throw MapProviderExceptionMapper.fromHttpStatus(ex);
         } catch (ResourceAccessException ex) {
+            log.warn("Timed out while calling map provider URL {}", requestUrl);
             throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT, "Map provider request timed out");
         }
     }

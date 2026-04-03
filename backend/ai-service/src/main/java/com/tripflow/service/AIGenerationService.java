@@ -41,7 +41,7 @@ public class AIGenerationService {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
             return AIItineraryMock.getItineraryMock();
         }

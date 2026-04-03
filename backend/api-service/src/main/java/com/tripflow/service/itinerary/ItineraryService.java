@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.tripflow.dto.itinerary.ExtendedItineraryDTO;
 import com.tripflow.dto.itinerary.ExtendedItineraryResponseDTO;
@@ -38,6 +40,8 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class ItineraryService {
+    private static final Logger log = LoggerFactory.getLogger(ItineraryService.class);
+
     private final ItineraryRepository itineraryRepository;
     private final UserService userService;
     private final ExternalImageService externalImageService;
@@ -83,7 +87,8 @@ public class ItineraryService {
             ExtendedItineraryDTO itineraryDTO = message.itinerary();
             this.createItinerary(user, itineraryDTO);
             return true;
-        } catch (Exception e) {
+        } catch (RuntimeException ex) {
+            log.error("Failed to process generated itinerary for user {}", message.username(), ex);
             return false;
         }
     }

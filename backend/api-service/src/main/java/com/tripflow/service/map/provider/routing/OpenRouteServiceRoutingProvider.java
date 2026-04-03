@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -34,6 +36,8 @@ import com.tripflow.service.map.provider.support.MapProviderExceptionMapper;
 
 @Service
 public class OpenRouteServiceRoutingProvider implements MapsRoutingProvider {
+    private static final Logger log = LoggerFactory.getLogger(OpenRouteServiceRoutingProvider.class);
+
 
     private static final String ENDPOINT_DIRECTIONS = "directions";
     private static final String PROFILE_DRIVING = "driving-car";
@@ -104,6 +108,7 @@ public class OpenRouteServiceRoutingProvider implements MapsRoutingProvider {
         } catch (ResponseStatusException ex) {
             throw ex;
         } catch (Exception ex) {
+            log.warn("Failed to parse directions response from map provider", ex);
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Invalid map provider response");
         }
     }
@@ -190,6 +195,7 @@ public class OpenRouteServiceRoutingProvider implements MapsRoutingProvider {
         } catch (HttpStatusCodeException ex) {
             throw MapProviderExceptionMapper.fromHttpStatus(ex);
         } catch (ResourceAccessException ex) {
+            log.warn("Timed out while calling directions provider URL {}", requestUrl);
             throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT, "Map provider request timed out");
         }
     }
@@ -209,6 +215,7 @@ public class OpenRouteServiceRoutingProvider implements MapsRoutingProvider {
         try {
             return this.objectMapper.writeValueAsString(payload);
         } catch (Exception ex) {
+            log.warn("Failed to serialize directions request payload", ex);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid map request payload");
         }
     }
