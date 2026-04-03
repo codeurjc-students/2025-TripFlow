@@ -1,17 +1,54 @@
-.ctaContent {
+.ctaSurface {
   width: 100%;
+  border: 1px solid color-mix(in srgb, var(--primary) 32%, var(--border-secondary));
+  border-radius: var(--border-radius-xl);
+  background:
+    radial-gradient(circle at 12% -10%, color-mix(in srgb, var(--primary) 20%, transparent), transparent 46%),
+    radial-gradient(circle at 92% 115%, color-mix(in srgb, var(--info) 18%, transparent), transparent 42%),
+    linear-gradient(150deg, color-mix(in srgb, var(--bg-tertiary) 56%, transparent), var(--bg-secondary));
+  box-shadow: 0 24px 54px color-mix(in srgb, var(--bg-primary) 56%, transparent);
+}
+
+.ctaContent {
+  width: min(980px, 100%);
+  margin: 0 auto;
+  padding: clamp(var(--space-xxl), 4vw, var(--space-largest)) clamp(var(--space-lg), 5vw, var(--space-largest));
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  gap: var(--space-lg);
+}
 
-  .ctaText {
-    font-size: var(--font-size-xxl);
-    margin-bottom: var(--space-md);
+.ctaLead {
+  font-size: clamp(var(--font-size-xl), 2.6vw, var(--font-size-xxxl));
+  color: var(--text-primary);
+  font-weight: var(--font-weight-bold);
+  width: 100%;
+  max-width: 100%;
+  text-wrap: balance;
+}
+
+.ctaText {
+  font-size: clamp(var(--font-size-md), 1.7vw, var(--font-size-lg));
+  color: var(--text-secondary);
+  max-width: 48ch;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.actions {
+  margin-top: var(--space-xs);
+}
+
+@media (max-width: 640px) {
+  .ctaSurface {
+    border-radius: var(--border-radius-lg);
   }
 
-  .actions {
-    margin-top: var(--space-xxxl);
+  .ctaContent {
+    gap: var(--space-lg);
+    padding: var(--space-xxl) var(--space-xl);
   }
 }

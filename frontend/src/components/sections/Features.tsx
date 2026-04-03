@@ -19,9 +19,9 @@ const FEATURES_DATA = [
   },
   {
     icon: RouteIcon,
-    title: "Rutas Óptimas",
+    title: "Rutas claras y eficientes",
     description:
-      "Optimiza el orden de los lugares a visitar para ahorrar tiempo y dinero, evitando desplazamientos innecesarios y maximizando tu experiencia.",
+      "Visualiza y organiza mejor tus paradas para reducir desvíos y mantener cada día del viaje bajo control.",
   },
 ];
 
@@ -37,7 +37,9 @@ export default function Features() {
       <div className={styles.featuresContainer}>
         {FEATURES_DATA.map((feature, index) => (
           <div key={index} className={styles.featureCard}>
-            {<feature.icon className={styles.icon} size={36} />}
+            <div className={styles.iconBadge}>
+              <feature.icon className={styles.icon} size={28} />
+            </div>
             <h3 className={styles.featureTitle}>{feature.title}</h3>
             <p className={styles.featureDescription}>{feature.description}</p>
           </div>

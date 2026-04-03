@@ -18,7 +18,7 @@ describe("Features", () => {
     // Check that all 3 features are rendered
     expect(screen.getByText("Itinerarios con IA")).toBeInTheDocument();
     expect(screen.getByText("Acceso sin conexión")).toBeInTheDocument();
-    expect(screen.getByText("Rutas Óptimas")).toBeInTheDocument();
+    expect(screen.getByText("Rutas claras y eficientes")).toBeInTheDocument();
   });
 
   it("renders feature descriptions correctly", () => {
@@ -38,7 +38,7 @@ describe("Features", () => {
 
     expect(
       screen.getByText(
-        "Optimiza el orden de los lugares a visitar para ahorrar tiempo y dinero, evitando desplazamientos innecesarios y maximizando tu experiencia."
+        "Visualiza y organiza mejor tus paradas para reducir desvíos y mantener cada día del viaje bajo control."
       )
     ).toBeInTheDocument();
   });
@@ -50,7 +50,7 @@ describe("Features", () => {
     expect(featureTitles).toHaveLength(3);
     expect(featureTitles[0]).toHaveTextContent("Itinerarios con IA");
     expect(featureTitles[1]).toHaveTextContent("Acceso sin conexión");
-    expect(featureTitles[2]).toHaveTextContent("Rutas Óptimas");
+    expect(featureTitles[2]).toHaveTextContent("Rutas claras y eficientes");
   });
 
   it("has correct CSS structure", () => {

@@ -1,42 +1,82 @@
 .featuresContainer {
   width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-items: stretch;
   gap: var(--space-xl);
 
   .featureCard {
-    width: min(450px, 100%);
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-lg);
-    background: var(--bg-secondary);
-    padding: var(--space-xxl);
+    gap: var(--space-xl);
+    background:
+      radial-gradient(circle at 12% -10%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 48%),
+      linear-gradient(155deg, color-mix(in srgb, var(--bg-tertiary) 42%, transparent), var(--bg-secondary));
+    padding: clamp(var(--space-xl), 2.8vw, var(--space-xxxl));
     border: 2px solid var(--border-secondary);
-    border-radius: var(--border-radius-lg);
-    transition: all 0.2s ease;
+    border-radius: var(--border-radius-xl);
+    box-shadow: 0 16px 34px color-mix(in srgb, var(--bg-primary) 44%, transparent);
+    text-align: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 
     @media (hover: hover) {
       &:hover {
-        filter: brightness(1.25);
-        transform: translateY(-4px);
+        transform: translateY(-6px);
+        box-shadow: 0 24px 44px color-mix(in srgb, var(--bg-primary) 60%, transparent);
+        border-color: color-mix(in srgb, var(--primary) 45%, var(--border-secondary));
+
+        &::before {
+          opacity: 1;
+        }
       }
     }
 
+    .iconBadge {
+      width: 56px;
+      height: 56px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--border-radius-full);
+      background: color-mix(in srgb, var(--primary) 20%, transparent);
+      border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+      box-shadow: var(--glow-blue);
+    }
+
     .icon {
-      color: var(--text-secondary);
+      width: 28px;
+      height: 28px;
+      color: var(--text-primary);
+      stroke-width: 2;
+      flex-shrink: 0;
     }
 
     .featureTitle {
       font-size: var(--font-size-xl);
-      text-align: center;
+      text-wrap: balance;
     }
 
     .featureDescription {
       font-size: var(--font-size-md);
       color: var(--text-secondary);
-      text-align: center;
+      max-width: 36ch;
+      text-wrap: pretty;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .featuresContainer {
+    gap: var(--space-lg);
+
+    .featureCard {
+      gap: var(--space-lg);
+      padding: var(--space-xl);
     }
   }
 }
