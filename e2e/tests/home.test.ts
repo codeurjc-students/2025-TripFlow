@@ -11,7 +11,7 @@ test.describe('Home Page Tests', () => {
         await expect(page.getByText("¿Por qué TripFlow?")).toBeVisible();
         await expect(page.getByText("Instala TripFlow en tu Móvil")).toBeVisible();
         await expect(page.getByText("Preguntas Frecuentes")).toBeVisible();
-        await expect(page.getByText("¿Aún no te hemos convencido?")).toBeVisible();
+        await expect(page.getByText(/Empieza a planificar un viaje/i)).toBeVisible();
     });
 
     test("should navigate to login page", async ({ page }) => {
