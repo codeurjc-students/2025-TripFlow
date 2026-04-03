@@ -27,7 +27,6 @@ export default function Faq() {
                         title={item.question}
                         isOpen={openIndex === index}
                         onToggle={() => toggleAccordion(index)}
-                        widthLimited
                     >
                         <p className={styles.faqAnswer}>{item.answer}</p>
                     </AccordionItem>

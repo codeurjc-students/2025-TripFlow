@@ -1,75 +1,132 @@
 .container {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: var(--app-padding) 0;
+  padding-bottom: var(--space-largest);
+
+  .section {
     width: 100%;
-    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: var(--space-largest);
-    padding: var(--app-padding) 0;
+    gap: var(--space-larger);
+  }
 
-    .section {
-        width: 100%;
-        margin-bottom: calc(var(--space-largest) * 2);
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-xxxl);
+  .headerBlock {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
 
-        .sectionTitle {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-            font-size: var(--font-size-xxxl);
-            color: var(--text-primary);
-            padding-bottom: var(--space-lg);
-            border-bottom: 1px solid var(--border-subtle);
-            
-            .icon {
-                color: var(--primary);
-            }
-        }
+  .headerTopRow {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .sectionTitle {
+    margin: 0;
+    font-size: var(--font-size-xxxl);
+    color: var(--text-primary);
+    text-wrap: balance;
+  }
+
+  .sectionDescription {
+    margin: 0;
+    font-size: var(--font-size-md);
+    color: var(--text-secondary);
+    max-width: 62ch;
+    text-wrap: pretty;
+  }
+
+  .helpChip {
+    display: flex;
+  }
+
+  .faqWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-larger);
+  }
+
+  .categorySection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .categoryHeader {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--border-secondary);
+  }
+
+  .categoryTitle {
+    margin: 0;
+    font-size: var(--font-size-xxl);
+    color: var(--text-primary);
+  }
+
+  .categoryCount {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+  }
+
+  .legalNote {
+    margin: var(--space-md) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+
+    a {
+      color: var(--primary);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    .headerBlock {
+      gap: var(--space-sm);
     }
 
-    .faqWrapper {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-xxl);
-        width: 100%;
-
-        .categorySection {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-lg);
-
-            .categoryTitle {
-                font-size: var(--font-size-xxl);
-                color: var(--text-primary);
-                border-bottom: 1px solid var(--border-secondary);
-                padding-block: var(--space-md);
-                line-height: 1;
-            }
-
-            .categoryItems {
-                display: flex;
-                flex-direction: column;
-            }
-        }
+    .headerTopRow {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+      gap: var(--space-sm);
     }
 
-    .contactCard {
-        width: 100%;
-        background-color: var(--bg-secondary);
-        border: 1px solid var(--border-secondary);
-        border-radius: var(--border-radius-xl);
-        padding: var(--space-xl);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--space-lg);
-        text-align: center;
-
-        .contactText {
-            font-size: var(--font-size-md);
-            color: var(--text-secondary);
-            max-width: 500px;
-        }
+    .sectionTitle {
+      font-size: var(--font-size-xxl);
+      line-height: 1.15;
+      flex: 1;
+      min-width: 0;
     }
+
+    .sectionDescription {
+      max-width: none;
+    }
+
+    .helpChip {
+      display: none;
+    }
+
+    .categoryTitle {
+      font-size: var(--font-size-xl);
+    }
+  }
 }

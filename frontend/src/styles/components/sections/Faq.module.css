@@ -6,7 +6,7 @@
 
     .faqAnswer {
         font-size: var(--font-size-md);
-        color: var(--text-primary);
+        color: var(--text-secondary);
         max-width: none;
     }
 }
