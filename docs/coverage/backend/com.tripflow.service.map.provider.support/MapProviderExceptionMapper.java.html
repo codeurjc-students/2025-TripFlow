@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapProviderExceptionMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.service.map.provider.support</a> &gt; <span class="el_source">MapProviderExceptionMapper.java</span></div><h1>MapProviderExceptionMapper.java</h1><pre class="source lang-java linenums">package com.tripflow.service.map.provider.support;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.server.ResponseStatusException;
+
+public final class MapProviderExceptionMapper {
+
+    private MapProviderExceptionMapper() {
+    }
+
+    public static ResponseStatusException fromHttpStatus(HttpStatusCodeException ex) {
+<span class="nc" id="L13">        int status = ex.getStatusCode().value();</span>
+<span class="nc" id="L14">        String providerMessage = extractProviderMessage(ex);</span>
+<span class="nc bnc" id="L15" title="All 2 branches missed.">        if (status == 400) {</span>
+<span class="nc" id="L16">            return new ResponseStatusException(</span>
+                HttpStatus.BAD_REQUEST,
+<span class="nc bnc" id="L18" title="All 2 branches missed.">                providerMessage == null ? &quot;Invalid map request parameters&quot; : providerMessage</span>
+            );
+        }
+<span class="nc bnc" id="L21" title="All 4 branches missed.">        if (status == 401 || status == 403) {</span>
+<span class="nc" id="L22">            return new ResponseStatusException(</span>
+                HttpStatus.SERVICE_UNAVAILABLE,
+<span class="nc bnc" id="L24" title="All 2 branches missed.">                providerMessage == null ? &quot;Map provider authentication failed&quot; : providerMessage</span>
+            );
+        }
+<span class="nc bnc" id="L27" title="All 2 branches missed.">        if (status == 404) {</span>
+<span class="nc" id="L28">            return new ResponseStatusException(</span>
+                HttpStatus.NOT_FOUND,
+<span class="nc bnc" id="L30" title="All 2 branches missed.">                providerMessage == null ? &quot;Map resource not found&quot; : providerMessage</span>
+            );
+        }
+<span class="nc bnc" id="L33" title="All 2 branches missed.">        if (status == 429) {</span>
+<span class="nc" id="L34">            return new ResponseStatusException(</span>
+                HttpStatus.TOO_MANY_REQUESTS,
+<span class="nc bnc" id="L36" title="All 2 branches missed.">                providerMessage == null ? &quot;Map provider rate limit reached&quot; : providerMessage</span>
+            );
+        }
+<span class="nc" id="L39">        return new ResponseStatusException(</span>
+            HttpStatus.BAD_GATEWAY,
+<span class="nc bnc" id="L41" title="All 2 branches missed.">            providerMessage == null ? &quot;Map provider is unavailable&quot; : providerMessage</span>
+        );
+    }
+
+    private static String extractProviderMessage(HttpStatusCodeException ex) {
+<span class="nc" id="L46">        String body = ex.getResponseBodyAsString();</span>
+<span class="nc bnc" id="L47" title="All 4 branches missed.">        if (body == null || body.isBlank()) {</span>
+<span class="nc" id="L48">            return null;</span>
+        }
+
+<span class="nc" id="L51">        String compactBody = body.replaceAll(&quot;\\s+&quot;, &quot; &quot;).trim();</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        if (compactBody.length() &lt;= 200) {</span>
+<span class="nc" id="L53">            return compactBody;</span>
+        }
+
+<span class="nc" id="L56">        return compactBody.substring(0, 200) + &quot;...&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

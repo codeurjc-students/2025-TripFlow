@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.model</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package com.tripflow.model;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.tripflow.model.itinerary.Itinerary;
+import com.tripflow.model.itinerary.ItineraryCollaborator;
 import com.tripflow.model.types.PlanType;
 import com.tripflow.model.types.UserType;
 
@@ -34,8 +36,8 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-<span class="pc" id="L37">    @Column(nullable = false)</span>
-<span class="pc" id="L38">    private Boolean verified = false;</span>
+<span class="pc" id="L39">    @Column(nullable = false)</span>
+<span class="pc" id="L40">    private Boolean verified = false;</span>
 
     @Column(nullable = false, unique = true, updatable = false)
     private String username;
@@ -47,19 +49,19 @@ public class User {
     private String verificationCode;
 
     @Column(name = &quot;verification_code_expires_at&quot;)
-    private java.time.Instant verificationCodeExpiresAt;
+    private Instant verificationCodeExpiresAt;
 
     @Column(nullable = true, unique = false)
     private String name;
 
-<span class="pc" id="L55">    @Column(nullable = true, unique = false)</span>
+<span class="pc" id="L57">    @Column(nullable = true, unique = false)</span>
     private String description = &quot;&quot;;
 
-<span class="pc" id="L58">    @Column(nullable = false, unique = false)</span>
+<span class="pc" id="L60">    @Column(nullable = false, unique = false)</span>
     private String location = &quot;¿?&quot;;
 
-<span class="pc" id="L61">    @Column(nullable = false)</span>
-<span class="pc" id="L62">    private Boolean notificationsAllowed = true;</span>
+<span class="pc" id="L63">    @Column(nullable = false)</span>
+<span class="pc" id="L64">    private Boolean notificationsAllowed = true;</span>
 
     @Column(nullable = false)
     private UserType role;
@@ -67,209 +69,220 @@ public class User {
     @Column(nullable = true)
     private byte[] avatar;
 
-<span class="pc" id="L70">    @Column(nullable = false)</span>
+<span class="pc" id="L72">    @Column(nullable = false)</span>
     private PlanType plan = PlanType.FREE;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-<span class="pc" id="L77">    @Column(nullable = false)</span>
+<span class="pc" id="L79">    @Column(nullable = false)</span>
     private boolean processingAI = false;
 
-<span class="pc" id="L80">    @OneToMany(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL, fetch = FetchType.EAGER)</span>
+<span class="pc" id="L82">    @OneToMany(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL, fetch = FetchType.EAGER)</span>
     private List&lt;Itinerary&gt; itineraries = new ArrayList&lt;&gt;();
 
-<span class="pc" id="L83">    @OneToMany(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL, orphanRemoval = true)</span>
+<span class="pc" id="L85">    @OneToMany(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL, orphanRemoval = true)</span>
     private List&lt;AIUsage&gt; aiUsages = new ArrayList&lt;&gt;();
+
+<span class="pc" id="L88">    @OneToMany(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL, orphanRemoval = true)</span>
+    private List&lt;ItineraryCollaborator&gt; collaborations = new ArrayList&lt;&gt;();
 
     // [Constructors] =================================================
 
-<span class="fc" id="L88">    public User() {</span>
-<span class="fc" id="L89">    }</span>
+<span class="fc" id="L93">    public User() {</span>
+<span class="fc" id="L94">    }</span>
 
-<span class="nc" id="L91">    public User(String username, String hashedPassword, UserType role) {</span>
-<span class="nc" id="L92">        this.username = username;</span>
-<span class="nc" id="L93">        this.name = username;</span>
-<span class="nc" id="L94">        this.hashedPassword = hashedPassword;</span>
-<span class="nc" id="L95">        this.role = role;</span>
-<span class="nc" id="L96">    }</span>
+<span class="nc" id="L96">    public User(String username, String hashedPassword, UserType role) {</span>
+<span class="nc" id="L97">        this.username = username;</span>
+<span class="nc" id="L98">        this.name = username;</span>
+<span class="nc" id="L99">        this.hashedPassword = hashedPassword;</span>
+<span class="nc" id="L100">        this.role = role;</span>
+<span class="nc" id="L101">    }</span>
 
     // [Methods] ======================================================
 
     @Override
     public boolean equals(Object o) {
-<span class="fc bfc" id="L102" title="All 2 branches covered.">        if (this == o) return true;</span>
-<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        if (!(o instanceof User)) return false;</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        if (this == o) return true;</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if (!(o instanceof User)) return false;</span>
 
-<span class="fc" id="L105">        User user = (User) o;</span>
-<span class="pc bpc" id="L106" title="1 of 2 branches missed.">        if (!username.equals(user.username)) return false;</span>
+<span class="fc" id="L110">        User user = (User) o;</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        if (!username.equals(user.username)) return false;</span>
 
-<span class="nc" id="L108">        return true;</span>
+<span class="nc" id="L113">        return true;</span>
     }
 
     public void addItinerary(Itinerary itinerary) {
-<span class="pc bpc" id="L112" title="1 of 2 branches missed.">        if (itinerary != null) {</span>
-<span class="fc" id="L113">            this.itineraries.add(itinerary);</span>
-<span class="fc" id="L114">            itinerary.setUser(this);</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">        if (itinerary != null) {</span>
+<span class="fc" id="L118">            this.itineraries.add(itinerary);</span>
+<span class="fc" id="L119">            itinerary.setUser(this);</span>
         }
-<span class="fc" id="L116">    }</span>
+<span class="fc" id="L121">    }</span>
 
     public void removeItinerary(Itinerary itinerary) {
-<span class="pc bpc" id="L119" title="1 of 4 branches missed.">        if (itinerary != null &amp;&amp; this.itineraries.contains(itinerary)) {</span>
-<span class="fc" id="L120">            this.itineraries.remove(itinerary);</span>
-<span class="fc" id="L121">            itinerary.setUser(null);</span>
+<span class="pc bpc" id="L124" title="1 of 4 branches missed.">        if (itinerary != null &amp;&amp; this.itineraries.contains(itinerary)) {</span>
+<span class="fc" id="L125">            this.itineraries.remove(itinerary);</span>
+<span class="fc" id="L126">            itinerary.setUser(null);</span>
         }
-<span class="fc" id="L123">    }</span>
+<span class="fc" id="L128">    }</span>
 
     public boolean isAdmin() {
-<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        return this.role == UserType.ADMIN;</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">        return this.role == UserType.ADMIN;</span>
     }
 
     // [Getters and Setters] ==========================================
 
     public Long getId() {
-<span class="fc" id="L132">        return id;</span>
+<span class="fc" id="L137">        return id;</span>
     }
 
     public void setId(Long id) {
-<span class="fc" id="L136">        this.id = id;</span>
-<span class="fc" id="L137">    }</span>
+<span class="fc" id="L141">        this.id = id;</span>
+<span class="fc" id="L142">    }</span>
 
     public String getEmail() {
-<span class="nc" id="L140">        return email;</span>
+<span class="nc" id="L145">        return email;</span>
     }
 
     public void setEmail(String email) {
-<span class="fc" id="L144">        this.email = email;</span>
-<span class="fc" id="L145">    }</span>
+<span class="fc" id="L149">        this.email = email;</span>
+<span class="fc" id="L150">    }</span>
 
     public Boolean getVerified() {
-<span class="fc" id="L148">        return verified;</span>
+<span class="fc" id="L153">        return verified;</span>
     }
 
     public void setVerified(Boolean verified) {
-<span class="fc" id="L152">        this.verified = verified;</span>
-<span class="fc" id="L153">    }</span>
+<span class="fc" id="L157">        this.verified = verified;</span>
+<span class="fc" id="L158">    }</span>
 
     public String getVerificationCode() {
-<span class="nc" id="L156">        return verificationCode;</span>
+<span class="nc" id="L161">        return verificationCode;</span>
     }
 
     public void setVerificationCode(String verificationCode) {
-<span class="fc" id="L160">        this.verificationCode = verificationCode;</span>
-<span class="fc" id="L161">    }</span>
+<span class="fc" id="L165">        this.verificationCode = verificationCode;</span>
+<span class="fc" id="L166">    }</span>
 
-    public java.time.Instant getVerificationCodeExpiresAt() {
-<span class="nc" id="L164">        return verificationCodeExpiresAt;</span>
+    public Instant getVerificationCodeExpiresAt() {
+<span class="nc" id="L169">        return verificationCodeExpiresAt;</span>
     }
 
-    public void setVerificationCodeExpiresAt(java.time.Instant verificationCodeExpiresAt) {
-<span class="fc" id="L168">        this.verificationCodeExpiresAt = verificationCodeExpiresAt;</span>
-<span class="fc" id="L169">    }</span>
+    public void setVerificationCodeExpiresAt(Instant verificationCodeExpiresAt) {
+<span class="fc" id="L173">        this.verificationCodeExpiresAt = verificationCodeExpiresAt;</span>
+<span class="fc" id="L174">    }</span>
 
     public String getUsername() {
-<span class="fc" id="L172">        return username;</span>
+<span class="fc" id="L177">        return username;</span>
     }
 
     public void setUsername(String username) {
-<span class="fc" id="L176">        this.username = username;</span>
-<span class="fc" id="L177">    }</span>
+<span class="fc" id="L181">        this.username = username;</span>
+<span class="fc" id="L182">    }</span>
 
     public String getName() {
-<span class="fc" id="L180">        return name;</span>
+<span class="fc" id="L185">        return name;</span>
     }
 
     public void setName(String name) {
-<span class="fc" id="L184">        this.name = name;</span>
-<span class="fc" id="L185">    }</span>
+<span class="fc" id="L189">        this.name = name;</span>
+<span class="fc" id="L190">    }</span>
 
     public String getDescription() {
-<span class="fc" id="L188">        return description;</span>
+<span class="fc" id="L193">        return description;</span>
     }
 
     public void setDescription(String description) {
-<span class="fc" id="L192">        this.description = description;</span>
-<span class="fc" id="L193">    }</span>
+<span class="fc" id="L197">        this.description = description;</span>
+<span class="fc" id="L198">    }</span>
 
     public String getLocation() {
-<span class="fc" id="L196">        return location;</span>
+<span class="fc" id="L201">        return location;</span>
     }
 
     public void setLocation(String location) {
-<span class="fc" id="L200">        this.location = location;</span>
-<span class="fc" id="L201">    }</span>
+<span class="fc" id="L205">        this.location = location;</span>
+<span class="fc" id="L206">    }</span>
 
     public Boolean getNotificationsAllowed() {
-<span class="fc" id="L204">        return notificationsAllowed;</span>
+<span class="fc" id="L209">        return notificationsAllowed;</span>
     }
 
     public void setNotificationsAllowed(Boolean notificationsAllowed) {
-<span class="fc" id="L208">        this.notificationsAllowed = notificationsAllowed;</span>
-<span class="fc" id="L209">    }</span>
+<span class="fc" id="L213">        this.notificationsAllowed = notificationsAllowed;</span>
+<span class="fc" id="L214">    }</span>
 
     public String getHashedPassword() {
-<span class="fc" id="L212">        return hashedPassword;</span>
+<span class="fc" id="L217">        return hashedPassword;</span>
     }
 
     public void setHashedPassword(String hashedPassword) {
-<span class="fc" id="L216">        this.hashedPassword = hashedPassword;</span>
-<span class="fc" id="L217">    }</span>
+<span class="fc" id="L221">        this.hashedPassword = hashedPassword;</span>
+<span class="fc" id="L222">    }</span>
 
     public UserType getRole() {
-<span class="fc" id="L220">        return role;</span>
+<span class="fc" id="L225">        return role;</span>
     }
 
     public void setRole(UserType role) {
-<span class="fc" id="L224">        this.role = role;</span>
-<span class="fc" id="L225">    }</span>
+<span class="fc" id="L229">        this.role = role;</span>
+<span class="fc" id="L230">    }</span>
 
     public PlanType getPlan() {
-<span class="fc" id="L228">        return plan;</span>
+<span class="fc" id="L233">        return plan;</span>
     }
 
     public void setPlan(PlanType plan) {
-<span class="nc" id="L232">        this.plan = plan;</span>
-<span class="nc" id="L233">    }</span>
+<span class="fc" id="L237">        this.plan = plan;</span>
+<span class="fc" id="L238">    }</span>
 
     public LocalDateTime getCreatedAt() {
-<span class="fc" id="L236">        return createdAt;</span>
+<span class="fc" id="L241">        return createdAt;</span>
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
-<span class="nc" id="L240">        this.createdAt = createdAt;</span>
-<span class="nc" id="L241">    }</span>
+<span class="nc" id="L245">        this.createdAt = createdAt;</span>
+<span class="nc" id="L246">    }</span>
 
     public byte[] getAvatar() {
-<span class="fc" id="L244">        return avatar;</span>
+<span class="fc" id="L249">        return avatar;</span>
     }
 
     public void setAvatar(byte[] avatar) {
-<span class="fc" id="L248">        this.avatar = avatar;</span>
-<span class="fc" id="L249">    }</span>
+<span class="fc" id="L253">        this.avatar = avatar;</span>
+<span class="fc" id="L254">    }</span>
 
     public List&lt;Itinerary&gt; getItineraries() {
-<span class="nc" id="L252">        return itineraries;</span>
+<span class="nc" id="L257">        return itineraries;</span>
     }
 
     public void setItineraries(List&lt;Itinerary&gt; itineraries) {
-<span class="nc" id="L256">        this.itineraries = itineraries;</span>
-<span class="nc" id="L257">    }</span>
+<span class="nc" id="L261">        this.itineraries = itineraries;</span>
+<span class="nc" id="L262">    }</span>
 
     public boolean getProcessingAI() {
-<span class="fc" id="L260">        return processingAI;</span>
+<span class="fc" id="L265">        return processingAI;</span>
     }
 
     public void setProcessingAI(boolean processingAI) {
-<span class="fc" id="L264">        this.processingAI = processingAI;</span>
-<span class="fc" id="L265">    }</span>
+<span class="fc" id="L269">        this.processingAI = processingAI;</span>
+<span class="fc" id="L270">    }</span>
 
     public List&lt;AIUsage&gt; getAiUsages() {
-<span class="nc" id="L268">        return aiUsages;</span>
+<span class="nc" id="L273">        return aiUsages;</span>
     }
 
     public void setAiUsages(List&lt;AIUsage&gt; aiUsages) {
-<span class="nc" id="L272">        this.aiUsages = aiUsages;</span>
-<span class="nc" id="L273">    }</span>
+<span class="nc" id="L277">        this.aiUsages = aiUsages;</span>
+<span class="nc" id="L278">    }</span>
+
+    public List&lt;ItineraryCollaborator&gt; getCollaborations() {
+<span class="nc" id="L281">        return collaborations;</span>
+    }
+
+    public void setCollaborations(List&lt;ItineraryCollaborator&gt; collaborations) {
+<span class="nc" id="L285">        this.collaborations = collaborations;</span>
+<span class="nc" id="L286">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

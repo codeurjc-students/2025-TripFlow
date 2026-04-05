@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OpenRouteServiceRoutingProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.service.map.provider.routing</a> &gt; <span class="el_source">OpenRouteServiceRoutingProvider.java</span></div><h1>OpenRouteServiceRoutingProvider.java</h1><pre class="source lang-java linenums">package com.tripflow.service.map.provider.routing;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tripflow.config.MapsProperties;
+import com.tripflow.config.OpenRouteServiceProperties;
+import com.tripflow.dto.map.MapCoordinateDTO;
+import com.tripflow.dto.map.MapDirectionsProfileDTO;
+import com.tripflow.dto.map.MapDirectionsRequestDTO;
+import com.tripflow.dto.map.MapDirectionsResponseDTO;
+import com.tripflow.dto.map.MapRouteDTO;
+import com.tripflow.dto.map.MapRouteLegDTO;
+import com.tripflow.service.map.MapsCacheService;
+import com.tripflow.service.map.MapsHttpClientFactory;
+import com.tripflow.service.map.provider.support.DirectionsCacheKeyBuilder;
+import com.tripflow.service.map.provider.support.MapProviderExceptionMapper;
+
+@Service
+public class OpenRouteServiceRoutingProvider implements MapsRoutingProvider {
+<span class="fc" id="L39">    private static final Logger log = LoggerFactory.getLogger(OpenRouteServiceRoutingProvider.class);</span>
+
+
+    private static final String ENDPOINT_DIRECTIONS = &quot;directions&quot;;
+    private static final String PROFILE_DRIVING = &quot;driving-car&quot;;
+    private static final String PROFILE_WALKING = &quot;foot-walking&quot;;
+    private static final String PROFILE_CYCLING = &quot;cycling-regular&quot;;
+
+    private final RestTemplate mapsRestTemplate;
+    private final ObjectMapper objectMapper;
+    private final OpenRouteServiceProperties openRouteServiceProperties;
+    private final MapsProperties mapsProperties;
+    private final MapsCacheService mapsCacheService;
+
+    public OpenRouteServiceRoutingProvider(
+        MapsHttpClientFactory mapsHttpClientFactory,
+        ObjectMapper objectMapper,
+        OpenRouteServiceProperties openRouteServiceProperties,
+        MapsProperties mapsProperties,
+        MapsCacheService mapsCacheService
+<span class="fc" id="L59">    ) {</span>
+<span class="fc" id="L60">        this.mapsRestTemplate = mapsHttpClientFactory.createRestTemplate();</span>
+<span class="fc" id="L61">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L62">        this.openRouteServiceProperties = openRouteServiceProperties;</span>
+<span class="fc" id="L63">        this.mapsProperties = mapsProperties;</span>
+<span class="fc" id="L64">        this.mapsCacheService = mapsCacheService;</span>
+<span class="fc" id="L65">    }</span>
+
+    @Override
+    public MapDirectionsResponseDTO directions(MapDirectionsRequestDTO request) {
+<span class="nc" id="L69">        String profile = this.toOrsProfile(request.profile());</span>
+<span class="nc" id="L70">        String requestUrl = this.openRouteServiceProperties.getDirectionsBaseUrl() + &quot;/&quot; + profile + &quot;/geojson&quot;;</span>
+<span class="nc" id="L71">        String requestBody = this.buildRequestBody(request);</span>
+
+<span class="nc" id="L73">        String cacheKey = this.buildDirectionsCacheKey(request);</span>
+
+<span class="nc" id="L75">        String payload = this.mapsCacheService.getValidPayload(cacheKey)</span>
+<span class="nc" id="L76">            .orElseGet(() -&gt; {</span>
+<span class="nc" id="L77">                String responsePayload = this.fetch(requestUrl, requestBody);</span>
+<span class="nc" id="L78">                this.mapsCacheService.save(</span>
+                    cacheKey,
+                    ENDPOINT_DIRECTIONS,
+                    responsePayload,
+<span class="nc" id="L82">                    this.mapsProperties.getDirectionsCacheTtlSeconds()</span>
+                );
+<span class="nc" id="L84">                return responsePayload;</span>
+            });
+
+<span class="nc" id="L87">        return this.parseDirectionsResponse(payload);</span>
+    }
+
+    private String buildDirectionsCacheKey(MapDirectionsRequestDTO request) {
+<span class="nc" id="L91">        String rawKey = DirectionsCacheKeyBuilder.buildRawKey(request);</span>
+<span class="nc" id="L92">        return MapsCacheService.buildCacheKey(rawKey);</span>
+    }
+
+    private MapDirectionsResponseDTO parseDirectionsResponse(String payload) {
+        try {
+<span class="nc" id="L97">            JsonNode root = this.objectMapper.readTree(payload);</span>
+<span class="nc" id="L98">            JsonNode features = root.path(&quot;features&quot;);</span>
+<span class="nc" id="L99">            List&lt;MapRouteDTO&gt; routes = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L101" title="All 2 branches missed.">            if (features.isArray()) {</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">                for (JsonNode feature : features) {</span>
+<span class="nc" id="L103">                    routes.add(this.toRoute(feature));</span>
+<span class="nc" id="L104">                }</span>
+            }
+
+<span class="nc" id="L107">            return new MapDirectionsResponseDTO(routes);</span>
+<span class="nc" id="L108">        } catch (ResponseStatusException ex) {</span>
+<span class="nc" id="L109">            throw ex;</span>
+<span class="nc" id="L110">        } catch (Exception ex) {</span>
+<span class="nc" id="L111">            log.warn(&quot;Failed to parse directions response from map provider&quot;, ex);</span>
+<span class="nc" id="L112">            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, &quot;Invalid map provider response&quot;);</span>
+        }
+    }
+
+    private MapRouteDTO toRoute(JsonNode featureNode) {
+<span class="nc" id="L117">        JsonNode properties = featureNode.path(&quot;properties&quot;);</span>
+<span class="nc" id="L118">        JsonNode summary = properties.path(&quot;summary&quot;);</span>
+
+<span class="nc" id="L120">        return new MapRouteDTO(</span>
+<span class="nc" id="L121">            summary.path(&quot;distance&quot;).asDouble(0),</span>
+<span class="nc" id="L122">            summary.path(&quot;duration&quot;).asDouble(0),</span>
+<span class="nc" id="L123">            this.toGeometry(featureNode.path(&quot;geometry&quot;).path(&quot;coordinates&quot;)),</span>
+<span class="nc" id="L124">            this.toLegs(properties.path(&quot;segments&quot;))</span>
+        );
+    }
+
+    private List&lt;MapCoordinateDTO&gt; toGeometry(JsonNode coordinatesNode) {
+<span class="nc" id="L129">        List&lt;MapCoordinateDTO&gt; geometry = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        if (!coordinatesNode.isArray()) {</span>
+<span class="nc" id="L131">            return geometry;</span>
+        }
+
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        for (JsonNode point : coordinatesNode) {</span>
+<span class="nc bnc" id="L135" title="All 4 branches missed.">            if (!point.isArray() || point.size() &lt; 2) {</span>
+<span class="nc" id="L136">                continue;</span>
+            }
+<span class="nc" id="L138">            double longitude = point.path(0).asDouble(Double.NaN);</span>
+<span class="nc" id="L139">            double latitude = point.path(1).asDouble(Double.NaN);</span>
+<span class="nc bnc" id="L140" title="All 4 branches missed.">            if (!Double.isNaN(latitude) &amp;&amp; !Double.isNaN(longitude)) {</span>
+<span class="nc" id="L141">                geometry.add(new MapCoordinateDTO(latitude, longitude));</span>
+            }
+<span class="nc" id="L143">        }</span>
+<span class="nc" id="L144">        return geometry;</span>
+    }
+
+    private List&lt;MapRouteLegDTO&gt; toLegs(JsonNode segmentsNode) {
+<span class="nc" id="L148">        List&lt;MapRouteLegDTO&gt; legs = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">        if (!segmentsNode.isArray()) {</span>
+<span class="nc" id="L150">            return legs;</span>
+        }
+
+<span class="nc bnc" id="L153" title="All 2 branches missed.">        for (JsonNode segmentNode : segmentsNode) {</span>
+<span class="nc" id="L154">            String summary = this.resolveLegSummary(segmentNode.path(&quot;steps&quot;));</span>
+<span class="nc" id="L155">            legs.add(new MapRouteLegDTO(</span>
+<span class="nc" id="L156">                segmentNode.path(&quot;distance&quot;).asDouble(0),</span>
+<span class="nc" id="L157">                segmentNode.path(&quot;duration&quot;).asDouble(0),</span>
+                summary
+            ));
+<span class="nc" id="L160">        }</span>
+<span class="nc" id="L161">        return legs;</span>
+    }
+
+    private String resolveLegSummary(JsonNode stepsNode) {
+<span class="nc bnc" id="L165" title="All 4 branches missed.">        if (!stepsNode.isArray() || stepsNode.size() == 0) {</span>
+<span class="nc" id="L166">            return &quot;&quot;;</span>
+        }
+<span class="nc" id="L168">        return stepsNode.path(0).path(&quot;instruction&quot;).asText(&quot;&quot;);</span>
+    }
+
+    private String fetch(String requestUrl, String requestBody) {
+        try {
+<span class="nc" id="L173">            HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L174">            headers.setContentType(MediaType.parseMediaType(&quot;application/json; charset=utf-8&quot;));</span>
+<span class="nc" id="L175">            headers.set(</span>
+                HttpHeaders.ACCEPT,
+                &quot;application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8&quot;
+            );
+<span class="nc" id="L179">            headers.set(HttpHeaders.AUTHORIZATION, this.openRouteServiceProperties.getApiKey());</span>
+
+<span class="nc" id="L181">            HttpEntity&lt;String&gt; requestEntity = new HttpEntity&lt;&gt;(requestBody, headers);</span>
+<span class="nc" id="L182">            ResponseEntity&lt;String&gt; response = this.mapsRestTemplate.exchange(</span>
+                requestUrl,
+                HttpMethod.POST,
+                requestEntity,
+                String.class
+            );
+
+<span class="nc" id="L189">            String responseBody = response.getBody();</span>
+<span class="nc bnc" id="L190" title="All 4 branches missed.">            if (responseBody == null || responseBody.isBlank()) {</span>
+<span class="nc" id="L191">                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, &quot;Map provider returned an empty response&quot;);</span>
+            }
+
+<span class="nc" id="L194">            return responseBody;</span>
+<span class="nc" id="L195">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L196">            throw MapProviderExceptionMapper.fromHttpStatus(ex);</span>
+<span class="nc" id="L197">        } catch (ResourceAccessException ex) {</span>
+<span class="nc" id="L198">            log.warn(&quot;Timed out while calling directions provider URL {}&quot;, requestUrl);</span>
+<span class="nc" id="L199">            throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT, &quot;Map provider request timed out&quot;);</span>
+        }
+    }
+
+    private String buildRequestBody(MapDirectionsRequestDTO request) {
+<span class="nc" id="L204">        Map&lt;String, Object&gt; payload = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L205">        payload.put(&quot;coordinates&quot;, this.toCoordinates(request.waypoints()));</span>
+<span class="nc" id="L206">        payload.put(&quot;instructions&quot;, request.steps());</span>
+<span class="nc" id="L207">        payload.put(&quot;geometry&quot;, true);</span>
+
+<span class="nc bnc" id="L209" title="All 2 branches missed.">        if (request.alternatives()) {</span>
+<span class="nc" id="L210">            Map&lt;String, Object&gt; alternatives = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L211">            alternatives.put(&quot;target_count&quot;, 2);</span>
+<span class="nc" id="L212">            payload.put(&quot;alternative_routes&quot;, alternatives);</span>
+        }
+
+        try {
+<span class="nc" id="L216">            return this.objectMapper.writeValueAsString(payload);</span>
+<span class="nc" id="L217">        } catch (Exception ex) {</span>
+<span class="nc" id="L218">            log.warn(&quot;Failed to serialize directions request payload&quot;, ex);</span>
+<span class="nc" id="L219">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Invalid map request payload&quot;);</span>
+        }
+    }
+
+    private List&lt;List&lt;Double&gt;&gt; toCoordinates(List&lt;MapCoordinateDTO&gt; waypoints) {
+<span class="nc" id="L224">        List&lt;List&lt;Double&gt;&gt; coordinates = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">        for (MapCoordinateDTO waypoint : waypoints) {</span>
+<span class="nc" id="L226">            coordinates.add(List.of(waypoint.longitude(), waypoint.latitude()));</span>
+<span class="nc" id="L227">        }</span>
+<span class="nc" id="L228">        return coordinates;</span>
+    }
+
+    private String toOrsProfile(MapDirectionsProfileDTO profile) {
+<span class="nc bnc" id="L232" title="All 3 branches missed.">        return switch (profile) {</span>
+<span class="nc" id="L233">            case WALKING -&gt; PROFILE_WALKING;</span>
+<span class="nc" id="L234">            case CYCLING -&gt; PROFILE_CYCLING;</span>
+<span class="nc" id="L235">            default -&gt; PROFILE_DRIVING;</span>
+        };
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

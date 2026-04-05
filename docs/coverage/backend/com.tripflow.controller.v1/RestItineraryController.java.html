@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.tripflow.dto.itinerary.ExtendedItineraryDTO;
-import com.tripflow.dto.itinerary.ItineraryDTO;
+import com.tripflow.dto.itinerary.ExtendedItineraryResponseDTO;
+import com.tripflow.dto.itinerary.ItineraryResponseDTO;
 import com.tripflow.dto.shared.PaginatedDTO;
 import com.tripflow.service.itinerary.ItineraryService;
 
@@ -34,9 +37,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class RestItineraryController {
     private final ItineraryService itineraryService;
 
-<span class="fc" id="L37">    public RestItineraryController(ItineraryService itineraryService) {</span>
-<span class="fc" id="L38">        this.itineraryService = itineraryService;</span>
-<span class="fc" id="L39">    }</span>
+<span class="fc" id="L40">    public RestItineraryController(ItineraryService itineraryService) {</span>
+<span class="fc" id="L41">        this.itineraryService = itineraryService;</span>
+<span class="fc" id="L42">    }</span>
 
     @PostMapping({&quot;&quot;, &quot;/&quot;})
     @Operation(
@@ -49,12 +52,12 @@ public class RestItineraryController {
         @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid itinerary data provided&quot;),
         @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized access&quot;)
     })
-    public ResponseEntity&lt;ExtendedItineraryDTO&gt; createItinerary(@RequestBody ExtendedItineraryDTO itineraryDTO) throws Exception {
-<span class="fc" id="L53">        ExtendedItineraryDTO createdItinerary = this.itineraryService.createItinerary(itineraryDTO);</span>
-<span class="fc" id="L54">        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;/{id}&quot;)</span>
-<span class="fc" id="L55">            .buildAndExpand(createdItinerary.id()).toUri();</span>
+    public ResponseEntity&lt;ExtendedItineraryResponseDTO&gt; createItinerary(@Valid @RequestBody ExtendedItineraryDTO itineraryDTO) throws Exception {
+<span class="fc" id="L56">        ExtendedItineraryResponseDTO createdItinerary = this.itineraryService.createItinerary(itineraryDTO);</span>
+<span class="fc" id="L57">        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;/{id}&quot;)</span>
+<span class="fc" id="L58">            .buildAndExpand(createdItinerary.itinerary().id()).toUri();</span>
 
-<span class="fc" id="L57">        return ResponseEntity.created(location).body(createdItinerary);</span>
+<span class="fc" id="L60">        return ResponseEntity.created(location).body(createdItinerary);</span>
     }
 
     @GetMapping({&quot;&quot;, &quot;/&quot;})
@@ -68,12 +71,12 @@ public class RestItineraryController {
         @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized access&quot;),
         @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
     })
-    public ResponseEntity&lt;PaginatedDTO&lt;ItineraryDTO&gt;&gt; getAllItineraries(
+    public ResponseEntity&lt;PaginatedDTO&lt;ItineraryResponseDTO&gt;&gt; getAllItineraries(
         @PageableDefault(page = 0, size = 10) Pageable pageable,
         @RequestParam(required = false) String search
     ) throws Exception {
-<span class="fc" id="L75">        PaginatedDTO&lt;ItineraryDTO&gt; itineraries = this.itineraryService.getAllItineraries(pageable, search);</span>
-<span class="fc" id="L76">        return ResponseEntity.ok(itineraries);</span>
+<span class="fc" id="L78">        PaginatedDTO&lt;ItineraryResponseDTO&gt; itineraries = this.itineraryService.getAllItineraries(pageable, search);</span>
+<span class="fc" id="L79">        return ResponseEntity.ok(itineraries);</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
@@ -89,9 +92,9 @@ public class RestItineraryController {
         @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Access to the itinerary is forbidden&quot;),
         @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
     })
-    public ResponseEntity&lt;ExtendedItineraryDTO&gt; getItineraryById(@PathVariable Long id) throws Exception {
-<span class="fc" id="L93">        ExtendedItineraryDTO itinerary = this.itineraryService.getItineraryById(id);</span>
-<span class="fc" id="L94">        return ResponseEntity.ok(itinerary);</span>
+    public ResponseEntity&lt;ExtendedItineraryResponseDTO&gt; getItineraryById(@PathVariable Long id) throws Exception {
+<span class="fc" id="L96">        ExtendedItineraryResponseDTO itinerary = this.itineraryService.getItineraryById(id);</span>
+<span class="fc" id="L97">        return ResponseEntity.ok(itinerary);</span>
     }
 
     @PutMapping(&quot;/{id}&quot;)
@@ -108,12 +111,12 @@ public class RestItineraryController {
         @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Access to the itinerary is forbidden&quot;),
         @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
     })
-    public ResponseEntity&lt;ExtendedItineraryDTO&gt; updateItinerary(
-        @PathVariable Long id, @RequestBody ExtendedItineraryDTO itineraryDTO
+    public ResponseEntity&lt;ExtendedItineraryResponseDTO&gt; updateItinerary(
+        @PathVariable Long id, @Valid @RequestBody ExtendedItineraryDTO itineraryDTO
     ) throws Exception {
-<span class="fc" id="L114">        ExtendedItineraryDTO updatedItinerary = this.itineraryService.updateItinerary(id, itineraryDTO);</span>
+<span class="fc" id="L117">        ExtendedItineraryResponseDTO updatedItinerary = this.itineraryService.updateItinerary(id, itineraryDTO);</span>
 
-<span class="fc" id="L116">        return ResponseEntity.ok(updatedItinerary);</span>
+<span class="fc" id="L119">        return ResponseEntity.ok(updatedItinerary);</span>
     }
 
     @DeleteMapping(&quot;/{id}&quot;)
@@ -130,8 +133,8 @@ public class RestItineraryController {
         @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
     })
     public ResponseEntity&lt;Void&gt; deleteItinerary(@PathVariable Long id) throws Exception {
-<span class="fc" id="L133">        this.itineraryService.deleteItinerary(id);</span>
-<span class="fc" id="L134">        return ResponseEntity.noContent().build();</span>
+<span class="fc" id="L136">        this.itineraryService.deleteItinerary(id);</span>
+<span class="fc" id="L137">        return ResponseEntity.noContent().build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

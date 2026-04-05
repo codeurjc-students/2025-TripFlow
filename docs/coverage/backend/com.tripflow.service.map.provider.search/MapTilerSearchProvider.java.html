@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapTilerSearchProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.service.map.provider.search</a> &gt; <span class="el_source">MapTilerSearchProvider.java</span></div><h1>MapTilerSearchProvider.java</h1><pre class="source lang-java linenums">package com.tripflow.service.map.provider.search;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tripflow.config.MapTilerProperties;
+import com.tripflow.config.MapsProperties;
+import com.tripflow.dto.map.MapCoordinateDTO;
+import com.tripflow.dto.map.MapPlaceDTO;
+import com.tripflow.dto.map.MapRetrieveQueryDTO;
+import com.tripflow.dto.map.MapSuggestQueryDTO;
+import com.tripflow.dto.map.MapSuggestResponseDTO;
+import com.tripflow.dto.map.MapSuggestionDTO;
+import com.tripflow.service.map.MapsCacheService;
+import com.tripflow.service.map.MapsHttpClientFactory;
+import com.tripflow.service.map.provider.support.MapProviderExceptionMapper;
+
+@Service
+public class MapTilerSearchProvider implements MapsSearchProvider {
+<span class="fc" id="L37">    private static final Logger log = LoggerFactory.getLogger(MapTilerSearchProvider.class);</span>
+
+
+    private static final String ENDPOINT_SUGGEST = &quot;search_suggest&quot;;
+    private static final String ENDPOINT_RETRIEVE = &quot;search_retrieve&quot;;
+    private static final double EARTH_RADIUS_KM = 6371.0;
+    private static final int DEFAULT_RADIUS_KM = 5;
+    private static final String DEFAULT_DISCOVERY_QUERY = &quot;poi&quot;;
+    private static final int DEFAULT_SUGGEST_LIMIT = 15;
+<span class="fc" id="L46">    private static final Set&lt;String&gt; POI_FEATURE_TYPES = Set.of(</span>
+        &quot;poi&quot;, &quot;place&quot;, &quot;restaurant&quot;, &quot;cafe&quot;, &quot;bar&quot;, &quot;museum&quot;, &quot;hotel&quot;, &quot;attraction&quot;, &quot;park&quot;, &quot;shop&quot;
+    );
+
+    private final RestTemplate mapsRestTemplate;
+    private final ObjectMapper objectMapper;
+    private final MapTilerProperties mapTilerProperties;
+    private final MapsProperties mapsProperties;
+    private final MapsCacheService mapsCacheService;
+
+    public MapTilerSearchProvider(
+        MapsHttpClientFactory mapsHttpClientFactory,
+        ObjectMapper objectMapper,
+        MapTilerProperties mapTilerProperties,
+        MapsProperties mapsProperties,
+        MapsCacheService mapsCacheService
+<span class="fc" id="L62">    ) {</span>
+<span class="fc" id="L63">        this.mapsRestTemplate = mapsHttpClientFactory.createRestTemplate();</span>
+<span class="fc" id="L64">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L65">        this.mapTilerProperties = mapTilerProperties;</span>
+<span class="fc" id="L66">        this.mapsProperties = mapsProperties;</span>
+<span class="fc" id="L67">        this.mapsCacheService = mapsCacheService;</span>
+<span class="fc" id="L68">    }</span>
+
+    @Override
+    public MapSuggestResponseDTO suggest(MapSuggestQueryDTO query) {
+<span class="nc" id="L72">        SuggestRequestContext context = this.buildSuggestContext(query);</span>
+<span class="nc" id="L73">        String requestUrl = this.buildSuggestRequestUrl(query, context);</span>
+<span class="nc" id="L74">        String cacheKey = this.buildSuggestCacheKey(query, context);</span>
+
+<span class="nc" id="L76">        String payload = this.getCachedOrFetch(</span>
+            cacheKey,
+            ENDPOINT_SUGGEST,
+            requestUrl,
+<span class="nc" id="L80">            this.mapsProperties.getSearchCacheTtlSeconds()</span>
+        );
+
+<span class="nc" id="L83">        return this.parseSuggestResponse(payload, context);</span>
+    }
+
+    @Override
+    public MapPlaceDTO retrieve(String id, MapRetrieveQueryDTO query) {
+<span class="nc bnc" id="L88" title="All 4 branches missed.">        if (id == null || id.isBlank()) {</span>
+<span class="nc" id="L89">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;id is required&quot;);</span>
+        }
+
+<span class="nc" id="L92">        String encodedId = UriUtils.encodePathSegment(id, StandardCharsets.UTF_8);</span>
+
+<span class="nc" id="L94">        UriComponentsBuilder requestBuilder = UriComponentsBuilder</span>
+<span class="nc" id="L95">            .fromUriString(this.mapTilerProperties.getGeocodingBaseUrl() + &quot;/&quot; + encodedId + &quot;.json&quot;)</span>
+<span class="nc" id="L96">            .queryParam(&quot;key&quot;, this.mapTilerProperties.getApiKey());</span>
+
+<span class="nc" id="L98">        this.addQueryParamIfPresent(requestBuilder, &quot;language&quot;, query.language());</span>
+
+<span class="nc" id="L100">        String requestUrl = requestBuilder.build().toUriString();</span>
+
+<span class="nc" id="L102">        String cacheKey = MapsCacheService.buildCacheKey(</span>
+<span class="nc" id="L103">            ENDPOINT_RETRIEVE + &quot;|&quot; + id + &quot;|&quot; + query.language()</span>
+        );
+
+<span class="nc" id="L106">        String payload = this.getCachedOrFetch(</span>
+            cacheKey,
+            ENDPOINT_RETRIEVE,
+            requestUrl,
+<span class="nc" id="L110">            this.mapsProperties.getSearchCacheTtlSeconds()</span>
+        );
+
+<span class="nc" id="L113">        return this.parseRetrieveResponse(payload);</span>
+    }
+
+    private String buildSuggestRequestUrl(MapSuggestQueryDTO query, SuggestRequestContext context) {
+<span class="fc" id="L117">        UriComponentsBuilder requestBuilder = UriComponentsBuilder</span>
+<span class="fc" id="L118">            .fromUriString(this.mapTilerProperties.getGeocodingBaseUrl() + &quot;/&quot; + UriUtils.encodePathSegment(context.effectiveQuery(), StandardCharsets.UTF_8) + &quot;.json&quot;)</span>
+<span class="fc" id="L119">            .queryParam(&quot;autocomplete&quot;, true)</span>
+<span class="fc" id="L120">            .queryParam(&quot;types&quot;, &quot;poi&quot;)</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">            .queryParam(&quot;limit&quot;, query.limit() != null ? query.limit() : DEFAULT_SUGGEST_LIMIT)</span>
+<span class="fc" id="L122">            .queryParam(&quot;key&quot;, this.mapTilerProperties.getApiKey());</span>
+
+<span class="fc" id="L124">        this.addQueryParamIfPresent(requestBuilder, &quot;language&quot;, query.language());</span>
+<span class="fc" id="L125">        this.addQueryParamIfPresent(requestBuilder, &quot;proximity&quot;, context.proximity());</span>
+<span class="fc" id="L126">        this.addQueryParamIfPresent(requestBuilder, &quot;bbox&quot;, context.bbox());</span>
+<span class="fc" id="L127">        this.addQueryParamIfPresent(requestBuilder, &quot;country&quot;, query.country());</span>
+
+<span class="fc" id="L129">        return requestBuilder.build().toUriString();</span>
+    }
+
+    private String buildSuggestCacheKey(MapSuggestQueryDTO query, SuggestRequestContext context) {
+<span class="fc" id="L133">        String rawKey = ENDPOINT_SUGGEST</span>
+<span class="fc" id="L134">            + &quot;|&quot; + context.effectiveQuery()</span>
+<span class="fc" id="L135">            + &quot;|&quot; + query.language()</span>
+<span class="fc" id="L136">            + &quot;|&quot; + query.limit()</span>
+<span class="fc" id="L137">            + &quot;|&quot; + context.proximity()</span>
+<span class="fc" id="L138">            + &quot;|&quot; + context.bbox()</span>
+<span class="fc" id="L139">            + &quot;|&quot; + query.country()</span>
+<span class="fc" id="L140">            + &quot;|&quot; + query.category();</span>
+<span class="fc" id="L141">        return MapsCacheService.buildCacheKey(rawKey);</span>
+    }
+
+    private MapSuggestResponseDTO parseSuggestResponse(String payload, SuggestRequestContext context) {
+        try {
+<span class="fc" id="L146">            JsonNode root = this.objectMapper.readTree(payload);</span>
+<span class="fc" id="L147">            JsonNode features = root.path(&quot;features&quot;);</span>
+<span class="fc" id="L148">            List&lt;MapSuggestionDTO&gt; suggestions = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">            if (features.isArray()) {</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">                for (JsonNode feature : features) {</span>
+<span class="fc" id="L151">                    MapSuggestionDTO suggestion = this.toSuggestion(feature);</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">                    if (this.isUsefulSuggestion(suggestion, context)) {</span>
+<span class="fc" id="L153">                        suggestions.add(suggestion);</span>
+                    }
+<span class="fc" id="L155">                }</span>
+            }
+<span class="fc" id="L157">            return new MapSuggestResponseDTO(suggestions);</span>
+<span class="nc" id="L158">        } catch (Exception ex) {</span>
+<span class="nc" id="L159">            log.warn(&quot;Failed to parse suggest response from map provider&quot;, ex);</span>
+<span class="nc" id="L160">            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, &quot;Invalid map provider response&quot;);</span>
+        }
+    }
+
+    private MapPlaceDTO parseRetrieveResponse(String payload) {
+        try {
+<span class="nc" id="L166">            JsonNode root = this.objectMapper.readTree(payload);</span>
+<span class="nc" id="L167">            JsonNode feature = root.path(&quot;features&quot;).path(0);</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">            if (feature.isMissingNode()) {</span>
+<span class="nc" id="L169">                throw new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Place not found&quot;);</span>
+            }
+
+<span class="nc" id="L172">            JsonNode center = feature.path(&quot;center&quot;);</span>
+<span class="nc bnc" id="L173" title="All 2 branches missed.">            double longitude = center.isArray() ? center.path(0).asDouble(Double.NaN) : Double.NaN;</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">            double latitude = center.isArray() ? center.path(1).asDouble(Double.NaN) : Double.NaN;</span>
+
+<span class="nc bnc" id="L176" title="All 4 branches missed.">            if (Double.isNaN(latitude) || Double.isNaN(longitude)) {</span>
+<span class="nc" id="L177">                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, &quot;Map provider returned invalid coordinates&quot;);</span>
+            }
+
+<span class="nc" id="L180">            return new MapPlaceDTO(</span>
+<span class="nc" id="L181">                feature.path(&quot;id&quot;).asText(null),</span>
+<span class="nc" id="L182">                feature.path(&quot;text&quot;).asText(null),</span>
+<span class="nc" id="L183">                feature.path(&quot;place_name&quot;).asText(null),</span>
+<span class="nc" id="L184">                feature.path(&quot;place_name&quot;).asText(null),</span>
+<span class="nc" id="L185">                firstText(feature.path(&quot;place_type&quot;)),</span>
+<span class="nc" id="L186">                new MapCoordinateDTO(latitude, longitude),</span>
+<span class="nc" id="L187">                this.extractCategories(feature)</span>
+            );
+<span class="nc" id="L189">        } catch (ResponseStatusException ex) {</span>
+<span class="nc" id="L190">            throw ex;</span>
+<span class="nc" id="L191">        } catch (Exception ex) {</span>
+<span class="nc" id="L192">            log.warn(&quot;Failed to parse retrieve response from map provider&quot;, ex);</span>
+<span class="nc" id="L193">            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, &quot;Invalid map provider response&quot;);</span>
+        }
+    }
+
+    private MapSuggestionDTO toSuggestion(JsonNode feature) {
+<span class="fc" id="L198">        JsonNode center = feature.path(&quot;center&quot;);</span>
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">        double longitude = center.isArray() ? center.path(0).asDouble(Double.NaN) : Double.NaN;</span>
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">        double latitude = center.isArray() ? center.path(1).asDouble(Double.NaN) : Double.NaN;</span>
+
+<span class="pc bpc" id="L202" title="2 of 4 branches missed.">        MapCoordinateDTO centerPoint = (!Double.isNaN(latitude) &amp;&amp; !Double.isNaN(longitude))</span>
+<span class="fc" id="L203">            ? new MapCoordinateDTO(latitude, longitude)</span>
+<span class="pc" id="L204">            : null;</span>
+
+<span class="fc" id="L206">        return new MapSuggestionDTO(</span>
+<span class="fc" id="L207">            feature.path(&quot;id&quot;).asText(null),</span>
+<span class="fc" id="L208">            feature.path(&quot;text&quot;).asText(null),</span>
+<span class="fc" id="L209">            feature.path(&quot;place_name&quot;).asText(null),</span>
+<span class="fc" id="L210">            feature.path(&quot;place_name&quot;).asText(null),</span>
+<span class="fc" id="L211">            firstText(feature.path(&quot;place_type&quot;)),</span>
+            centerPoint,
+<span class="fc" id="L213">            this.extractCategories(feature)</span>
+        );
+    }
+
+    private String getCachedOrFetch(String cacheKey, String endpoint, String requestUrl, long ttlSeconds) {
+<span class="nc" id="L218">        return this.mapsCacheService.getValidPayload(cacheKey)</span>
+<span class="nc" id="L219">            .orElseGet(() -&gt; {</span>
+<span class="nc" id="L220">                String payload = this.fetch(requestUrl);</span>
+<span class="nc" id="L221">                this.mapsCacheService.save(cacheKey, endpoint, payload, ttlSeconds);</span>
+<span class="nc" id="L222">                return payload;</span>
+            });
+    }
+
+    private String fetch(String requestUrl) {
+        try {
+<span class="nc" id="L228">            String response = this.mapsRestTemplate.getForObject(requestUrl, String.class);</span>
+<span class="nc bnc" id="L229" title="All 4 branches missed.">            if (response == null || response.isBlank()) {</span>
+<span class="nc" id="L230">                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, &quot;Map provider returned an empty response&quot;);</span>
+            }
+<span class="nc" id="L232">            return response;</span>
+<span class="nc" id="L233">        } catch (HttpStatusCodeException ex) {</span>
+<span class="nc" id="L234">            throw MapProviderExceptionMapper.fromHttpStatus(ex);</span>
+<span class="nc" id="L235">        } catch (ResourceAccessException ex) {</span>
+<span class="nc" id="L236">            log.warn(&quot;Timed out while calling map provider URL {}&quot;, requestUrl);</span>
+<span class="nc" id="L237">            throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT, &quot;Map provider request timed out&quot;);</span>
+        }
+    }
+
+    private String normalizeBlankToNull(String value) {
+<span class="fc bfc" id="L242" title="All 4 branches covered.">        return (value == null || value.isBlank()) ? null : value;</span>
+    }
+
+    private SuggestRequestContext buildSuggestContext(MapSuggestQueryDTO query) {
+<span class="fc" id="L246">        String effectiveQuery = this.buildEffectiveQuery(query);</span>
+
+<span class="pc bpc" id="L248" title="2 of 4 branches missed.">        if (query.lat() == null || query.lon() == null) {</span>
+<span class="nc" id="L249">            return new SuggestRequestContext(</span>
+                effectiveQuery,
+<span class="nc" id="L251">                this.normalizeBlankToNull(query.proximity()),</span>
+<span class="nc" id="L252">                this.normalizeBlankToNull(query.bbox())</span>
+            );
+        }
+
+<span class="fc" id="L256">        double lat = query.lat();</span>
+<span class="fc" id="L257">        double lon = query.lon();</span>
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">        int radiusKm = query.radiusKm() != null ? query.radiusKm() : DEFAULT_RADIUS_KM;</span>
+<span class="fc" id="L259">        String proximity = String.format(Locale.US, &quot;%s,%s&quot;, lon, lat);</span>
+<span class="fc" id="L260">        String bbox = this.buildBboxFromRadius(lat, lon, radiusKm);</span>
+
+<span class="fc" id="L262">        return new SuggestRequestContext(effectiveQuery, proximity, bbox);</span>
+    }
+
+    private String buildBboxFromRadius(double lat, double lon, int radiusKm) {
+<span class="fc" id="L266">        double latDelta = Math.toDegrees(radiusKm / EARTH_RADIUS_KM);</span>
+<span class="fc" id="L267">        double cosLat = Math.cos(Math.toRadians(lat));</span>
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">        if (Math.abs(cosLat) &lt; 1e-6) {</span>
+<span class="nc" id="L269">            cosLat = 1e-6;</span>
+        }
+<span class="fc" id="L271">        double lonDelta = Math.toDegrees(radiusKm / (EARTH_RADIUS_KM * cosLat));</span>
+
+<span class="fc" id="L273">        double minLon = this.clamp(lon - lonDelta, -180d, 180d);</span>
+<span class="fc" id="L274">        double maxLon = this.clamp(lon + lonDelta, -180d, 180d);</span>
+<span class="fc" id="L275">        double minLat = this.clamp(lat - latDelta, -90d, 90d);</span>
+<span class="fc" id="L276">        double maxLat = this.clamp(lat + latDelta, -90d, 90d);</span>
+
+<span class="fc" id="L278">        return String.format(Locale.US, &quot;%.6f,%.6f,%.6f,%.6f&quot;, minLon, minLat, maxLon, maxLat);</span>
+    }
+
+    private String buildEffectiveQuery(MapSuggestQueryDTO query) {
+<span class="fc" id="L282">        String baseQuery = this.normalizeBlankToNull(query.q());</span>
+<span class="fc" id="L283">        String category = this.normalizeBlankToNull(query.category());</span>
+
+<span class="fc bfc" id="L285" title="All 4 branches covered.">        if (baseQuery == null &amp;&amp; category == null) {</span>
+<span class="fc" id="L286">            return DEFAULT_DISCOVERY_QUERY;</span>
+        }
+
+<span class="fc bfc" id="L289" title="All 2 branches covered.">        if (baseQuery == null) {</span>
+<span class="fc" id="L290">            return category;</span>
+        }
+
+<span class="fc bfc" id="L293" title="All 2 branches covered.">        if (category == null) {</span>
+<span class="fc" id="L294">            return baseQuery;</span>
+        }
+
+<span class="fc" id="L297">        return baseQuery + &quot; &quot; + category;</span>
+    }
+
+    private double clamp(double value, double min, double max) {
+<span class="fc" id="L301">        return Math.max(min, Math.min(max, value));</span>
+    }
+
+    private boolean isUsefulSuggestion(MapSuggestionDTO suggestion, SuggestRequestContext context) {
+<span class="pc bpc" id="L305" title="3 of 6 branches missed.">        if (this.isBlank(suggestion.id()) || this.isBlank(suggestion.name()) || this.isBlank(suggestion.fullAddress())) {</span>
+<span class="nc" id="L306">            return false;</span>
+        }
+
+<span class="pc bpc" id="L309" title="2 of 4 branches missed.">        if (&quot;-&quot;.equals(suggestion.name().trim()) || &quot;-&quot;.equals(suggestion.fullAddress().trim())) {</span>
+<span class="nc" id="L310">            return false;</span>
+        }
+
+<span class="pc bpc" id="L313" title="1 of 2 branches missed.">        if (suggestion.center() == null) {</span>
+<span class="nc" id="L314">            return false;</span>
+        }
+
+<span class="pc bpc" id="L317" title="1 of 2 branches missed.">        if (!this.isPoiIntent(context)) {</span>
+<span class="nc" id="L318">            return true;</span>
+        }
+
+<span class="fc" id="L321">        String featureType = this.normalize(suggestion.featureType());</span>
+<span class="pc bpc" id="L322" title="1 of 2 branches missed.">        if (POI_FEATURE_TYPES.contains(featureType)) {</span>
+<span class="fc" id="L323">            return true;</span>
+        }
+
+<span class="nc bnc" id="L326" title="All 2 branches missed.">        return suggestion.categories() != null</span>
+<span class="nc" id="L327">            &amp;&amp; suggestion.categories().stream()</span>
+<span class="nc" id="L328">            .filter(Objects::nonNull)</span>
+<span class="nc" id="L329">            .map(this::normalize)</span>
+<span class="nc bnc" id="L330" title="All 8 branches missed.">            .anyMatch(category -&gt; !category.isBlank() &amp;&amp; !&quot;address&quot;.equals(category) &amp;&amp; !&quot;street&quot;.equals(category));</span>
+    }
+
+    private boolean isPoiIntent(SuggestRequestContext context) {
+<span class="pc bpc" id="L334" title="1 of 2 branches missed.">        return context.effectiveQuery() != null</span>
+<span class="pc bpc" id="L335" title="1 of 2 branches missed.">            &amp;&amp; context.effectiveQuery().toLowerCase(Locale.ROOT).contains(DEFAULT_DISCOVERY_QUERY);</span>
+    }
+
+    private String normalize(String value) {
+<span class="pc bpc" id="L339" title="1 of 2 branches missed.">        return value == null ? &quot;&quot; : value.trim().toLowerCase(Locale.ROOT);</span>
+    }
+
+    private boolean isBlank(String value) {
+<span class="pc bpc" id="L343" title="2 of 4 branches missed.">        return value == null || value.isBlank();</span>
+    }
+
+<span class="fc" id="L346">    private record SuggestRequestContext(</span>
+        String effectiveQuery,
+        String proximity,
+        String bbox
+    ) {
+    }
+
+    private void addQueryParamIfPresent(UriComponentsBuilder builder, String name, String value) {
+<span class="fc" id="L354">        String normalized = this.normalizeBlankToNull(value);</span>
+<span class="pc bpc" id="L355" title="1 of 2 branches missed.">        if (normalized != null) {</span>
+<span class="fc" id="L356">            builder.queryParam(name, normalized);</span>
+        }
+<span class="fc" id="L358">    }</span>
+
+    private String firstText(JsonNode node) {
+<span class="pc bpc" id="L361" title="3 of 6 branches missed.">        if (node.isArray() &amp;&amp; node.size() &gt; 0 &amp;&amp; node.path(0).isTextual()) {</span>
+<span class="fc" id="L362">            return node.path(0).asText();</span>
+        }
+<span class="nc bnc" id="L364" title="All 2 branches missed.">        if (node.isTextual()) {</span>
+<span class="nc" id="L365">            return node.asText();</span>
+        }
+<span class="nc" id="L367">        return null;</span>
+    }
+
+    private List&lt;String&gt; extractCategories(JsonNode feature) {
+<span class="fc" id="L371">        List&lt;String&gt; categories = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L373">        JsonNode placeType = feature.path(&quot;place_type&quot;);</span>
+<span class="pc bpc" id="L374" title="1 of 2 branches missed.">        if (placeType.isArray()) {</span>
+<span class="fc bfc" id="L375" title="All 2 branches covered.">            for (JsonNode type : placeType) {</span>
+<span class="pc bpc" id="L376" title="1 of 2 branches missed.">                if (type.isTextual()) {</span>
+<span class="fc" id="L377">                    categories.add(type.asText());</span>
+                }
+<span class="fc" id="L379">            }</span>
+        }
+
+<span class="fc" id="L382">        JsonNode properties = feature.path(&quot;properties&quot;);</span>
+<span class="fc" id="L383">        JsonNode category = properties.path(&quot;category&quot;);</span>
+<span class="pc bpc" id="L384" title="1 of 2 branches missed.">        if (category.isTextual()) {</span>
+<span class="nc" id="L385">            categories.add(category.asText());</span>
+        }
+
+<span class="fc" id="L388">        return categories.stream().filter(Objects::nonNull).distinct().toList();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

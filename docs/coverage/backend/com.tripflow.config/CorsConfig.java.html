@@ -1,23 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CorsConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.config</a> &gt; <span class="el_source">CorsConfig.java</span></div><h1>CorsConfig.java</h1><pre class="source lang-java linenums">package com.tripflow.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
+
 @Configuration
-<span class="fc" id="L9">public class CorsConfig {</span>
+<span class="fc" id="L12">public class CorsConfig {</span>
+
+    @Value(&quot;${origins.frontend}&quot;)
+    private String frontendOrigin;
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
-<span class="fc" id="L12">        return new WebMvcConfigurer() {</span>
+<span class="fc" id="L19">        String[] allowedOrigins = Arrays.stream(this.frontendOrigin.split(&quot;,&quot;))</span>
+<span class="fc" id="L20">            .map(String::trim)</span>
+<span class="pc bpc" id="L21" title="1 of 2 branches missed.">            .filter(origin -&gt; !origin.isBlank())</span>
+<span class="fc" id="L22">            .distinct()</span>
+<span class="fc" id="L23">            .toArray(String[]::new);</span>
+
+<span class="fc" id="L25">        return new WebMvcConfigurer() {</span>
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-<span class="fc" id="L15">                registry.addMapping(&quot;/**&quot;)</span>
-<span class="fc" id="L16">                    .allowedOrigins(&quot;http://localhost:5173&quot;, &quot;http://localhost:4173&quot;)</span>
-<span class="fc" id="L17">                    .allowedMethods(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;)</span>
-<span class="fc" id="L18">                    .allowedHeaders(&quot;*&quot;)</span>
-<span class="fc" id="L19">                    .allowCredentials(true);</span>
-<span class="fc" id="L20">            }</span>
+<span class="fc" id="L28">                registry.addMapping(&quot;/**&quot;)</span>
+<span class="fc" id="L29">                    .allowedOrigins(allowedOrigins)</span>
+<span class="fc" id="L30">                    .allowedMethods(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;)</span>
+<span class="fc" id="L31">                    .allowedHeaders(&quot;*&quot;)</span>
+<span class="fc" id="L32">                    .allowCredentials(true);</span>
+<span class="fc" id="L33">            }</span>
         };
     }
 }

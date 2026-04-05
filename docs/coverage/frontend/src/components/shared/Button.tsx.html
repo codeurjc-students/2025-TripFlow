@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>13/13</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">90.9% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>10/11</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>13/13</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
@@ -102,7 +102,11 @@
 <a name='L37'></a><a href='#L37'>37</a>
 <a name='L38'></a><a href='#L38'>38</a>
 <a name='L39'></a><a href='#L39'>39</a>
-<a name='L40'></a><a href='#L40'>40</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -128,30 +132,36 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">596x</span>
-<span class="cline-any cline-yes">596x</span>
-<span class="cline-any cline-yes">596x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">596x</span>
-<span class="cline-any cline-yes">596x</span>
-<span class="cline-any cline-yes">596x</span>
-<span class="cline-any cline-yes">596x</span>
-<span class="cline-any cline-yes">596x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">596x</span>
-<span class="cline-any cline-yes">300x</span>
-<span class="cline-any cline-yes">596x</span></td><td class="text"><pre class="prettyprint lang-js">import styles from "@styles/components/shared/Button.module.css";
+<span class="cline-any cline-yes">651x</span>
+<span class="cline-any cline-yes">651x</span>
+<span class="cline-any cline-yes">651x</span>
+<span class="cline-any cline-yes">651x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">651x</span>
+<span class="cline-any cline-yes">651x</span>
+<span class="cline-any cline-yes">651x</span>
+<span class="cline-any cline-yes">651x</span>
+<span class="cline-any cline-yes">651x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">651x</span>
+<span class="cline-any cline-yes">342x</span>
+<span class="cline-any cline-yes">651x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import styles from "@styles/components/shared/Button.module.css";
 &nbsp;
 import { NavLink } from "react-router";
 &nbsp;
-type ButtonStyle = "primary" | "secondary" | "inline" | "tool" | "tool_bordered" | "logo"
+type ButtonStyle = "primary" | "secondary" | "inline" | "tool" | "tool_bordered" | "bordered" | "logo"
     | "route" | "active" | "danger" | "info" | "wrap" | "rounded" | "big" | "full" | "float";
 type Target = "_blank" | "_self" | "_parent" | "_top";
 type Rel = "noopener noreferrer" | "nofollow" | "noopener" | "noreferrer";
 &nbsp;
 interface ButtonProps {
     style: ButtonStyle[];
+    size?: "default" | "small";
+    id?: string;
     label?: string;
     type?: "button" | "submit" | "reset";
     onClick?: (e?: React.MouseEvent) =&gt; void;
@@ -167,9 +177,10 @@ interface ButtonProps {
 /**
  * Button component for rendering unified styled buttons or links.
  */
-export default function Button({ label, onClick, style, type, to, target, rel, ariaLabel, disabled, children, noGap }: ButtonProps) {
+export default function Button({ id, label, onClick, style, size = "default", type, to, target, rel, ariaLabel, disabled, children, noGap }: ButtonProps) {
     let customStyles = `${styles.button}` + (children &amp;&amp; label &amp;&amp; !noGap ? ` ${styles.withChildren}` : ``);
     style.map(s =&gt; customStyles += ` ${styles[s]}`);
+    if (size === "small") <span class="branch-0 cbranch-no" title="branch not covered" >customStyles += ` ${styles.small}`;</span>
 &nbsp;
     const body = (
         &lt;&gt;
@@ -178,16 +189,17 @@ export default function Button({ label, onClick, style, type, to, target, rel, a
         &lt;/&gt;
     )
 &nbsp;
-    if (to) return &lt;NavLink to={to} className={customStyles} target={target} rel={rel} aria-label={ariaLabel}&gt;{body}&lt;/NavLink&gt;;
-    else return &lt;button className={customStyles} type={type} onClick={onClick} aria-label={ariaLabel} disabled={disabled}&gt;{body}&lt;/button&gt;;
-}</pre></td></tr></table></pre>
+    if (to) return &lt;NavLink id={id} to={to} className={customStyles} target={target} rel={rel} aria-label={ariaLabel}&gt;{body}&lt;/NavLink&gt;;
+    else return &lt;button id={id} className={customStyles} type={type} onClick={onClick} aria-label={ariaLabel} disabled={disabled}&gt;{body}&lt;/button&gt;;
+}
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-27T10:13:05.693Z
+                at 2026-04-05T08:13:34.875Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

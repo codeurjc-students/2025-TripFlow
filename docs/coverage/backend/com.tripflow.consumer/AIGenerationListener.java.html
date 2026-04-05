@@ -18,12 +18,13 @@ public class AIGenerationListener {
 
     public AIGenerationListener(
         ItineraryService itineraryService,
-        AIService aiService, KafkaService kafkaService
-<span class="fc" id="L22">    ) {</span>
-<span class="fc" id="L23">        this.itineraryService = itineraryService;</span>
-<span class="fc" id="L24">        this.aiService = aiService;</span>
-<span class="fc" id="L25">        this.kafkaService = kafkaService;</span>
-<span class="fc" id="L26">    }</span>
+        AIService aiService,
+        KafkaService kafkaService
+<span class="fc" id="L23">    ) {</span>
+<span class="fc" id="L24">        this.itineraryService = itineraryService;</span>
+<span class="fc" id="L25">        this.aiService = aiService;</span>
+<span class="fc" id="L26">        this.kafkaService = kafkaService;</span>
+<span class="fc" id="L27">    }</span>
     
     @KafkaListener(
         topics = &quot;ai-generation&quot;,
@@ -31,11 +32,11 @@ public class AIGenerationListener {
         containerFactory = &quot;aiGenerationFactory&quot;
     )
     public void consume(AIGenerationMessage message) {
-<span class="nc" id="L34">        String username = message.username();</span>
-<span class="nc" id="L35">        boolean result = this.itineraryService.processGeneratedItinerary(message);</span>
+<span class="nc" id="L35">        String username = message.username();</span>
+<span class="nc" id="L36">        boolean result = this.itineraryService.processGeneratedItinerary(message);</span>
         
-<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (result) {</span>
-<span class="nc" id="L38">            this.kafkaService.sendNotificationMessage(</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (result) {</span>
+<span class="nc" id="L39">            this.kafkaService.sendNotificationMessage(</span>
                 new NotificationMessage(
                     username,
                     &quot;Your AI generated itinerary is ready!&quot;,
@@ -43,7 +44,8 @@ public class AIGenerationListener {
                 )
             );
         } else {
-<span class="nc" id="L46">            this.kafkaService.sendNotificationMessage(</span>
+<span class="nc" id="L47">            this.aiService.processFailedAIGeneration(username);</span>
+<span class="nc" id="L48">            this.kafkaService.sendNotificationMessage(</span>
                 new NotificationMessage(
                     username,
                     &quot;Failed to process your AI generated itinerary.&quot;,
@@ -52,7 +54,7 @@ public class AIGenerationListener {
             );
         }
 
-<span class="nc" id="L55">        this.aiService.setAIProcessing(username, false);</span>
-<span class="nc" id="L56">    }</span>
+<span class="nc" id="L57">        this.aiService.setAIProcessing(username, false);</span>
+<span class="nc" id="L58">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapProviderResolver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.service.map.dispatch</a> &gt; <span class="el_source">MapProviderResolver.java</span></div><h1>MapProviderResolver.java</h1><pre class="source lang-java linenums">package com.tripflow.service.map.dispatch;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.tripflow.config.MapTilerProperties;
+import com.tripflow.config.MapsProperties;
+import com.tripflow.config.OpenRouteServiceProperties;
+
+@Component
+public class MapProviderResolver {
+
+    public static final String PROVIDER_MAPTILER = &quot;maptiler&quot;;
+    public static final String PROVIDER_MOCK = &quot;mock&quot;;
+
+    private final MapsProperties mapsProperties;
+    private final MapTilerProperties mapTilerProperties;
+    private final OpenRouteServiceProperties openRouteServiceProperties;
+
+    public MapProviderResolver(
+        MapsProperties mapsProperties,
+        MapTilerProperties mapTilerProperties,
+        OpenRouteServiceProperties openRouteServiceProperties
+<span class="fc" id="L25">    ) {</span>
+<span class="fc" id="L26">        this.mapsProperties = mapsProperties;</span>
+<span class="fc" id="L27">        this.mapTilerProperties = mapTilerProperties;</span>
+<span class="fc" id="L28">        this.openRouteServiceProperties = openRouteServiceProperties;</span>
+<span class="fc" id="L29">    }</span>
+
+    public String resolveSearchProvider() {
+<span class="fc" id="L32">        this.ensureMapsEnabled();</span>
+<span class="fc" id="L33">        String provider = this.ensureSupportedProvider();</span>
+
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (PROVIDER_MAPTILER.equalsIgnoreCase(provider)</span>
+<span class="pc bpc" id="L36" title="2 of 4 branches missed.">            &amp;&amp; (this.mapTilerProperties.getApiKey() == null || this.mapTilerProperties.getApiKey().isBlank())) {</span>
+<span class="nc" id="L37">            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, &quot;Map provider key is not configured&quot;);</span>
+        }
+
+<span class="fc" id="L40">        return provider;</span>
+    }
+
+    public String resolveRoutingProvider() {
+<span class="fc" id="L44">        this.ensureMapsEnabled();</span>
+<span class="fc" id="L45">        String provider = this.ensureSupportedProvider();</span>
+
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (PROVIDER_MAPTILER.equalsIgnoreCase(provider)</span>
+<span class="pc bpc" id="L48" title="2 of 4 branches missed.">            &amp;&amp; (this.openRouteServiceProperties.getApiKey() == null || this.openRouteServiceProperties.getApiKey().isBlank())) {</span>
+<span class="fc" id="L49">            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, &quot;Directions provider key is not configured&quot;);</span>
+        }
+
+<span class="fc" id="L52">        return provider;</span>
+    }
+
+    private void ensureMapsEnabled() {
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (!this.mapsProperties.isEnabled()) {</span>
+<span class="nc" id="L57">            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, &quot;Map service is disabled&quot;);</span>
+        }
+<span class="fc" id="L59">    }</span>
+
+    private String ensureSupportedProvider() {
+<span class="fc" id="L62">        String provider = this.mapsProperties.getProvider();</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if (PROVIDER_MOCK.equalsIgnoreCase(provider)) {</span>
+<span class="fc" id="L64">            return PROVIDER_MOCK;</span>
+        }
+
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        if (!PROVIDER_MAPTILER.equalsIgnoreCase(provider)) {</span>
+<span class="nc" id="L68">            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, &quot;Unsupported map provider configured&quot;);</span>
+        }
+
+<span class="fc" id="L71">        return PROVIDER_MAPTILER;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

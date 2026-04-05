@@ -17,6 +17,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
@@ -25,9 +27,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class RestAIController {
     private final AIService aiService;
 
-<span class="fc" id="L28">    public RestAIController(AIService aiService) {</span>
-<span class="fc" id="L29">        this.aiService = aiService;</span>
-<span class="fc" id="L30">    }</span>
+<span class="fc" id="L30">    public RestAIController(AIService aiService) {</span>
+<span class="fc" id="L31">        this.aiService = aiService;</span>
+<span class="fc" id="L32">    }</span>
 
     @GetMapping(&quot;/status&quot;)
     @Operation(
@@ -41,8 +43,8 @@ public class RestAIController {
         @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
     })
     public ResponseEntity&lt;AIStatus&gt; getAIStatus() {
-<span class="fc" id="L44">        AIStatus aiStatus = this.aiService.getAIStatus();</span>
-<span class="fc" id="L45">        return ResponseEntity.ok(aiStatus);</span>
+<span class="fc" id="L46">        AIStatus aiStatus = this.aiService.getAIStatus();</span>
+<span class="fc" id="L47">        return ResponseEntity.ok(aiStatus);</span>
     }
     
     @PostMapping
@@ -57,9 +59,9 @@ public class RestAIController {
         @ApiResponse(responseCode = &quot;429&quot;, description = &quot;Too many requests - daily AI usage limit exceeded&quot;),
         @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
     })
-    public ResponseEntity&lt;AIResponse&gt; handleAIRequest(@RequestBody AIGenerationRequest request) throws Exception {
-<span class="fc" id="L61">        AIResponse response = this.aiService.requestAIProcessing(request);</span>
-<span class="fc" id="L62">        return ResponseEntity.ok(response);</span>
+    public ResponseEntity&lt;AIResponse&gt; handleAIRequest(@Valid @RequestBody AIGenerationRequest request) throws Exception {
+<span class="fc" id="L63">        AIResponse response = this.aiService.requestAIProcessing(request);</span>
+<span class="fc" id="L64">        return ResponseEntity.ok(response);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

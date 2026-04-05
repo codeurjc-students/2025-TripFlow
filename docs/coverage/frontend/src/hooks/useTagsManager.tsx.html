@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">6.66% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/30</span>
+                <span class='fraction'>30/30</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">6.66% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>2/30</span>
+                <span class='fraction'>30/30</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -109,77 +109,77 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useState, useCallback } from "react";
 &nbsp;
 /**
  * Custom hook for managing tags functionality
  * Handles adding, removing, and keyboard interactions for tags
  */
-export <span class="fstat-no" title="function not covered" >function useTagsManager(</span>
-<span class="cstat-no" title="statement not covered" >    tags: string[], </span>
-<span class="cstat-no" title="statement not covered" >    onTagsChange: (newTags: string[]) =&gt; void</span>
-<span class="cstat-no" title="statement not covered" >) {</span>
-<span class="cstat-no" title="statement not covered" >    const [newTag, setNewTag] = useState("");</span>
+export function useTagsManager(
+    tags: string[], 
+    onTagsChange: (newTags: string[]) =&gt; void
+) {
+    const [newTag, setNewTag] = useState("");
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    const handleAddTag = useCallback(() =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        const trimmedTag = newTag.trim();</span>
-<span class="cstat-no" title="statement not covered" >        if (trimmedTag &amp;&amp; !tags.includes(trimmedTag)) {</span>
-<span class="cstat-no" title="statement not covered" >            onTagsChange([...tags, trimmedTag]);</span>
-<span class="cstat-no" title="statement not covered" >            setNewTag("");</span>
-<span class="cstat-no" title="statement not covered" >        }</span>
-<span class="cstat-no" title="statement not covered" >    }, [newTag, tags, onTagsChange]);</span>
+    const handleAddTag = useCallback(() =&gt; {
+        const trimmedTag = newTag.trim();
+        if (trimmedTag &amp;&amp; !tags.includes(trimmedTag)) {
+            onTagsChange([...tags, trimmedTag]);
+            setNewTag("");
+        }
+    }, [newTag, tags, onTagsChange]);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    const handleRemoveTag = useCallback((tagToRemove: string) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        onTagsChange(tags.filter(tag =&gt; tag !== tagToRemove));</span>
-<span class="cstat-no" title="statement not covered" >    }, [tags, onTagsChange]);</span>
+    const handleRemoveTag = useCallback((tagToRemove: string) =&gt; {
+        onTagsChange(tags.filter(tag =&gt; tag !== tagToRemove));
+    }, [tags, onTagsChange]);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    const handleTagKeyPress = useCallback((e: React.KeyboardEvent) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if (e.key === 'Enter') {</span>
-<span class="cstat-no" title="statement not covered" >            e.preventDefault();</span>
-<span class="cstat-no" title="statement not covered" >            handleAddTag();</span>
-<span class="cstat-no" title="statement not covered" >        }</span>
-<span class="cstat-no" title="statement not covered" >    }, [handleAddTag]);</span>
+    const handleTagKeyPress = useCallback((e: React.KeyboardEvent) =&gt; {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleAddTag();
+        }
+    }, [handleAddTag]);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return {</span>
-<span class="cstat-no" title="statement not covered" >        newTag,</span>
-<span class="cstat-no" title="statement not covered" >        setNewTag,</span>
-<span class="cstat-no" title="statement not covered" >        handleAddTag,</span>
-<span class="cstat-no" title="statement not covered" >        handleRemoveTag,</span>
-<span class="cstat-no" title="statement not covered" >        handleTagKeyPress</span>
-<span class="cstat-no" title="statement not covered" >    };</span>
-<span class="cstat-no" title="statement not covered" >}</span>
+    return {
+        newTag,
+        setNewTag,
+        handleAddTag,
+        handleRemoveTag,
+        handleTagKeyPress
+    };
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -187,7 +187,7 @@ export <span class="fstat-no" title="function not covered" >function useTagsMana
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-27T10:13:05.693Z
+                at 2026-04-05T08:13:34.875Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

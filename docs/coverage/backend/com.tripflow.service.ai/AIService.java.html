@@ -59,12 +59,12 @@ public class AIService {
      */
     public AIResponse requestAIProcessing(AIGenerationRequest aiRequest) {
 <span class="fc" id="L61">        User authenticatedUser = this.userService.getAuthenticatedUser();</span>
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        if (authenticatedUser == null) {</span>
-<span class="nc" id="L63">            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, &quot;User not authenticated&quot;);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if (authenticatedUser == null) {</span>
+<span class="fc" id="L63">            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, &quot;User not authenticated&quot;);</span>
         }
 
-<span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if (!this.aiUsageService.canUseAI(authenticatedUser)) {</span>
-<span class="nc" id="L67">            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, &quot;Daily AI usage limit exceeded&quot;);</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (!this.aiUsageService.canUseAI(authenticatedUser)) {</span>
+<span class="fc" id="L67">            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, &quot;Daily AI usage limit exceeded&quot;);</span>
         }
 
 <span class="fc" id="L70">        AIUsageDTO aiUsage = this.aiUsageService.recordUsage(authenticatedUser);</span>
@@ -76,5 +76,15 @@ public class AIService {
 
 <span class="fc" id="L77">        return new AIResponse(&quot;AI request submitted successfully&quot;, aiUsage);</span>
     }
+
+    /**
+     * Processes a failed AI generation by reducing the user's AI usage.
+     * 
+     * @param username The username of the user whose AI generation failed.
+     */
+    public void processFailedAIGeneration(String username) {
+<span class="fc" id="L86">        User user = this.userService.getUserByUsername(username);</span>
+<span class="fc" id="L87">        this.aiUsageService.reduceUsage(user);</span>
+<span class="fc" id="L88">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

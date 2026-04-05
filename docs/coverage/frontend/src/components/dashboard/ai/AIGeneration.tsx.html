@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.61% </span>
+                <span class="strong">96.64% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>142/144</span>
+                <span class='fraction'>144/149</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.33% </span>
+                <span class="strong">90.32% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>28/30</span>
+                <span class='fraction'>28/31</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.61% </span>
+                <span class="strong">96.64% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>142/144</span>
+                <span class='fraction'>144/149</span>
             </div>
         
             
@@ -242,7 +242,13 @@
 <a name='L177'></a><a href='#L177'>177</a>
 <a name='L178'></a><a href='#L178'>178</a>
 <a name='L179'></a><a href='#L179'>179</a>
-<a name='L180'></a><a href='#L180'>180</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -305,6 +311,8 @@
 <span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
@@ -328,6 +336,10 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">14x</span>
@@ -484,29 +496,35 @@ export default function AIGeneration() {
     const handleSubmit = async (e: React.FormEvent) =&gt; {
         e.preventDefault();
         setIsLoading(true);
-        const response = await generateItinerary(form);
 &nbsp;
-        if (response?.aiUsage) {
-            setAiUsage(response.aiUsage);
-        }
+        try {
+            const response = await generateItinerary(form);
 &nbsp;
-        resetForm();
+            if (response?.aiUsage) {
+                setAiUsage(response.aiUsage);
+            }
 &nbsp;
-        // Handle rate limit
-        if (!response || !response.aiUsage) {
-            setRateLimit(true);
-            setIsLoading(false);
-            notify("Has alcanzado el límite diario de generaciones.", "error", {
-                title: "Límite diario alcanzado"
+            resetForm();
+&nbsp;
+            // Handle rate limit
+            if (!response || !response.aiUsage) {
+                setRateLimit(true);
+                setIsLoading(false);
+                notify("Has alcanzado el límite diario de generaciones.", "error", {
+                    title: "Límite diario alcanzado"
+                });
+                return;
+            }
+&nbsp;
+            notify("Tu solicitud se está procesando.", "success", {
+                title: "Solicitud recibida!"
             });
-            return;
-        }
 &nbsp;
-        notify("Tu solicitud se está procesando.", "success", {
-            title: "Solicitud recibida!"
-        });
-&nbsp;
-        setRateLimit(false);
+            setRateLimit(false);
+<span class="branch-0 cbranch-no" title="branch not covered" >        } catch {</span>
+<span class="cstat-no" title="statement not covered" >            setIsLoading(false);</span>
+<span class="cstat-no" title="statement not covered" >            notify("Error al generar el itinerario. Inténtalo de nuevo.", "error");</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
     };
 &nbsp;
     return (
@@ -607,7 +625,7 @@ export default function AIGeneration() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-27T10:13:05.693Z
+                at 2026-04-05T08:13:34.875Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

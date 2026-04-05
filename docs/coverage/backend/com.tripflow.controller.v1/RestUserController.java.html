@@ -8,9 +8,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.tripflow.dto.shared.PaginatedDTO;
+import com.tripflow.dto.itinerary.collaborator.CollaboratorDTO;
 import com.tripflow.dto.user.PublicUserDTO;
 import com.tripflow.dto.user.UpdateUserRequest;
 import com.tripflow.service.UserService;
+import com.tripflow.service.itinerary.ItineraryCollaborationService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +21,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
@@ -33,16 +36,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping(&quot;/api/v1/users&quot;)
 @Tag(name = &quot;Users Management&quot;, description = &quot;User management and operations&quot;)
 public class RestUserController {
     private final UserService userService;
+    private final ItineraryCollaborationService collaborationService;
 
-<span class="fc" id="L43">    public RestUserController(UserService userService) {</span>
-<span class="fc" id="L44">        this.userService = userService;</span>
-<span class="fc" id="L45">    }</span>
+    public RestUserController(
+        UserService userService,
+        ItineraryCollaborationService collaborationService
+<span class="fc" id="L52">    ) {</span>
+<span class="fc" id="L53">        this.userService = userService;</span>
+<span class="fc" id="L54">        this.collaborationService = collaborationService;</span>
+<span class="fc" id="L55">    }</span>
 
     @GetMapping(&quot;&quot;)
     @Operation(
@@ -57,8 +67,8 @@ public class RestUserController {
         @PageableDefault(page = 0, size = 10) Pageable pageable,
         @RequestParam(required = false) String search
     ) throws Exception {
-<span class="fc" id="L60">        PaginatedDTO&lt;PublicUserDTO&gt; users = this.userService.getAllUsers(pageable, search);</span>
-<span class="fc" id="L61">        return ResponseEntity.ok(users);</span>
+<span class="fc" id="L70">        PaginatedDTO&lt;PublicUserDTO&gt; users = this.userService.getAllUsers(pageable, search);</span>
+<span class="fc" id="L71">        return ResponseEntity.ok(users);</span>
     }
 
     @GetMapping(&quot;/{username}&quot;)
@@ -72,8 +82,8 @@ public class RestUserController {
         @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
     })
     public ResponseEntity&lt;PublicUserDTO&gt; getUserByUsername(@PathVariable String username) throws Exception {
-<span class="fc" id="L75">        PublicUserDTO user = this.userService.getPublicUserByUsername(username);</span>
-<span class="fc" id="L76">        return ResponseEntity.ok(user);</span>
+<span class="fc" id="L85">        PublicUserDTO user = this.userService.getPublicUserByUsername(username);</span>
+<span class="fc" id="L86">        return ResponseEntity.ok(user);</span>
     }
 
     @PutMapping(&quot;/{username}&quot;)
@@ -88,11 +98,11 @@ public class RestUserController {
         @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
     })
     public ResponseEntity&lt;PublicUserDTO&gt; updateUser(
-        @PathVariable String username, @RequestBody UpdateUserRequest request
+        @PathVariable String username, @Valid @RequestBody UpdateUserRequest request
     ) throws Exception {
-<span class="fc" id="L93">        PublicUserDTO user = this.userService.updateUser(username, request);</span>
-<span class="fc" id="L94">        URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();</span>
-<span class="fc" id="L95">        return ResponseEntity.ok().location(location).body(user);</span>
+<span class="fc" id="L103">        PublicUserDTO user = this.userService.updateUser(username, request);</span>
+<span class="fc" id="L104">        URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();</span>
+<span class="fc" id="L105">        return ResponseEntity.ok().location(location).body(user);</span>
     }
 
     @DeleteMapping(&quot;/{username}&quot;)
@@ -107,8 +117,8 @@ public class RestUserController {
         @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
     })
     public ResponseEntity&lt;Void&gt; deleteUser(@PathVariable String username) throws Exception {
-<span class="fc" id="L110">        this.userService.deleteUser(username);</span>
-<span class="fc" id="L111">        return ResponseEntity.noContent().build();</span>
+<span class="fc" id="L120">        this.userService.deleteUser(username);</span>
+<span class="fc" id="L121">        return ResponseEntity.noContent().build();</span>
     }
     
     @PostMapping(&quot;/{username}/avatar&quot;)
@@ -126,9 +136,9 @@ public class RestUserController {
     public ResponseEntity&lt;PublicUserDTO&gt; uploadAvatar(
         @PathVariable String username, @RequestParam MultipartFile avatar
     ) throws Exception {
-<span class="fc" id="L129">        PublicUserDTO user = this.userService.uploadAvatar(username, avatar);</span>
-<span class="fc" id="L130">        URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();</span>
-<span class="fc" id="L131">        return ResponseEntity.ok().location(location).body(user);</span>
+<span class="fc" id="L139">        PublicUserDTO user = this.userService.uploadAvatar(username, avatar);</span>
+<span class="fc" id="L140">        URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();</span>
+<span class="fc" id="L141">        return ResponseEntity.ok().location(location).body(user);</span>
     }
     
     @GetMapping(&quot;/{username}/avatar&quot;)
@@ -142,8 +152,23 @@ public class RestUserController {
         @ApiResponse(responseCode = &quot;404&quot;, description = &quot;User not found&quot;),
     })
     public ResponseEntity&lt;Resource&gt; getAvatar(@PathVariable String username) throws Exception {
-<span class="fc" id="L145">        Resource resource = this.userService.getAvatar(username);</span>
-<span class="fc" id="L146">        return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);</span>
+<span class="fc" id="L155">        Resource resource = this.userService.getAvatar(username);</span>
+<span class="fc" id="L156">        return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);</span>
+    }
+
+    @GetMapping(&quot;/{username}/invitations&quot;)
+    @Operation(
+        summary = &quot;Get pending invitations&quot;,
+        description = &quot;Retrieves all pending collaboration invitations for a user.&quot;,
+        security = @SecurityRequirement(name = &quot;auth_token&quot;)
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Invitations retrieved successfully&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;User not found&quot;)
+    })
+    public ResponseEntity&lt;List&lt;CollaboratorDTO&gt;&gt; getPendingInvitations(@PathVariable String username) {
+<span class="fc" id="L170">        List&lt;CollaboratorDTO&gt; invitations = this.collaborationService.getPendingInvitations(username);</span>
+<span class="fc" id="L171">        return ResponseEntity.ok(invitations);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

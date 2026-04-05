@@ -2,6 +2,11 @@
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -9,6 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tripflow.dto.auth.AuthResponse;
@@ -29,11 +35,12 @@ import com.tripflow.service.KafkaService;
 import com.tripflow.service.UserService;
 
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class AuthService {
+<span class="fc" id="L42">    private static final Logger log = LoggerFactory.getLogger(AuthService.class);</span>
+
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -41,18 +48,27 @@ public class AuthService {
     private final AuthValidator authValidator;
     private final KafkaService kafkaService;
 
+    @Value(&quot;${cookie.domain}&quot;)
+    private String cookieDomain;
+
+    @Value(&quot;${cookie.secure}&quot;)
+    private boolean cookieSecure;
+
+    @Value(&quot;${cookie.same-site}&quot;)
+    private String cookieSameSite;
+
     public AuthService(
         AuthenticationManager authenticationManager, UserDetailsService userDetailsService,
         JwtTokenProvider jwtTokenProvider, UserService userService, AuthValidator authValidator,
         KafkaService kafkaService
-<span class="fc" id="L48">    ) {</span>
-<span class="fc" id="L49">        this.authenticationManager = authenticationManager;</span>
-<span class="fc" id="L50">        this.userDetailsService = userDetailsService;</span>
-<span class="fc" id="L51">        this.jwtTokenProvider = jwtTokenProvider;</span>
-<span class="fc" id="L52">        this.userService = userService;</span>
-<span class="fc" id="L53">        this.authValidator = authValidator;</span>
-<span class="fc" id="L54">        this.kafkaService = kafkaService;</span>
-<span class="fc" id="L55">    }</span>
+<span class="fc" id="L64">    ) {</span>
+<span class="fc" id="L65">        this.authenticationManager = authenticationManager;</span>
+<span class="fc" id="L66">        this.userDetailsService = userDetailsService;</span>
+<span class="fc" id="L67">        this.jwtTokenProvider = jwtTokenProvider;</span>
+<span class="fc" id="L68">        this.userService = userService;</span>
+<span class="fc" id="L69">        this.authValidator = authValidator;</span>
+<span class="fc" id="L70">        this.kafkaService = kafkaService;</span>
+<span class="fc" id="L71">    }</span>
 
     /**
      * Handles user registration by creating a new user.
@@ -62,11 +78,11 @@ public class AuthService {
      */
     public AuthResponse register(RegisterUserRequest request) {
         // Validate the registration request
-<span class="fc" id="L65">        Map&lt;String, String&gt; errors = this.authValidator.validateUserRegistrationRequest(request);</span>
+<span class="fc" id="L81">        Map&lt;String, String&gt; errors = this.authValidator.validateUserRegistrationRequest(request);</span>
 
         // If there are validation errors, return them in the response
-<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (!errors.isEmpty()) {</span>
-<span class="fc" id="L69">            return new AuthResponse(</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        if (!errors.isEmpty()) {</span>
+<span class="fc" id="L85">            return new AuthResponse(</span>
                 AuthStatus.FAILURE,
                 null,
                 errors,
@@ -76,34 +92,35 @@ public class AuthService {
 
         try {
             // Try to register the user
-<span class="fc" id="L79">            PublicUserDTO publicUser = this.userService.registerUser(request);</span>
-<span class="fc" id="L80">            this.sendVerificationEmail(request.email());</span>
+<span class="fc" id="L95">            PublicUserDTO publicUser = this.userService.registerUser(request);</span>
+<span class="fc" id="L96">            this.sendVerificationEmail(request.email());</span>
 
-<span class="fc" id="L82">            return new AuthResponse(</span>
+<span class="fc" id="L98">            return new AuthResponse(</span>
                 AuthStatus.SUCCESS,
                 &quot;Registration successful&quot;,
                 null,
                 publicUser
             );
-<span class="fc" id="L88">        } catch (UsernameAlreadyExistsException e) {</span>
-<span class="fc" id="L89">            return new AuthResponse(</span>
+<span class="fc" id="L104">        } catch (UsernameAlreadyExistsException e) {</span>
+<span class="fc" id="L105">            return new AuthResponse(</span>
                 AuthStatus.FAILURE,
                 null,
-<span class="fc" id="L92">                Map.of(&quot;username&quot;, e.getMessage()),</span>
+<span class="fc" id="L108">                Map.of(&quot;username&quot;, e.getMessage()),</span>
                 null
             );
-<span class="fc" id="L95">        } catch (EmailAlreadyExistsException e) {</span>
-<span class="fc" id="L96">            return new AuthResponse(</span>
+<span class="fc" id="L111">        } catch (EmailAlreadyExistsException e) {</span>
+<span class="fc" id="L112">            return new AuthResponse(</span>
                 AuthStatus.FAILURE,
                 null,
-<span class="fc" id="L99">                Map.of(&quot;email&quot;, e.getMessage()),</span>
+<span class="fc" id="L115">                Map.of(&quot;email&quot;, e.getMessage()),</span>
                 null
             );
-<span class="nc" id="L102">        } catch (Exception e) {</span>
-<span class="nc" id="L103">            return new AuthResponse(</span>
+<span class="nc" id="L118">        } catch (Exception e) {</span>
+<span class="nc" id="L119">            log.error(&quot;Unexpected error during registration for username {}&quot;, request.username(), e);</span>
+<span class="nc" id="L120">            return new AuthResponse(</span>
                 AuthStatus.FAILURE,
                 null,
-<span class="nc" id="L106">                Map.of(&quot;unexpected&quot;, &quot;An error occurred during registration&quot;),</span>
+<span class="nc" id="L123">                Map.of(&quot;unexpected&quot;, &quot;An error occurred during registration&quot;),</span>
                 null
             );
         }
@@ -117,37 +134,38 @@ public class AuthService {
      */
     public AuthResponse verify(HttpServletResponse response, VerifyAccountRequest request) {
         try {
-<span class="nc" id="L120">            PublicUserDTO publicUserDTO = this.userService.verifyUser(</span>
-<span class="nc" id="L121">                request.username(),</span>
-<span class="nc" id="L122">                request.code()</span>
+<span class="nc" id="L137">            PublicUserDTO publicUserDTO = this.userService.verifyUser(</span>
+<span class="nc" id="L138">                request.username(),</span>
+<span class="nc" id="L139">                request.code()</span>
             );
 
             // Auto-login logic
-<span class="nc" id="L126">            UserDetails userDetails = this.userDetailsService.loadUserByUsername(request.username());</span>
+<span class="nc" id="L143">            UserDetails userDetails = this.userDetailsService.loadUserByUsername(request.username());</span>
             
-<span class="nc" id="L128">            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());</span>
-<span class="nc" id="L129">            SecurityContextHolder.getContext().setAuthentication(authentication);</span>
+<span class="nc" id="L145">            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());</span>
+<span class="nc" id="L146">            SecurityContextHolder.getContext().setAuthentication(authentication);</span>
 
-<span class="nc" id="L131">            this.createSession(response, userDetails);</span>
+<span class="nc" id="L148">            this.createSession(response, userDetails);</span>
             
-<span class="nc" id="L133">            return new AuthResponse(</span>
+<span class="nc" id="L150">            return new AuthResponse(</span>
                 AuthStatus.SUCCESS,
                 &quot;Account verified successfully&quot;,
                 null,
                 publicUserDTO
             );
-<span class="nc" id="L139">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L140">            return new AuthResponse(</span>
+<span class="nc" id="L156">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L157">            return new AuthResponse(</span>
                 AuthStatus.FAILURE,
                 &quot;Verification failed&quot;,
-<span class="nc" id="L143">                Map.of(&quot;error&quot;, e.getMessage()),</span>
+<span class="nc" id="L160">                Map.of(&quot;error&quot;, e.getMessage()),</span>
                 null
             );
-<span class="nc" id="L146">        } catch (Exception e) {</span>
-<span class="nc" id="L147">            return new AuthResponse(</span>
+<span class="nc" id="L163">        } catch (Exception e) {</span>
+<span class="nc" id="L164">            log.error(&quot;Unexpected error during account verification for username {}&quot;, request.username(), e);</span>
+<span class="nc" id="L165">            return new AuthResponse(</span>
                 AuthStatus.FAILURE,
                 &quot;Verification failed&quot;,
-<span class="nc" id="L150">                Map.of(&quot;unexpected&quot;, &quot;An error occurred during verification&quot;),</span>
+<span class="nc" id="L168">                Map.of(&quot;unexpected&quot;, &quot;An error occurred during verification&quot;),</span>
                 null
             );
         }
@@ -161,30 +179,31 @@ public class AuthService {
      */
     public AuthResponse resendVerificationCode(String username) {
         try {
-<span class="nc" id="L164">            User user = this.userService.getUserByUsername(username);</span>
+<span class="nc" id="L182">            User user = this.userService.getUserByUsername(username);</span>
             
-<span class="nc bnc" id="L166" title="All 2 branches missed.">            if (user.getVerified()) {</span>
-<span class="nc" id="L167">                return new AuthResponse(</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">            if (user.getVerified()) {</span>
+<span class="nc" id="L185">                return new AuthResponse(</span>
                     AuthStatus.FAILURE,
                     &quot;Account already verified&quot;,
-<span class="nc" id="L170">                    Map.of(&quot;error&quot;, &quot;Account is already verified&quot;),</span>
+<span class="nc" id="L188">                    Map.of(&quot;error&quot;, &quot;Account is already verified&quot;),</span>
                     null
                 );
             }
 
-<span class="nc" id="L175">            this.sendVerificationEmail(user.getEmail());</span>
+<span class="nc" id="L193">            this.sendVerificationEmail(user.getEmail());</span>
 
-<span class="nc" id="L177">            return new AuthResponse(</span>
+<span class="nc" id="L195">            return new AuthResponse(</span>
                 AuthStatus.SUCCESS,
                 &quot;Verification code sent successfully&quot;,
                 null,
                 null
             );
-<span class="nc" id="L183">        } catch (Exception e) {</span>
-<span class="nc" id="L184">            return new AuthResponse(</span>
+<span class="nc" id="L201">        } catch (Exception e) {</span>
+<span class="nc" id="L202">            log.error(&quot;Unexpected error while resending verification code for username {}&quot;, username, e);</span>
+<span class="nc" id="L203">            return new AuthResponse(</span>
                 AuthStatus.FAILURE,
                 &quot;Failed to resend verification code&quot;,
-<span class="nc" id="L187">                Map.of(&quot;error&quot;, e.getMessage()),</span>
+<span class="nc" id="L206">                Map.of(&quot;error&quot;, e.getMessage()),</span>
                 null
             );
         }
@@ -199,52 +218,81 @@ public class AuthService {
      */
     public AuthResponse login(HttpServletResponse response, LoginRequest request) {
         // Retrieve username or email from the request
-<span class="fc" id="L202">        String identifier = request.username();</span>
+<span class="fc" id="L221">        String identifier = request.username();</span>
         String username;
-<span class="pc bpc" id="L204" title="2 of 4 branches missed.">        if (identifier != null &amp;&amp; identifier.contains(&quot;@&quot;)) {</span>
-<span class="nc" id="L205">            username = this.userService.getUserByEmail(identifier).getUsername();</span>
-        } else {
-<span class="fc" id="L207">            username = identifier;</span>
-        }
-
-        // Try to authenticate the user
-        Authentication authentication;
         try {
-<span class="fc" id="L213">            authentication = authenticationManager.authenticate(</span>
-<span class="fc" id="L214">                new UsernamePasswordAuthenticationToken(username, request.password())</span>
-            );
-<span class="fc" id="L216">        } catch (AuthenticationException e) {</span>
-<span class="fc" id="L217">            return new AuthResponse(</span>
+<span class="pc bpc" id="L224" title="2 of 4 branches missed.">            if (identifier != null &amp;&amp; identifier.contains(&quot;@&quot;)) {</span>
+<span class="nc" id="L225">                username = this.userService.getUserByEmail(identifier).getUsername();</span>
+            } else {
+<span class="fc" id="L227">                username = identifier;</span>
+            }
+<span class="nc" id="L229">        } catch (UsernameNotFoundException e) {</span>
+<span class="nc" id="L230">            return new AuthResponse(</span>
                 AuthStatus.FAILURE,
                 &quot;Invalid credentials&quot;,
                 null,
                 null
             );
-<span class="fc" id="L223">        }</span>
+<span class="fc" id="L236">        }</span>
+
+        // Try to authenticate the user
+        Authentication authentication;
+        try {
+<span class="fc" id="L241">            authentication = authenticationManager.authenticate(</span>
+<span class="fc" id="L242">                new UsernamePasswordAuthenticationToken(username, request.password())</span>
+            );
+<span class="fc" id="L244">        } catch (AuthenticationException e) {</span>
+<span class="fc" id="L245">            return new AuthResponse(</span>
+                AuthStatus.FAILURE,
+                &quot;Invalid credentials&quot;,
+                null,
+                null
+            );
+<span class="fc" id="L251">        }</span>
 
         // Set the authentication in the security context
-<span class="fc" id="L226">		SecurityContextHolder.getContext().setAuthentication(authentication);</span>
+<span class="fc" id="L254">		SecurityContextHolder.getContext().setAuthentication(authentication);</span>
 
         // Retrieve user details and public user information
-<span class="fc" id="L229">        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);</span>
+        UserDetails userDetails;
+        try {
+<span class="fc" id="L259">            userDetails = this.userDetailsService.loadUserByUsername(username);</span>
+<span class="nc" id="L260">        } catch (UsernameNotFoundException e) {</span>
+<span class="nc" id="L261">            return new AuthResponse(</span>
+                AuthStatus.FAILURE,
+                &quot;Invalid credentials&quot;,
+                null,
+                null
+            );
+<span class="fc" id="L267">        }</span>
         
         // Check if user is verified
-<span class="fc" id="L232">        User user = this.userService.getUserByUsername(username);</span>
-<span class="pc bpc" id="L233" title="1 of 2 branches missed.">        if (!user.getVerified()) {</span>
-<span class="nc" id="L234">            this.sendVerificationEmail(user.getEmail());</span>
+        User user;
+        try {
+<span class="fc" id="L272">            user = this.userService.getUserByUsername(username);</span>
+<span class="nc" id="L273">        } catch (UsernameNotFoundException e) {</span>
+<span class="nc" id="L274">            return new AuthResponse(</span>
+                AuthStatus.FAILURE,
+                &quot;Invalid credentials&quot;,
+                null,
+                null
+            );
+<span class="fc" id="L280">        }</span>
+<span class="pc bpc" id="L281" title="1 of 2 branches missed.">        if (!user.getVerified()) {</span>
+<span class="nc" id="L282">            this.sendVerificationEmail(user.getEmail());</span>
 
-<span class="nc" id="L236">            return new AuthResponse(</span>
+<span class="nc" id="L284">            return new AuthResponse(</span>
                 AuthStatus.FAILURE,
                 &quot;Account not verified&quot;,
-<span class="nc" id="L239">                Map.of(&quot;error&quot;, &quot;Account not verified&quot;),</span>
+<span class="nc" id="L287">                Map.of(&quot;error&quot;, &quot;Account not verified&quot;),</span>
                 null
             );
         }
 
-<span class="fc" id="L244">        PublicUserDTO publicUser = this.userService.getPublicUserByUsername(username);</span>
-<span class="fc" id="L245">        this.createSession(response, userDetails);</span>
+<span class="fc" id="L292">        PublicUserDTO publicUser = this.userService.getPublicUserByUsername(username);</span>
+<span class="fc" id="L293">        this.createSession(response, userDetails);</span>
 
-<span class="fc" id="L247">        return new AuthResponse(</span>
+<span class="fc" id="L295">        return new AuthResponse(</span>
             AuthStatus.SUCCESS,
             &quot;Login successful&quot;,
             null,
@@ -259,12 +307,12 @@ public class AuthService {
      * @return an AuthResponse indicating the logout status
      */
     public AuthResponse logout(HttpServletResponse response) {
-<span class="fc" id="L262">        SecurityContextHolder.clearContext();</span>
+<span class="fc" id="L310">        SecurityContextHolder.clearContext();</span>
 
-<span class="fc" id="L264">        response.addCookie(this.removeTokenFromCookie(TokenType.AUTH_TOKEN));</span>
-<span class="fc" id="L265">        response.addCookie(this.removeTokenFromCookie(TokenType.REFRESH_TOKEN));</span>
+<span class="fc" id="L312">        response.addHeader(HttpHeaders.SET_COOKIE, this.removeTokenFromCookie(TokenType.AUTH_TOKEN).toString());</span>
+<span class="fc" id="L313">        response.addHeader(HttpHeaders.SET_COOKIE, this.removeTokenFromCookie(TokenType.REFRESH_TOKEN).toString());</span>
 
-<span class="fc" id="L267">        return new AuthResponse(</span>
+<span class="fc" id="L315">        return new AuthResponse(</span>
             AuthStatus.SUCCESS,
             &quot;Logout successful&quot;,
             null,
@@ -281,30 +329,34 @@ public class AuthService {
      */
     public AuthResponse refresh(HttpServletResponse response, String refreshToken) {
         try {
-<span class="fc" id="L284">            Claims claims = this.jwtTokenProvider.validateToken(refreshToken);</span>
-<span class="fc" id="L285">            String username = claims.getSubject();</span>
+<span class="fc" id="L332">            Claims claims = this.jwtTokenProvider.validateToken(refreshToken);</span>
+<span class="fc" id="L333">            String username = claims.getSubject();</span>
 
             // Generate new tokens using the JWT token provider
-<span class="fc" id="L288">            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);</span>
-<span class="fc" id="L289">            String newAuthToken = this.jwtTokenProvider.generateAuthToken(userDetails);</span>
+<span class="fc" id="L336">            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);</span>
+<span class="fc" id="L337">            String newAuthToken = this.jwtTokenProvider.generateAuthToken(userDetails);</span>
 
             // Add the new auth token to the response as a Read-Only Cookie
-<span class="fc" id="L292">            response.addCookie(this.buildTokenCookie(TokenType.AUTH_TOKEN, newAuthToken));</span>
+<span class="fc" id="L340">            response.addHeader(</span>
+                HttpHeaders.SET_COOKIE,
+<span class="fc" id="L342">                this.buildTokenCookie(TokenType.AUTH_TOKEN, newAuthToken).toString()</span>
+            );
 
             // Retrieve public user information
-<span class="fc" id="L295">            PublicUserDTO publicUser = this.userService.getPublicUserByUsername(username);</span>
+<span class="fc" id="L346">            PublicUserDTO publicUser = this.userService.getPublicUserByUsername(username);</span>
 
-<span class="fc" id="L297">            return new AuthResponse(</span>
+<span class="fc" id="L348">            return new AuthResponse(</span>
                 AuthStatus.SUCCESS,
                 &quot;Token refreshed successfully&quot;,
                 null,
                 publicUser
             );
-<span class="fc" id="L303">        } catch (Exception e) {</span>
-<span class="fc" id="L304">            return new AuthResponse(</span>
+<span class="fc" id="L354">        } catch (Exception e) {</span>
+<span class="fc" id="L355">            log.warn(&quot;Refresh token validation failed&quot;, e);</span>
+<span class="fc" id="L356">            return new AuthResponse(</span>
                 AuthStatus.FAILURE,
                 &quot;Invalid refresh token&quot;,
-<span class="fc" id="L307">                Map.of(&quot;error&quot;, &quot;Refresh token is invalid&quot;),</span>
+<span class="fc" id="L359">                Map.of(&quot;error&quot;, &quot;Refresh token is invalid&quot;),</span>
                 null
             );
         }
@@ -312,38 +364,55 @@ public class AuthService {
 
     // [Private Methods] ================================================================
 
-    private Cookie buildTokenCookie(TokenType type, String token) {
-<span class="fc" id="L316">        Cookie cookie = new Cookie(type.getCookieName(), token);</span>
-<span class="fc" id="L317">        cookie.setMaxAge((int) type.getDuration().getSeconds());</span>
-<span class="fc" id="L318">        cookie.setHttpOnly(true);</span>
-<span class="fc" id="L319">        cookie.setPath(&quot;/&quot;);</span>
-<span class="fc" id="L320">        return cookie;</span>
+    private ResponseCookie buildTokenCookie(TokenType type, String token) {
+<span class="fc" id="L368">        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(type.getCookieName(), token)</span>
+<span class="fc" id="L369">            .maxAge((int) type.getDuration().getSeconds())</span>
+<span class="fc" id="L370">            .httpOnly(true)</span>
+<span class="fc" id="L371">            .path(&quot;/&quot;)</span>
+<span class="fc" id="L372">            .secure(this.cookieSecure)</span>
+<span class="fc" id="L373">            .sameSite(this.cookieSameSite);</span>
+
+<span class="pc bpc" id="L375" title="1 of 4 branches missed.">        if (this.cookieDomain != null &amp;&amp; !this.cookieDomain.isEmpty()) {</span>
+<span class="nc" id="L376">            builder.domain(this.cookieDomain);</span>
+        }
+
+<span class="fc" id="L379">        return builder.build();</span>
     }
 
-    private Cookie removeTokenFromCookie(TokenType type) {
-<span class="fc" id="L324">        Cookie cookie = new Cookie(type.getCookieName(), &quot;&quot;);</span>
-<span class="fc" id="L325">        cookie.setMaxAge(0);</span>
-<span class="fc" id="L326">        cookie.setHttpOnly(true);</span>
-<span class="fc" id="L327">        cookie.setPath(&quot;/&quot;);</span>
-<span class="fc" id="L328">        return cookie;</span>
+    private ResponseCookie removeTokenFromCookie(TokenType type) {
+<span class="fc" id="L383">        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(type.getCookieName(), &quot;&quot;)</span>
+<span class="fc" id="L384">            .maxAge(0)</span>
+<span class="fc" id="L385">            .httpOnly(true)</span>
+<span class="fc" id="L386">            .path(&quot;/&quot;)</span>
+<span class="fc" id="L387">            .secure(this.cookieSecure)</span>
+<span class="fc" id="L388">            .sameSite(this.cookieSameSite);</span>
+
+<span class="pc bpc" id="L390" title="1 of 4 branches missed.">        if (this.cookieDomain != null &amp;&amp; !this.cookieDomain.isEmpty()) {</span>
+<span class="nc" id="L391">            builder.domain(this.cookieDomain);</span>
+        }
+
+<span class="fc" id="L394">        return builder.build();</span>
     }
 
     private void sendVerificationEmail(String email) {
-<span class="fc" id="L332">        VerificationCode verificationCode = this.userService.generateVerificationCode(email);</span>
+<span class="fc" id="L398">        VerificationCode verificationCode = this.userService.generateVerificationCode(email);</span>
 
-<span class="fc" id="L334">        this.kafkaService.sendEmailMessage(new EmailMessage(</span>
+<span class="fc" id="L400">        this.kafkaService.sendEmailMessage(new EmailMessage(</span>
             email,
             EmailType.VERIFICATION,
-<span class="fc" id="L337">            Map.of(&quot;code&quot;, verificationCode.code())</span>
+<span class="fc" id="L403">            Map.of(&quot;code&quot;, verificationCode.code())</span>
         ));
-<span class="fc" id="L339">    }</span>
+<span class="fc" id="L405">    }</span>
 
     private void createSession(HttpServletResponse response, UserDetails userDetails) {
-<span class="fc" id="L342">        String newAuthToken = this.jwtTokenProvider.generateAuthToken(userDetails);</span>
-<span class="fc" id="L343">        String newRefreshToken = this.jwtTokenProvider.generateRefreshToken(userDetails);</span>
+<span class="fc" id="L408">        String newAuthToken = this.jwtTokenProvider.generateAuthToken(userDetails);</span>
+<span class="fc" id="L409">        String newRefreshToken = this.jwtTokenProvider.generateRefreshToken(userDetails);</span>
 
-<span class="fc" id="L345">        response.addCookie(this.buildTokenCookie(TokenType.AUTH_TOKEN, newAuthToken));</span>
-<span class="fc" id="L346">        response.addCookie(this.buildTokenCookie(TokenType.REFRESH_TOKEN, newRefreshToken));</span>
-<span class="fc" id="L347">    }</span>
+<span class="fc" id="L411">        ResponseCookie authCookie = this.buildTokenCookie(TokenType.AUTH_TOKEN, newAuthToken);</span>
+<span class="fc" id="L412">        ResponseCookie refreshCookie = this.buildTokenCookie(TokenType.REFRESH_TOKEN, newRefreshToken);</span>
+
+<span class="fc" id="L414">        response.addHeader(HttpHeaders.SET_COOKIE, authCookie.toString());</span>
+<span class="fc" id="L415">        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());</span>
+<span class="fc" id="L416">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

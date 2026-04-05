@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapsCacheService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.service.map</a> &gt; <span class="el_source">MapsCacheService.java</span></div><h1>MapsCacheService.java</h1><pre class="source lang-java linenums">package com.tripflow.service.map;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.util.HexFormat;
+import java.util.Optional;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import com.tripflow.model.MapsCacheEntry;
+import com.tripflow.repository.MapsCacheRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+public class MapsCacheService {
+
+    private final MapsCacheRepository mapsCacheRepository;
+
+<span class="fc" id="L23">    public MapsCacheService(MapsCacheRepository mapsCacheRepository) {</span>
+<span class="fc" id="L24">        this.mapsCacheRepository = mapsCacheRepository;</span>
+<span class="fc" id="L25">    }</span>
+
+    public Optional&lt;String&gt; getValidPayload(String cacheKey) {
+<span class="nc" id="L28">        return this.mapsCacheRepository.findByCacheKeyAndExpiresAtAfter(cacheKey, Instant.now())</span>
+<span class="nc" id="L29">            .map(MapsCacheEntry::getPayload);</span>
+    }
+
+    @Transactional
+    public void save(String cacheKey, String endpoint, String payload, long ttlSeconds) {
+<span class="nc" id="L34">        Instant expiresAt = Instant.now().plusSeconds(Math.max(ttlSeconds, 1));</span>
+
+<span class="nc" id="L36">        MapsCacheEntry entry = this.mapsCacheRepository.findByCacheKey(cacheKey)</span>
+<span class="nc" id="L37">            .orElseGet(() -&gt; new MapsCacheEntry(cacheKey, endpoint, payload, expiresAt));</span>
+
+<span class="nc" id="L39">        entry.setEndpoint(endpoint);</span>
+<span class="nc" id="L40">        entry.setPayload(payload);</span>
+<span class="nc" id="L41">        entry.setExpiresAt(expiresAt);</span>
+
+<span class="nc" id="L43">        this.mapsCacheRepository.save(entry);</span>
+<span class="nc" id="L44">    }</span>
+
+    public static String buildCacheKey(String key) {
+        try {
+<span class="fc" id="L48">            MessageDigest digest = MessageDigest.getInstance(&quot;SHA-256&quot;);</span>
+<span class="fc" id="L49">            byte[] hash = digest.digest(key.getBytes(StandardCharsets.UTF_8));</span>
+<span class="fc" id="L50">            return HexFormat.of().formatHex(hash);</span>
+<span class="nc" id="L51">        } catch (NoSuchAlgorithmException ex) {</span>
+<span class="nc" id="L52">            throw new IllegalStateException(&quot;Unable to hash cache key&quot;, ex);</span>
+        }
+    }
+
+    @Scheduled(fixedDelayString = &quot;${maps.cache.cleanup-ms:3600000}&quot;)
+    @Transactional
+    public void cleanupExpiredEntries() {
+<span class="fc" id="L59">        this.mapsCacheRepository.deleteByExpiresAtBefore(Instant.now());</span>
+<span class="fc" id="L60">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

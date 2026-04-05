@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import com.tripflow.dto.auth.AuthResponse;
 import com.tripflow.dto.auth.AuthStatus;
 import com.tripflow.dto.auth.LoginRequest;
@@ -29,9 +31,9 @@ public class RestAuthController {
     private static final String REFRESH_TOKEN_COOKIE_NAME = &quot;refresh_token&quot;;
     private final AuthService authService;
 
-<span class="fc" id="L32">    public RestAuthController(AuthService authService) {</span>
-<span class="fc" id="L33">        this.authService = authService;</span>
-<span class="fc" id="L34">    }</span>
+<span class="fc" id="L34">    public RestAuthController(AuthService authService) {</span>
+<span class="fc" id="L35">        this.authService = authService;</span>
+<span class="fc" id="L36">    }</span>
 
     @PostMapping(&quot;/register&quot;)
     @Operation(
@@ -42,13 +44,13 @@ public class RestAuthController {
         @ApiResponse(responseCode = &quot;201&quot;, description = &quot;User registered successfully&quot;),
         @ApiResponse(responseCode = &quot;400&quot;, description = &quot;User registration failed&quot;)
     })
-    public ResponseEntity&lt;AuthResponse&gt; register(@RequestBody RegisterUserRequest request) {
-<span class="fc" id="L46">        AuthResponse response = authService.register(request);</span>
-<span class="fc bfc" id="L47" title="All 2 branches covered.">        HttpStatusCode status = response.status() == AuthStatus.FAILURE</span>
-<span class="fc" id="L48">            ? HttpStatusCode.valueOf(400)</span>
-<span class="fc" id="L49">            : HttpStatusCode.valueOf(201);</span>
+    public ResponseEntity&lt;AuthResponse&gt; register(@Valid @RequestBody RegisterUserRequest request) {
+<span class="fc" id="L48">        AuthResponse response = authService.register(request);</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        HttpStatusCode status = response.status() == AuthStatus.FAILURE</span>
+<span class="fc" id="L50">            ? HttpStatusCode.valueOf(400)</span>
+<span class="fc" id="L51">            : HttpStatusCode.valueOf(201);</span>
 
-<span class="fc" id="L51">        return ResponseEntity.status(status).body(response);</span>
+<span class="fc" id="L53">        return ResponseEntity.status(status).body(response);</span>
     }
 
     @PostMapping(&quot;/verify&quot;)
@@ -60,13 +62,13 @@ public class RestAuthController {
         @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Account verified successfully&quot;),
         @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Account verification failed&quot;)
     })
-    public ResponseEntity&lt;AuthResponse&gt; verify(HttpServletResponse response, @RequestBody VerifyAccountRequest request) {
-<span class="nc" id="L64">        AuthResponse authResponse = authService.verify(response, request);</span>
-<span class="nc bnc" id="L65" title="All 2 branches missed.">        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE</span>
-<span class="nc" id="L66">            ? HttpStatusCode.valueOf(400)</span>
-<span class="nc" id="L67">            : HttpStatusCode.valueOf(200);</span>
+    public ResponseEntity&lt;AuthResponse&gt; verify(HttpServletResponse response, @Valid @RequestBody VerifyAccountRequest request) {
+<span class="nc" id="L66">        AuthResponse authResponse = authService.verify(response, request);</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE</span>
+<span class="nc" id="L68">            ? HttpStatusCode.valueOf(400)</span>
+<span class="nc" id="L69">            : HttpStatusCode.valueOf(200);</span>
 
-<span class="nc" id="L69">        return ResponseEntity.status(status).body(authResponse);</span>
+<span class="nc" id="L71">        return ResponseEntity.status(status).body(authResponse);</span>
     }
 
     @PostMapping(&quot;/resend-code&quot;)
@@ -78,13 +80,13 @@ public class RestAuthController {
         @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Verification code sent successfully&quot;),
         @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Failed to resend verification code&quot;)
     })
-    public ResponseEntity&lt;AuthResponse&gt; resendCode(@RequestBody ResendCodeRequest request) {
-<span class="nc" id="L82">        AuthResponse response = authService.resendVerificationCode(request.username());</span>
-<span class="nc bnc" id="L83" title="All 2 branches missed.">        HttpStatusCode status = response.status() == AuthStatus.FAILURE</span>
-<span class="nc" id="L84">            ? HttpStatusCode.valueOf(400)</span>
-<span class="nc" id="L85">            : HttpStatusCode.valueOf(200);</span>
+    public ResponseEntity&lt;AuthResponse&gt; resendCode(@Valid @RequestBody ResendCodeRequest request) {
+<span class="nc" id="L84">        AuthResponse response = authService.resendVerificationCode(request.username());</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        HttpStatusCode status = response.status() == AuthStatus.FAILURE</span>
+<span class="nc" id="L86">            ? HttpStatusCode.valueOf(400)</span>
+<span class="nc" id="L87">            : HttpStatusCode.valueOf(200);</span>
 
-<span class="nc" id="L87">        return ResponseEntity.status(status).body(response);</span>
+<span class="nc" id="L89">        return ResponseEntity.status(status).body(response);</span>
     }
 
     @PostMapping(&quot;/login&quot;)
@@ -96,13 +98,13 @@ public class RestAuthController {
         @ApiResponse(responseCode = &quot;200&quot;, description = &quot;User logged in successfully&quot;),
         @ApiResponse(responseCode = &quot;401&quot;, description = &quot;User login failed&quot;)
     })
-    public ResponseEntity&lt;AuthResponse&gt; login(HttpServletResponse response, @RequestBody LoginRequest request) {
-<span class="fc" id="L100">        AuthResponse authResponse = authService.login(response, request);</span>
-<span class="fc bfc" id="L101" title="All 2 branches covered.">        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE</span>
-<span class="fc" id="L102">            ? HttpStatusCode.valueOf(401)</span>
-<span class="fc" id="L103">            : HttpStatusCode.valueOf(200);</span>
+    public ResponseEntity&lt;AuthResponse&gt; login(HttpServletResponse response, @Valid @RequestBody LoginRequest request) {
+<span class="fc" id="L102">        AuthResponse authResponse = authService.login(response, request);</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE</span>
+<span class="fc" id="L104">            ? HttpStatusCode.valueOf(401)</span>
+<span class="fc" id="L105">            : HttpStatusCode.valueOf(200);</span>
         
-<span class="fc" id="L105">        return ResponseEntity.status(status).body(authResponse);</span>
+<span class="fc" id="L107">        return ResponseEntity.status(status).body(authResponse);</span>
     }
 
     @PostMapping(&quot;/logout&quot;)
@@ -115,12 +117,12 @@ public class RestAuthController {
         @ApiResponse(responseCode = &quot;400&quot;, description = &quot;User logout failed&quot;)
     })
     public ResponseEntity&lt;AuthResponse&gt; logout(HttpServletResponse response) {
-<span class="fc" id="L118">        AuthResponse authResponse = authService.logout(response);</span>
-<span class="pc bpc" id="L119" title="1 of 2 branches missed.">        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE</span>
-<span class="nc" id="L120">            ? HttpStatusCode.valueOf(400)</span>
-<span class="fc" id="L121">            : HttpStatusCode.valueOf(200);</span>
+<span class="fc" id="L120">        AuthResponse authResponse = authService.logout(response);</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE</span>
+<span class="nc" id="L122">            ? HttpStatusCode.valueOf(400)</span>
+<span class="fc" id="L123">            : HttpStatusCode.valueOf(200);</span>
         
-<span class="fc" id="L123">        return ResponseEntity.status(status).body(authResponse);</span>
+<span class="fc" id="L125">        return ResponseEntity.status(status).body(authResponse);</span>
     }
 
     @PostMapping(&quot;/refresh&quot;)
@@ -136,12 +138,12 @@ public class RestAuthController {
         HttpServletResponse response,
         @CookieValue(name = REFRESH_TOKEN_COOKIE_NAME, required = true) String refreshToken
     ) {
-<span class="fc" id="L139">        AuthResponse authResponse = authService.refresh(response, refreshToken);</span>
-<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE</span>
-<span class="nc" id="L141">            ? HttpStatusCode.valueOf(401)</span>
-<span class="fc" id="L142">            : HttpStatusCode.valueOf(200);</span>
+<span class="fc" id="L141">        AuthResponse authResponse = authService.refresh(response, refreshToken);</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE</span>
+<span class="nc" id="L143">            ? HttpStatusCode.valueOf(401)</span>
+<span class="fc" id="L144">            : HttpStatusCode.valueOf(200);</span>
         
-<span class="fc" id="L144">        return ResponseEntity.status(status).body(authResponse);</span>
+<span class="fc" id="L146">        return ResponseEntity.status(status).body(authResponse);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

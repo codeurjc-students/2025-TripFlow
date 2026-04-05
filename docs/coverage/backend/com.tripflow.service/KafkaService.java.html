@@ -4,20 +4,22 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.tripflow.kafka.messages.AIRequestMessage;
+import com.tripflow.kafka.messages.CollaborationEventMessage;
 import com.tripflow.kafka.messages.EmailMessage;
+import com.tripflow.kafka.messages.ItineraryChangeMessage;
 import com.tripflow.kafka.messages.NotificationMessage;
 
 @Service
 public class KafkaService {
     private final KafkaTemplate&lt;String, Object&gt; kafkaTemplate;
 
-<span class="fc" id="L14">    public KafkaService(KafkaTemplate&lt;String, Object&gt; kafkaTemplate) {</span>
-<span class="fc" id="L15">        this.kafkaTemplate = kafkaTemplate;</span>
-<span class="fc" id="L16">    }</span>
+<span class="fc" id="L16">    public KafkaService(KafkaTemplate&lt;String, Object&gt; kafkaTemplate) {</span>
+<span class="fc" id="L17">        this.kafkaTemplate = kafkaTemplate;</span>
+<span class="fc" id="L18">    }</span>
 
     private void sendMessage(String topic, Object message) {
-<span class="fc" id="L19">        kafkaTemplate.send(topic, message);</span>
-<span class="fc" id="L20">    }</span>
+<span class="fc" id="L21">        kafkaTemplate.send(topic, message);</span>
+<span class="fc" id="L22">    }</span>
 
     /**
      * Sends an AI request message to the &quot;ai-request&quot; topic.
@@ -25,8 +27,8 @@ public class KafkaService {
      * @param message The AIRequestMessage to be sent.
      */
     public void sendAIRequestMessage(AIRequestMessage message) {
-<span class="fc" id="L28">        this.sendMessage(&quot;ai-request&quot;, message);</span>
-<span class="fc" id="L29">    }</span>
+<span class="fc" id="L30">        this.sendMessage(&quot;ai-request&quot;, message);</span>
+<span class="fc" id="L31">    }</span>
 
     /**
      * Sends a Notification message to the &quot;notification&quot; topic.
@@ -34,8 +36,26 @@ public class KafkaService {
      * @param message The NotificationMessage to be sent.
      */
     public void sendNotificationMessage(NotificationMessage message) {
-<span class="nc" id="L37">        this.sendMessage(&quot;notification&quot;, message);</span>
-<span class="nc" id="L38">    }</span>
+<span class="fc" id="L39">        this.sendMessage(&quot;notification&quot;, message);</span>
+<span class="fc" id="L40">    }</span>
+
+    /**
+     * Sends a Collaboration event message to the &quot;collaboration&quot; topic.
+     *
+     * @param message The CollaborationEventMessage to be sent.
+     */
+    public void sendCollaborationEventMessage(CollaborationEventMessage message) {
+<span class="fc" id="L48">        this.sendMessage(&quot;collaboration&quot;, message);</span>
+<span class="fc" id="L49">    }</span>
+
+    /**
+     * Sends an Itinerary change message to the &quot;itinerary-change&quot; topic.
+     *
+     * @param message The ItineraryChangeMessage to be sent.
+     */
+    public void sendItineraryChangeMessage(ItineraryChangeMessage message) {
+<span class="fc" id="L57">        this.sendMessage(&quot;itinerary-change&quot;, message);</span>
+<span class="fc" id="L58">    }</span>
 
     /**
      * Sends an Email message to the &quot;email&quot; topic.
@@ -43,7 +63,7 @@ public class KafkaService {
      * @param message The EmailMessage to be sent.
      */
     public void sendEmailMessage(EmailMessage message) {
-<span class="fc" id="L46">        this.sendMessage(&quot;email&quot;, message);</span>
-<span class="fc" id="L47">    }</span>
+<span class="fc" id="L66">        this.sendMessage(&quot;email&quot;, message);</span>
+<span class="fc" id="L67">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

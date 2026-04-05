@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Normalizer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.utils</a> &gt; <span class="el_source">Normalizer.java</span></div><h1>Normalizer.java</h1><pre class="source lang-java linenums">package com.tripflow.utils;
+
+import java.text.Normalizer.Form;
+
+public class Normalizer {
+    private Normalizer() {}
+
+    public static String normalize(String text) {
+<span class="nc" id="L9">        return java.text.Normalizer</span>
+<span class="nc" id="L10">            .normalize(text, Form.NFD)</span>
+<span class="nc" id="L11">            .replaceAll(&quot;\\p{M}&quot;, &quot;&quot;)</span>
+<span class="nc" id="L12">            .replaceAll(&quot;[^a-zA-Z0-9\\s]&quot;, &quot;&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
