@@ -26,7 +26,10 @@ fi
 
 # Install Redocly CLI
 echo "[+] Installing Redocly CLI..."
-npm install @redocly/cli -g
+if ! npx @redocly/cli --version >/dev/null 2>&1; then
+  echo "[!] Unable to execute Redocly CLI via npx"
+  exit 1
+fi
 
 # Download OpenAPI specification from the running API
 echo "[+] Downloading OpenAPI specification..."
@@ -43,7 +46,7 @@ fi
 
 # Generate API documentation using Redocly
 echo "[+] Generating API documentation..."
-redocly build-docs "$PROJECT_ROOT/docs/api/api-docs.yaml" --output "$PROJECT_ROOT/docs/api/api-docs.html"
+npx @redocly/cli build-docs "$PROJECT_ROOT/docs/api/api-docs.yaml" --output "$PROJECT_ROOT/docs/api/api-docs.html"
 
 # Stop and remove test containers
 echo "[+] Stopping and removing test containers..."

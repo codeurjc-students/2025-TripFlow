@@ -41,7 +41,7 @@ npm ci
 
 # Install Playwright browsers
 echo "[+] Installing Playwright browsers..."
-npx playwright install --with-deps
+npx playwright install
 
 # Wait for services to be healthy
 echo "[+] Waiting for services to be healthy..."

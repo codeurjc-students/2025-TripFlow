@@ -8,7 +8,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 echo "[+] Generating backend coverage with JaCoCo..."
 
 # Define backend report directory
-REPORT_DIR="$PROJECT_ROOT/coverage-reports/backend"
+REPORT_DIR="$PROJECT_ROOT/docs/coverage/backend"
 mkdir -p "$REPORT_DIR"
 
 # Clean previous reports
@@ -18,7 +18,7 @@ rm -rf "$REPORT_DIR"/*
 
 # Run tests and generate coverage report
 echo "[+] Running backend tests and generating coverage..."
-cd "$PROJECT_ROOT/backend/api-service"
+cd "$PROJECT_ROOT/backend"
 
 ./mvnw clean test -pl ai-service -am
 ./mvnw clean test -pl notification-service -am
