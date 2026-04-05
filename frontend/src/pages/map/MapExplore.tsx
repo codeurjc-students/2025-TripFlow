@@ -73,7 +73,7 @@ export default function MapExplorePage() {
 
     useEffect(() => {
         if (geolocation.status === "denied") {
-            notify("Activa permisos de ubicacion para recomendaciones alrededor tuyo.", "info", {
+            notify("Activa los permisos de ubicación para ver recomendaciones cercanas.", "info", {
                 title: "Permiso requerido",
             });
         }
@@ -173,7 +173,7 @@ export default function MapExplorePage() {
                             <Button
                                 style={["tool_bordered"]}
                                 onClick={handleRecenter}
-                                ariaLabel="Recentrar en mi ubicacion"
+                                ariaLabel="Recentrar en mi ubicación"
                             >
                                 <LocateFixedIcon size={18} />
                             </Button>

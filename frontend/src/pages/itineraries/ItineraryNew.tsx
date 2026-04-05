@@ -44,7 +44,7 @@ export default function ItineraryNewPage() {
             navigate(`/itineraries/${res.id}`);
         } catch (error) {
             if (error instanceof OfflineReadOnlyError) {
-                notify("Sin conexion: no puedes crear itinerarios en modo offline.", "info", {
+                notify("Sin conexión: no puedes crear itinerarios en modo offline.", "info", {
                     title: "Modo offline",
                 });
                 navigate("/itineraries");

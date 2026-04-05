@@ -39,7 +39,7 @@ export default function ItineraryDetailPage() {
             setItinerary(itineraryData);
         } catch (error) {
             if (error instanceof OfflineNoCacheError) {
-                notify("Sin conexion y sin cache para este itinerario.", "info", {
+                notify("Sin conexión y sin caché para este itinerario.", "info", {
                     title: "Modo offline",
                 });
                 setItinerary(null);

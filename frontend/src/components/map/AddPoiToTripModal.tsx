@@ -89,7 +89,7 @@ export default function AddPoiToTripModal({
 
     const hasEditableItineraries = itineraries.length > 0;
     const dayOptions = Array.from({ length: Math.max(1, selectedItinerary?.countDays || 1) }, (_, index) => ({
-        label: `Dia ${index + 1}`,
+        label: `Día ${index + 1}`,
         value: String(index + 1),
     }));
 
@@ -128,7 +128,7 @@ export default function AddPoiToTripModal({
                         <div className={styles.successContent}>
                             <span className={styles.successTitle}>LUGAR AÑADIDO</span>
                             <p className={styles.message}>Se ha agregado correctamente a tu itinerario.</p>
-                            <p className={styles.supportText}>Puedes seguir explorando y guardar mas lugares rapido.</p>
+                            <p className={styles.supportText}>Puedes seguir explorando y guardar más lugares rápido.</p>
                         </div>
                     ) : isLoadingItineraries ? (
                         <p className={styles.message}>Cargando tus viajes...</p>
@@ -152,11 +152,11 @@ export default function AddPoiToTripModal({
                                 }))}
                                 placeholder="Selecciona itinerario"
                             />
-                            <p className={styles.supportText}>Primero elegimos el viaje, luego el dia y detalles.</p>
+                            <p className={styles.supportText}>Primero elegimos el viaje, luego el día y detalles.</p>
                         </div>
                     ) : (
                         <div className={styles.stepContent}>
-                            <span className={styles.stepTitle}>Paso 2: Dia y detalles</span>
+                            <span className={styles.stepTitle}>Paso 2: Día y detalles</span>
                             <div className={styles.selectedTripBox}>
                                 <strong>{selectedItinerary?.title}</strong>
                                 <button type="button" className={styles.linkButton} onClick={() => setStep("itinerary")}>
@@ -165,13 +165,13 @@ export default function AddPoiToTripModal({
                             </div>
 
                             <div className={styles.gridRow}>
-                                <label className={styles.fieldLabel} htmlFor="add-poi-day">Dia</label>
+                                <label className={styles.fieldLabel} htmlFor="add-poi-day">Día</label>
                                 <CustomSelect
                                     id="add-poi-day"
                                     value={String(selectedDay)}
                                     onChange={(value) => setSelectedDay(Number(value))}
                                     options={dayOptions}
-                                    placeholder="Selecciona dia"
+                                    placeholder="Selecciona día"
                                 />
                             </div>
 
@@ -187,7 +187,7 @@ export default function AddPoiToTripModal({
                                 </div>
 
                                 <div className={styles.gridRow}>
-                                    <label className={styles.fieldLabel} htmlFor="add-poi-duration">Duracion (opcional)</label>
+                                    <label className={styles.fieldLabel} htmlFor="add-poi-duration">Duración (opcional)</label>
                                     <input
                                         id="add-poi-duration"
                                         type="text"

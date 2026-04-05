@@ -42,7 +42,7 @@ export default function AttributionImage({
       ) : (
         <div className={styles.fallbackTemplate} role="img" aria-label={alt || "Imagen no disponible"}>
           <ImageOff size={22} />
-          <span>Imagen no disponible sin conexion</span>
+          <span>Imagen no disponible sin conexión</span>
         </div>
       )}
 

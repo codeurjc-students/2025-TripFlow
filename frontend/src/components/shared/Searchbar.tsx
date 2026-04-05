@@ -43,7 +43,7 @@ export default function Searchbar({
                     type="button"
                     className={styles.clearButton}
                     onClick={onClear}
-                    aria-label="Limpiar busqueda"
+                    aria-label="Limpiar búsqueda"
                 >
                     <XIcon size={16} />
                 </button>

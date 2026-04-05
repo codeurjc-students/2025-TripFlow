@@ -31,7 +31,7 @@ export default function ItineraryEditForm({
         <div className={`${styles.editForm} ${readOnly ? styles.readOnly : ""}`}>
             {readOnly && (
                 <p className={styles.readOnlyNotice}>
-                    Modo offline: este itinerario esta disponible solo para lectura.
+                    Modo offline: este itinerario está disponible solo para lectura.
                 </p>
             )}
             <BasicInfoSection

@@ -11,7 +11,7 @@ export default function AICta() {
                 <h2 className={styles.aiCtaTitle}>Asistente con IA</h2>
             </div>
             <div className={styles.cta}>
-                <p>Estás preparado para planear tu próximo viaje? Descubre el poder de nuestra IA para ayudarte a planificar tus viajes en cuestión de segundos.</p>
+                <p>¿Estás preparado para planear tu próximo viaje? Descubre el poder de nuestra IA para ayudarte a planificar tus viajes en cuestión de segundos.</p>
                 <Button
                     style={["primary", "big", "full"]}
                     label="Comenzar"

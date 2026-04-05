@@ -199,7 +199,7 @@ export default function ItineraryPdfDocument({ itinerary }: ItineraryPdfDocument
                     {itinerary.days.map((day, dayIndex) => (
                         <View key={day.day} style={styles.dayBlock}>
                             <Text style={styles.dayTitle}>
-                                Dia {day.day} - {formatDate(getDate(itinerary.date, dayIndex), { excludeYear: true })}
+                                Día {day.day} - {formatDate(getDate(itinerary.date, dayIndex), { excludeYear: true })}
                             </Text>
 
                             <Text style={styles.activityCount}>
@@ -207,7 +207,7 @@ export default function ItineraryPdfDocument({ itinerary }: ItineraryPdfDocument
                             </Text>
 
                             {day.activities.length === 0 && (
-                                <Text style={styles.noActivities}>No hay actividades planeadas para este dia.</Text>
+                                <Text style={styles.noActivities}>No hay actividades planeadas para este día.</Text>
                             )}
 
                             {day.activities.map((activity, activityIndex) => (

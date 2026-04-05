@@ -23,7 +23,7 @@ export default function CurrentLocationLayer({ map, latitude, longitude }: Curre
         if (!markerRef.current) {
             markerRef.current = L.marker(point, { icon: currentLocationIcon }).addTo(map);
             markerRef.current.setZIndexOffset(1500);
-            markerRef.current.bindTooltip("Tu ubicacion", {
+            markerRef.current.bindTooltip("Tu ubicación", {
                 direction: "top",
                 offset: [0, -6],
                 className: "current-location-tooltip",

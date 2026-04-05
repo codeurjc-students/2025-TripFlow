@@ -43,7 +43,7 @@ export default function ItineraryEdit() {
             navigate(`/itineraries/${itineraryId}`);
         } catch (error) {
             if (error instanceof OfflineReadOnlyError) {
-                notify("Sin conexion: la edicion esta deshabilitada.", "info", {
+                notify("Sin conexión: la edición está deshabilitada.", "info", {
                     title: "Modo offline",
                 });
                 navigate(`/itineraries/${itineraryId}`);
@@ -70,7 +70,7 @@ export default function ItineraryEdit() {
             navigate("/itineraries");
         } catch (error) {
             if (error instanceof OfflineReadOnlyError) {
-                notify("Sin conexion: no puedes eliminar en modo offline.", "info", {
+                notify("Sin conexión: no puedes eliminar en modo offline.", "info", {
                     title: "Modo offline",
                 });
                 navigate(`/itineraries/${itineraryId}`);

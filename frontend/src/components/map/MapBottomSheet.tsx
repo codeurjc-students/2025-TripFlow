@@ -36,7 +36,7 @@ export default function MapBottomSheet({
 }: MapBottomSheetProps) {
     const hasInvalid = invalidCount > 0;
     const invalidLabel = invalidCount === 1
-        ? "1 ubicacion sin coordenadas"
+        ? "1 ubicación sin coordenadas"
         : `${invalidCount} ubicaciones sin coordenadas`;
 
     return (
