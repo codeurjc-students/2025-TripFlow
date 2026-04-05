@@ -171,7 +171,7 @@ describe("ItineraryEditForm Component", () => {
     it("renders read-only notice in read-only mode", () => {
         render(<ItineraryEditForm itinerary={mockItinerary} {...mockHandlers} readOnly />);
 
-        expect(screen.getByText(/modo offline: este itinerario esta disponible solo para lectura/i)).toBeInTheDocument();
+        expect(screen.getByText(/modo offline: este itinerario está disponible solo para lectura/i)).toBeInTheDocument();
     });
 
     it("calls onDelete when delete button is clicked", () => {

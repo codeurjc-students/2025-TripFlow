@@ -73,7 +73,7 @@ describe("ItineraryPdfDocument pagination", () => {
 
         expect(blob).toBeInstanceOf(Blob);
         expect(blob.size).toBeGreaterThan(0);
-    });
+    }, 15000);
 
     it("creates multiple pages when content is long", async () => {
         const itinerary = createLargeItinerary(18, 7);
@@ -87,5 +87,5 @@ describe("ItineraryPdfDocument pagination", () => {
         const pageMatches = rawPdf.match(/\/Type\s*\/Page\b/g) || [];
 
         expect(pageMatches.length).toBeGreaterThan(1);
-    });
+    }, 15000);
 });

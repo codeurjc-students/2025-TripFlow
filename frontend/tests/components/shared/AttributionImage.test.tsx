@@ -90,6 +90,6 @@ describe("AttributionImage Component", () => {
         const image = screen.getByRole("img");
         fireEvent.error(image);
 
-        expect(screen.getByText(/imagen no disponible sin conexion/i)).toBeInTheDocument();
+        expect(screen.getByText(/imagen no disponible sin conexión/i)).toBeInTheDocument();
     });
 });
