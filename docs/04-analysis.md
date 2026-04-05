@@ -208,7 +208,7 @@
 > **🔐 Registered Users**
 > - Full access to all features
 > - Ability to create, edit, and delete itineraries
-> - AI itinerary generation and advanced route optimization
+> - AI itinerary generation, map exploration, and collaboration features
 
 > ---
 
@@ -231,11 +231,26 @@
 
 ---
 
+### 📈 Charts
+
+> **📊 Users by Plan (Admin)**
+>
+> The application includes an admin-focused chart that visualizes user distribution by subscription plan (`FREE`, `PRO`, `PREMIUM`).
+>
+> The chart is powered by the endpoint `GET /api/v1/stats/users-by-plan` and rendered in the admin interface.
+>
+> Implementation references:
+> - `backend/api-service/src/main/java/com/tripflow/controller/v1/RestStatsController.java`
+> - `backend/api-service/src/main/java/com/tripflow/service/StatsService.java`
+> - `frontend/src/components/dashboard/admin/UsersByPlanChart.tsx`
+
+---
+
 ### 📶 Complementary Technologies
 
 > **🌐 External API Rest**
 > 
-> The application will integrate:
+> The application integrates:
 > - AI LLM providers to provide AI-powered itinerary generation capabilities.
 > - Unsplash API to provide high-quality images for destinations.
 > - Brevo to provide transactional email service for account verification and notifications.
@@ -245,21 +260,47 @@
 
 > **📝 PDF Generation**
 >
-> The application will use the PDFjs library to generate PDF summaries of itineraries, allowing users to export their travel plans in a portable format.
+> The application uses the PDFjs library to generate PDF summaries of itineraries, allowing users to export their travel plans in a portable format.
 
 ---
 
 ### 🧮 Algorithms
 
-> **🧩 Route Optimization**
+> **✅ Advanced Algorithm / Query Requirement Coverage**
 >
-> The application will implement advanced algorithms to optimize travel routes, taking into account factors such as distance and time.
+> TripFlow includes implemented non-CRUD advanced processing over managed data:
+>
+> - Geospatial processing for nearby place exploration.
+> - Rule-based AI daily quota logic by subscription plan.
+> - Ownership/collaboration-aware filtering and sorting queries.
+
+> ---
+
+> **📏 Geospatial Distance & Nearby Search**
+>
+> The map experience applies geospatial processing in two steps:
+> - Dynamic bounding-box computation from center coordinates + radius.
+> - Haversine distance calculation for nearby place display.
+>
+> Implementation references:
+> - `backend/api-service/src/main/java/com/tripflow/service/map/provider/search/MapTilerSearchProvider.java`
+> - `frontend/src/utils/mapDistance.ts`
 >
 > ---
 >
 > **⏳ Rate Limiting (Daily Quota)**
 >
 > The AI Service implements a Daily Quota system to control the rate of AI generation requests per user, ensuring fair usage based on their subscription plan.
+>
+> Implementation reference: `backend/api-service/src/main/java/com/tripflow/service/ai/AIUsageService.java`.
+
+> ---
+>
+> **🔎 Advanced Query (Ownership + Collaboration Search)**
+>
+> Itinerary search combines owner and accepted-collaborator visibility with text filtering over title/place/tags and ordered results by recency.
+>
+> Implementation reference: `backend/api-service/src/main/java/com/tripflow/repository/itinerary/ItineraryRepository.java`.
 
 ---
 

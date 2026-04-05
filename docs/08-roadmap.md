@@ -3,7 +3,7 @@
 > **Project Deadline**: June 2026
 >
 > This roadmap outlines the development phases and tasks for the TripFlow TFG project.
-> Each phase might be modified based on project progress and requirements.
+> Status is updated for the v1.0.0 milestone.
 
 ---
 
@@ -60,7 +60,7 @@
   - [x] {Integration-Backend} User authentication endpoints
   - [x] {Integration-Backend} Itinerary endpoints
 - [x] {Integration-Frontend} Frontend-backend communication tests
-- [x] {E2E} User flow tests (Puppeteer)
+- [x] {E2E} User flow tests (Playwright)
 - [x] {Security} Authorization tests for protected resources
 
 ---
@@ -254,12 +254,21 @@
 
 ---
 
-## ⭐ Future & Nice-to-Have
+## ✅ v1.0.0 Milestone Status
 
-- [ ] {Feature} Route Optimization Algorithms (TSP)
+- [x] Core MVP features delivered
+- [x] Intermediate features delivered (AI, notifications, profile, admin)
+- [x] Advanced v2 scope delivered (maps, collaboration, share links, PWA, PDF)
+- [x] CI/CD release workflows and deployment automation consolidated
+
+---
+
+## ⭐ Future & Nice-to-Have (Post-v1)
+
+- [ ] {Feature} Smart Budget Planner (daily cost forecasting + alerts)
+- [ ] {Feature} Plans & Payment Integration (checkout, upgrades, renewals, billing history)
 - [ ] {Feature} Travel Achievements & Gamification
 - [ ] {Feature} User Travel Preferences
-- [x] {Feature} Advanced Location Discovery (Filters, Categories)
 
 ---
 

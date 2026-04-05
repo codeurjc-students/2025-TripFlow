@@ -1,47 +1,52 @@
 ## ✨ Features
 
-> **⚡ Basic Functionality (Core MVP)**
+> **⚡ Core Features (v1.0.0)**
 >
-> Minimal features required for the application to be usable and testable by the end user.
+> Stable functionality available in the current release.
 > 
-> - User registration, login, logout, and token refresh system.
-> - Role-based access control.
-> - Public landing page and user dashboard.
-> - CRUD operations for itineraries, including days, activities, and locations.
-> - View, create, update and delete itineraries.
-> - Basic profile page for logout and basic user details.
-> - Frontend-backend integration via REST API.
-> - 404 error page and basic routing.
+> - User registration, login, logout, and token refresh.
+> - Role-based access control (`USER`, `ADMIN`).
+> - Public landing page and authenticated dashboard.
+> - Full itinerary CRUD with days, activities, and locations.
 > - Demo mode for exploring the app without registration.
-> - User statistics display (number of trips, days, and destinations).
+> - User statistics display (trips, days, destinations).
+> - Frontend-backend integration via REST API.
+> - 404 page and protected route handling.
 
 > ---
 
-> **🚀 Intermediate Functionality**
+> **🚀 Extended Features (v1.0.0)**
 >
-> Additional features that enhance the user experience and add value to the application.
+> Enhancements delivered after MVP and included in v1.
 > 
-> - Avatar functionality for user profile pictures.
-> - User profile page with detailed information.
-> - Editing and deleting profiles.
-> - Display of itinerary statistics (number of trips, days, destinations).
-> - AI-powered itinerary generation based on user preferences.
-> - Unsplash integration for automatic background images.
-> - Notifications in real-time.
-> - Administration panel for users.
-> - Account verification system through email.
+> - Avatar upload and user profile management.
+> - Account verification by email.
+> - AI-powered itinerary generation.
+> - Unsplash image integration for itinerary visuals.
+> - Real-time notifications using WebSockets.
+> - Admin panel with user management actions.
+> - Admin chart for users grouped by subscription plan.
 
 > ---
 
-> **🌟 Advanced Functionality**
+> **🌟 Advanced Features (v1.0.0)**
 > 
-> Features that provide a competitive advantage and improve the overall user experience.
+> Features that define the full v1 scope.
 >
-> - Progressive Web App (PWA) features for offline access and mobile installation.
-> - Map and geolocation integration.
-> - Collaborative itinerary sharing.
-> - Routes and itineraries optimization.
-> - PDF export of itineraries.
+> - PWA offline support (read-focused usage).
+> - Interactive map and geolocation-based exploration.
+> - Collaborative itineraries with role-based permissions.
+> - Public share links with expiration/revocation lifecycle.
+> - Client-side PDF export for itineraries.
+
+> ---
+
+> **🔭 Future Features (Post-v1)**
+>
+> - Smart budget planner with per-day cost forecasts.
+> - Subscription plans integration with payment methods (checkout, upgrades, downgrades, renewals).
+> - Travel achievements and gamification.
+> - User travel preferences with deeper personalization.
 
 ---
 
