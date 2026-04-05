@@ -535,6 +535,33 @@
                 }
               },
               "response": []
+            },
+            {
+              "name": "Users by plan",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/api/v1/stats/users-by-plan",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "stats",
+                    "users-by-plan"
+                  ]
+                }
+              },
+              "response": []
             }
           ]
         },

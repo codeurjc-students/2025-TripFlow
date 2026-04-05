@@ -33,4 +33,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     );
 
     List<User> findByVerifiedFalseAndCreatedAtBefore(LocalDateTime expiryDate); 
+
+    @Query("SELECT u.plan, COUNT(u) FROM User u GROUP BY u.plan")
+    List<Object[]> countUsersByPlan();
 }

@@ -5,6 +5,7 @@ import { useUsers } from "@/hooks/useUsers";
 
 import AppLayout from "@/layouts/AppLayout";
 import AdminHeader from "@components/dashboard/headers/AdminHeader";
+import UsersByPlanChart from "@/components/dashboard/admin/UsersByPlanChart";
 import Searchbar from "@components/shared/Searchbar";
 import Table from "@components/shared/Table";
 import Pagination from "@components/shared/Pagination";
@@ -48,6 +49,8 @@ export default function AdminPage() {
                     onSearch={() => handleSearch(search)}
                 />
             </AdminHeader>
+
+            <UsersByPlanChart />
 
             {isLoading ? (
                 <Loader variant="dots" />

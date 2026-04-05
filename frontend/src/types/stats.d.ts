@@ -9,3 +9,12 @@ export interface UserStat {
 export interface UserStatsResponse {
     stats: UserStat[];
 }
+
+export interface UsersByPlanItem {
+    plan: string;
+    count: number;
+}
+
+export interface UsersByPlanStatsResponse {
+    items: UsersByPlanItem[];
+}
