@@ -1054,6 +1054,41 @@ paths:
                   $ref: "#/components/schemas/CollaboratorDTO"
       security:
       - auth_token: []
+  /api/v1/stats/users-by-plan:
+    get:
+      tags:
+      - Statistics
+      summary: Get Users By Plan Statistics
+      description: Retrieves user distribution grouped by subscription plan. Admin
+        only endpoint.
+      operationId: getUsersByPlanStats
+      responses:
+        "200":
+          description: Users by plan statistics retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UsersByPlanStatsDTO"
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UsersByPlanStatsDTO"
+        "403":
+          description: Admin role required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UsersByPlanStatsDTO"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UsersByPlanStatsDTO"
+      security:
+      - auth_token: []
   /api/v1/stats/user:
     get:
       tags:
@@ -1883,6 +1918,21 @@ components:
           format: int64
         isLastPage:
           type: boolean
+    UsersByPlanItemDTO:
+      type: object
+      properties:
+        plan:
+          type: string
+        count:
+          type: integer
+          format: int64
+    UsersByPlanStatsDTO:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/UsersByPlanItemDTO"
     StatDTO:
       type: object
       properties:
