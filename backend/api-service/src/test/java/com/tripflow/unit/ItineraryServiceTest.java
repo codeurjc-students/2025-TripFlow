@@ -15,9 +15,13 @@ import org.springframework.data.domain.*;
 
 import com.tripflow.dto.itinerary.ExtendedItineraryDTO;
 import com.tripflow.dto.itinerary.ExtendedItineraryResponseDTO;
+import com.tripflow.dto.itinerary.ActivityDTO;
+import com.tripflow.dto.itinerary.CoordinatesDTO;
 import com.tripflow.dto.itinerary.ItineraryDTO;
 import com.tripflow.dto.itinerary.ItineraryResponseDTO;
 import com.tripflow.dto.itinerary.ItineraryDayDTO;
+import com.tripflow.dto.itinerary.ItineraryStatusDTO;
+import com.tripflow.dto.itinerary.LocationDTO;
 import com.tripflow.dto.shared.PaginatedDTO;
 import com.tripflow.kafka.messages.ItineraryChangeMessage;
 import com.tripflow.kafka.messages.ItineraryChangeType;
@@ -134,6 +138,64 @@ public class ItineraryServiceTest {
         assertEquals(1, result.totalItems());
         assertEquals(2, result.itemsPerPage());
         assertTrue(result.isLastPage());
+    }
+
+    @Test
+    @DisplayName("ItineraryService should sanitize missing activity/location fields on create")
+    public void testCreateItinerarySanitizesNullActivityFields() {
+        User user = mock(User.class);
+        when(userService.getAuthenticatedUser()).thenReturn(user);
+
+        ActivityDTO activityWithNulls = new ActivityDTO(
+            null,
+            null,
+            new LocationDTO(null, null, new CoordinatesDTO(200.0, -500.0)),
+            null,
+            null
+        );
+        ItineraryDayDTO dayDTO = new ItineraryDayDTO(0, List.of(activityWithNulls));
+
+        ExtendedItineraryDTO dto = new ExtendedItineraryDTO(
+            null,
+            "",
+            null,
+            -2,
+            -10,
+            null,
+            Arrays.asList("  cultura ", "", null),
+            0L,
+            ItineraryStatusDTO.DRAFT,
+            List.of(dayDTO),
+            -1,
+            null
+        );
+
+        ItineraryDay dayEntity = mock(ItineraryDay.class);
+        when(itineraryDayService.createItineraryDayEntity(any(), any())).thenReturn(dayEntity);
+        doNothing().when(user).addItinerary(any(Itinerary.class));
+        when(externalImageService.getOrCreateImageByQuery(eq("Destino por definir"))).thenReturn(null);
+
+        Itinerary savedItinerary = mock(Itinerary.class);
+        when(itineraryRepository.save(any(Itinerary.class))).thenReturn(savedItinerary);
+
+        ExtendedItineraryDTO expectedDTO = mock(ExtendedItineraryDTO.class);
+        when(itineraryMapper.toExtendedDTO(savedItinerary)).thenReturn(expectedDTO);
+
+        itineraryService.createItinerary(dto);
+
+        ArgumentCaptor<ItineraryDayDTO> dayCaptor = ArgumentCaptor.forClass(ItineraryDayDTO.class);
+        verify(itineraryDayService).createItineraryDayEntity(dayCaptor.capture(), any(Itinerary.class));
+        ItineraryDayDTO sanitizedDay = dayCaptor.getValue();
+        ActivityDTO sanitizedActivity = sanitizedDay.activities().get(0);
+
+        assertEquals(1, sanitizedDay.day());
+        assertEquals("Actividad", sanitizedActivity.activity());
+        assertEquals("", sanitizedActivity.details());
+        assertEquals("", sanitizedActivity.time());
+        assertEquals("", sanitizedActivity.duration());
+        assertEquals("Sin ubicacion", sanitizedActivity.location().name());
+        assertEquals("", sanitizedActivity.location().address());
+        assertNull(sanitizedActivity.location().coordinates());
     }
 
     @Test
