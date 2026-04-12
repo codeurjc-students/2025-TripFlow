@@ -2,6 +2,7 @@ package com.tripflow.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -53,6 +54,7 @@ public class ItinerarySanitizerTest {
         assertEquals("Destino por definir", sanitized.place());
         assertEquals(0, sanitized.people());
         assertEquals(0, sanitized.budget());
+        assertTrue(sanitized.date().matches("^\\d{4}-\\d{2}-\\d{2}$"));
         assertEquals(1, sanitized.days().get(0).day());
         assertEquals("Actividad", sanitized.days().get(0).activities().get(0).activity());
         assertEquals("", sanitized.days().get(0).activities().get(0).details());
@@ -62,5 +64,27 @@ public class ItinerarySanitizerTest {
         assertEquals("", sanitized.days().get(0).activities().get(0).location().address());
         assertNull(sanitized.days().get(0).activities().get(0).location().coordinates());
         assertEquals(List.of("food"), sanitized.tags());
+    }
+
+    @Test
+    @DisplayName("ItinerarySanitizer should preserve valid ISO dates")
+    public void testSanitizeDateKeepsValidIsoDate() {
+        ExtendedItineraryDTO raw = new ExtendedItineraryDTO(
+            1L,
+            "Trip",
+            "Madrid",
+            2,
+            100.0,
+            "2026-06-15",
+            List.of("city"),
+            0L,
+            ItineraryStatusDTO.DRAFT,
+            List.of(),
+            0,
+            null
+        );
+
+        ExtendedItineraryDTO sanitized = ItinerarySanitizer.sanitizeExtendedItinerary(raw);
+        assertEquals("2026-06-15", sanitized.date());
     }
 }

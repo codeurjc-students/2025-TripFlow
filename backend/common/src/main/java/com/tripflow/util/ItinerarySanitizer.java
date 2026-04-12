@@ -2,6 +2,8 @@ package com.tripflow.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 import com.tripflow.dto.itinerary.ActivityDTO;
 import com.tripflow.dto.itinerary.CoordinatesDTO;
@@ -29,7 +31,7 @@ public final class ItinerarySanitizer {
             normalizeText(itinerary.place(), DEFAULT_PLACE),
             Math.max(itinerary.people(), 0),
             Math.max(itinerary.budget(), 0),
-            normalizeText(itinerary.date(), ""),
+            sanitizeDate(itinerary.date()),
             sanitizeTags(itinerary.tags()),
             itinerary.updatedCount(),
             itinerary.status(),
@@ -138,5 +140,18 @@ public final class ItinerarySanitizer {
 
         String trimmed = value.trim();
         return trimmed.isEmpty() ? fallback : trimmed;
+    }
+
+    private static String sanitizeDate(String value) {
+        String normalized = normalizeText(value, "");
+        if (normalized.isEmpty()) {
+            return LocalDate.now().toString();
+        }
+
+        try {
+            return LocalDate.parse(normalized).toString();
+        } catch (DateTimeParseException e) {
+            return LocalDate.now().toString();
+        }
     }
 }
