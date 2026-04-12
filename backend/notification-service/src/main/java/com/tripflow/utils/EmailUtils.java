@@ -20,6 +20,8 @@ public class EmailUtils {
         switch (type) {
             case VERIFICATION:
                 return "Verificación de Cuenta TripFlow";
+            case PASSWORD_RESET_OTP:
+                return "Recupera tu contraseña en TripFlow";
             default:
                 throw new IllegalArgumentException("Unsupported email type: " + type);
         }
@@ -42,6 +44,9 @@ public class EmailUtils {
         switch (type) {
             case VERIFICATION:
                 templateName = "verification.html";
+                break;
+            case PASSWORD_RESET_OTP:
+                templateName = "password-reset-otp.html";
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported email type: " + type);
