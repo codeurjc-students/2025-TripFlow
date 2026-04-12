@@ -51,6 +51,12 @@ public class User {
     @Column(name = "verification_code_expires_at")
     private Instant verificationCodeExpiresAt;
 
+    @Column(name = "password_reset_code")
+    private String passwordResetCode;
+
+    @Column(name = "password_reset_code_expires_at")
+    private Instant passwordResetCodeExpiresAt;
+
     @Column(nullable = true, unique = false)
     private String name;
 
@@ -171,6 +177,22 @@ public class User {
 
     public void setVerificationCodeExpiresAt(Instant verificationCodeExpiresAt) {
         this.verificationCodeExpiresAt = verificationCodeExpiresAt;
+    }
+
+    public String getPasswordResetCode() {
+        return passwordResetCode;
+    }
+
+    public void setPasswordResetCode(String passwordResetCode) {
+        this.passwordResetCode = passwordResetCode;
+    }
+
+    public Instant getPasswordResetCodeExpiresAt() {
+        return passwordResetCodeExpiresAt;
+    }
+
+    public void setPasswordResetCodeExpiresAt(Instant passwordResetCodeExpiresAt) {
+        this.passwordResetCodeExpiresAt = passwordResetCodeExpiresAt;
     }
 
     public String getUsername() {

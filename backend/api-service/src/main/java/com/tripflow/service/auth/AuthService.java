@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 
 import com.tripflow.dto.auth.AuthResponse;
 import com.tripflow.dto.auth.AuthStatus;
+import com.tripflow.dto.auth.ForgotPasswordRequest;
 import com.tripflow.dto.auth.LoginRequest;
+import com.tripflow.dto.auth.ResetPasswordOtpRequest;
 import com.tripflow.dto.user.PublicUserDTO;
 import com.tripflow.exception.EmailAlreadyExistsException;
 import com.tripflow.exception.UsernameAlreadyExistsException;
@@ -204,6 +206,63 @@ public class AuthService {
                 AuthStatus.FAILURE,
                 "Failed to resend verification code",
                 Map.of("error", e.getMessage()),
+                null
+            );
+        }
+    }
+
+    public AuthResponse forgotPassword(ForgotPasswordRequest request) {
+        try {
+            String usernameOrEmail = request.username();
+            User user = usernameOrEmail != null && usernameOrEmail.contains("@")
+                ? this.userService.getUserByEmail(usernameOrEmail)
+                : this.userService.getUserByUsername(usernameOrEmail);
+
+            VerificationCode code = this.userService.generatePasswordResetCode(user.getEmail());
+            this.sendPasswordResetEmail(user.getEmail(), code.code());
+        } catch (Exception e) {
+            log.info("Password reset requested for unknown identifier");
+        }
+
+        return new AuthResponse(
+            AuthStatus.SUCCESS,
+            "If the account exists, a reset code was sent.",
+            null,
+            null
+        );
+    }
+
+    public AuthResponse resetPasswordWithOtp(HttpServletResponse response, ResetPasswordOtpRequest request) {
+        Map<String, String> errors = this.authValidator.validateResetPasswordRequest(request);
+        if (!errors.isEmpty()) {
+            return new AuthResponse(AuthStatus.FAILURE, "Reset failed", errors, null);
+        }
+
+        try {
+            this.userService.resetPasswordWithCode(request.username(), request.code(), request.password());
+
+            response.addHeader(HttpHeaders.SET_COOKIE, this.removeTokenFromCookie(TokenType.AUTH_TOKEN).toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, this.removeTokenFromCookie(TokenType.REFRESH_TOKEN).toString());
+
+            return new AuthResponse(
+                AuthStatus.SUCCESS,
+                "Password reset successful",
+                null,
+                null
+            );
+        } catch (IllegalArgumentException e) {
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Reset failed",
+                Map.of("code", e.getMessage()),
+                null
+            );
+        } catch (Exception e) {
+            log.error("Unexpected error during password reset", e);
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Reset failed",
+                Map.of("unexpected", "An error occurred during reset"),
                 null
             );
         }
@@ -413,5 +472,13 @@ public class AuthService {
 
         response.addHeader(HttpHeaders.SET_COOKIE, authCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+    }
+
+    private void sendPasswordResetEmail(String email, String code) {
+        this.kafkaService.sendEmailMessage(new EmailMessage(
+            email,
+            EmailType.PASSWORD_RESET_OTP,
+            Map.of("code", code, "expiryMinutes", "15")
+        ));
     }
 }

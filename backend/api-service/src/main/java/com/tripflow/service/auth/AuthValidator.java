@@ -2,6 +2,7 @@ package com.tripflow.service.auth;
 
 import org.springframework.stereotype.Component;
 
+import com.tripflow.dto.auth.ResetPasswordOtpRequest;
 import com.tripflow.dto.user.RegisterUserRequest;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +59,31 @@ public class AuthValidator {
             errors.put(key, "Password must contain at least one uppercase letter, one lowercase letter, and one number.");
         } else if (!password.equals(request.confirmPassword())) {
             errors.put(key, "Password and confirmation do not match.");
+        }
+
+        return errors;
+    }
+
+    public Map<String, String> validateResetPasswordRequest(ResetPasswordOtpRequest request) {
+        Map<String, String> errors = new HashMap<>();
+
+        if (request.username() == null || request.username().trim().isEmpty()) {
+            errors.put("username", "Username or email is required.");
+        }
+
+        if (request.code() == null || request.code().trim().isEmpty()) {
+            errors.put("code", "Verification code is required.");
+        }
+
+        String password = request.password();
+        if (password == null || password.isEmpty()) {
+            errors.put("password", "Password is required.");
+        } else if (password.length() < MIN_PASSWORD_LENGTH) {
+            errors.put("password", "Password must be at least 8 characters long.");
+        } else if (!password.matches(PASSWORD_REGEX)) {
+            errors.put("password", "Password must contain at least one uppercase letter, one lowercase letter, and one number.");
+        } else if (!password.equals(request.confirmPassword())) {
+            errors.put("password", "Password and confirmation do not match.");
         }
 
         return errors;

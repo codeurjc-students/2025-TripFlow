@@ -12,7 +12,9 @@ import jakarta.validation.Valid;
 
 import com.tripflow.dto.auth.AuthResponse;
 import com.tripflow.dto.auth.AuthStatus;
+import com.tripflow.dto.auth.ForgotPasswordRequest;
 import com.tripflow.dto.auth.LoginRequest;
+import com.tripflow.dto.auth.ResetPasswordOtpRequest;
 import com.tripflow.dto.auth.ResendCodeRequest;
 import com.tripflow.dto.auth.VerifyAccountRequest;
 import com.tripflow.dto.user.RegisterUserRequest;
@@ -143,6 +145,40 @@ public class RestAuthController {
             ? HttpStatusCode.valueOf(401)
             : HttpStatusCode.valueOf(200);
         
+        return ResponseEntity.status(status).body(authResponse);
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(
+        summary = "Forgot Password Endpoint",
+        description = "Sends a one-time code to reset account password."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Request processed")
+    })
+    public ResponseEntity<AuthResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        AuthResponse authResponse = authService.forgotPassword(request);
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(authResponse);
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(
+        summary = "Reset Password with OTP",
+        description = "Resets password using username/email, OTP code, and new password."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Password reset successful"),
+        @ApiResponse(responseCode = "400", description = "Password reset failed")
+    })
+    public ResponseEntity<AuthResponse> resetPassword(
+        HttpServletResponse response,
+        @Valid @RequestBody ResetPasswordOtpRequest request
+    ) {
+        AuthResponse authResponse = authService.resetPasswordWithOtp(response, request);
+        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE
+            ? HttpStatusCode.valueOf(400)
+            : HttpStatusCode.valueOf(200);
+
         return ResponseEntity.status(status).body(authResponse);
     }
 }
