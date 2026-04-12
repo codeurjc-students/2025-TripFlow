@@ -134,6 +134,61 @@
   color: var(--error);
 }
 
+.helperRow {
+  width: 100%;
+  text-align: center;
+  margin-top: calc(var(--space-md) * -1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+
+  a {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    opacity: 0.92;
+    transition: color 0.2s ease, opacity 0.2s ease;
+
+    &:hover {
+      color: var(--primary);
+      opacity: 1;
+    }
+  }
+}
+
+.helperLink {
+  color: var(--text-tertiary);
+  font-size: var(--font-size-sm);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  opacity: 0.92;
+  transition: color 0.2s ease, opacity 0.2s ease;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--primary);
+    opacity: 1;
+  }
+
+  &:focus-visible {
+    outline: 1px dashed var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+.helperHint {
+  color: var(--text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
 .offlineWarning {
   color: var(--warning);
   font-weight: var(--font-weight-bold);

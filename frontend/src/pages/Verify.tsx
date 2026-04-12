@@ -2,7 +2,7 @@ import styles from "@styles/components/form/Form.module.css";
 import verifyStyles from "@styles/pages/Verify.module.css";
 
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 import { retrieveFromLocalStorage, removeFromLocalStorage } from "@/utils/localStorageUtils";
 import { STORAGE_KEYS } from "@/constants/storageKeys";
@@ -165,13 +165,14 @@ export default function VerifyPage() {
                         />
                     </form>
 
-                    <div className={styles.alternative}>
-                        <div className={styles.alternativeText}>
-                            ¿No has recibido el código?
-                            <button className={verifyStyles.resendLink} type="button" onClick={handleResendCode}>
-                                Reenviar código
-                            </button>
-                        </div>
+                    <div className={styles.helperRow}>
+                        <span className={styles.helperHint}>¿No has recibido el código?</span>
+                        <button className={styles.helperLink} type="button" onClick={handleResendCode}>
+                            Reenviar código
+                        </button>
+                        <NavLink className={styles.helperLink} to="/login">
+                            Volver a iniciar sesión
+                        </NavLink>
                     </div>
                 </div>
             </div>

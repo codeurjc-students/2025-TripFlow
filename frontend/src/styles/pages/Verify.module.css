@@ -81,19 +81,4 @@
         text-align: center;
     }
 
-    .resendLink {
-        padding: 0;
-        border: none;
-        background: none;
-        color: var(--primary);
-        font-size: var(--font-size-sm);
-        text-decoration: underline;
-        cursor: pointer;
-
-        &:disabled {
-            color: var(--text-tertiary);
-            text-decoration: none;
-            cursor: not-allowed;
-        }
-    }
 }

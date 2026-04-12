@@ -4,6 +4,7 @@ import type { Field } from "@/types/form";
 
 import { render, screen, fireEvent } from "@tests/utils/testUtils";
 import { describe, it, expect, vi } from "vitest";
+import { NavLink } from "react-router";
 
 describe("AuthForm Component", () => {
   const mockFields: Field[] = [
@@ -207,6 +208,20 @@ describe("AuthForm Component", () => {
 
     const form = container.querySelector("form");
     expect(form).toBeInTheDocument();
+  });
+
+  it("renders belowSubmit content when provided", () => {
+    render(
+      <AuthForm
+        active="login"
+        fields={mockFields}
+        buttonLabel="Sign In"
+        onSubmit={mockOnSubmit}
+        belowSubmit={<NavLink to="/forgot-password">Forgot password</NavLink>}
+      />
+    );
+
+    expect(screen.getByRole("link", { name: "Forgot password" })).toBeInTheDocument();
   });
 
   it("renders fields with default text type when type not specified", () => {
