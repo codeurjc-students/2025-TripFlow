@@ -87,4 +87,37 @@ describe("ItineraryMarkersLayer", () => {
         expect(leafletMocks.setZIndexOffset).toHaveBeenCalledWith(1000);
         expect(leafletMocks.on).toHaveBeenCalled();
     });
+
+    it("handles null-like activity fields without crashing", () => {
+        const map = {} as any;
+
+        const waypoint = makeWaypoint();
+        const withNulls = {
+            ...waypoint,
+            activity: {
+                ...waypoint.activity,
+                activity: null as unknown as string,
+                location: {
+                    ...waypoint.activity.location,
+                    name: null as unknown as string,
+                },
+                time: null as unknown as string,
+            },
+        };
+
+        expect(() => {
+            render(
+                <ItineraryMarkersLayer
+                    map={map}
+                    waypoints={[withNulls]}
+                    selectedIndex={null}
+                    onMarkerClick={vi.fn()}
+                />
+            );
+        }).not.toThrow();
+
+        const html = leafletMocks.bindPopup.mock.calls[0][0];
+        expect(html).toContain("Actividad");
+        expect(html).toContain("Ubicacion");
+    });
 });
