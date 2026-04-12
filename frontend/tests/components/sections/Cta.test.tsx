@@ -63,12 +63,12 @@ describe("Cta", () => {
     const { container } = render(<Cta />);
 
     const ctaContent = container.querySelector("div[class*='ctaContent']");
-    const lead = ctaContent?.querySelector("p[class*='ctaLead']");
+    const heading = ctaContent?.querySelector("h3[class*='ctaHeading']");
     const paragraphs = ctaContent?.querySelectorAll("p[class*='ctaText']");
     const actionsDiv = ctaContent?.querySelector("div[class*='actions']");
     const button = actionsDiv?.querySelector("button");
 
-    expect(lead).toBeInTheDocument();
+    expect(heading).toBeInTheDocument();
     expect(paragraphs).toHaveLength(1);
     expect(actionsDiv).toBeInTheDocument();
     expect(button).toBeInTheDocument();

@@ -1,4 +1,7 @@
 .ctaSurface {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   width: 100%;
   border: 1px solid color-mix(in srgb, var(--primary) 32%, var(--border-secondary));
   border-radius: var(--border-radius-xl);
@@ -7,48 +10,119 @@
     radial-gradient(circle at 92% 115%, color-mix(in srgb, var(--info) 18%, transparent), transparent 42%),
     linear-gradient(150deg, color-mix(in srgb, var(--bg-tertiary) 56%, transparent), var(--bg-secondary));
   box-shadow: 0 24px 54px color-mix(in srgb, var(--bg-primary) 56%, transparent);
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 200px;
+    height: 200px;
+    pointer-events: none;
+    background: url("/assets/giddeon_1.png") no-repeat;
+    background-size: cover;
+  }
 }
 
 .ctaContent {
-  width: min(980px, 100%);
-  margin: 0 auto;
-  padding: clamp(var(--space-xxl), 4vw, var(--space-largest)) clamp(var(--space-lg), 5vw, var(--space-largest));
+  position: relative;
+  z-index: 1;
+  width: min(64%, 800px);
+  margin: 0;
+  padding: var(--space-xxl);
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  text-align: center;
-  gap: var(--space-lg);
+  text-align: left;
+  gap: var(--space-md);
 }
 
-.ctaLead {
-  font-size: clamp(var(--font-size-xl), 2.6vw, var(--font-size-xxxl));
+.ctaHeading {
+  font-size: var(--font-size-xxxl);
+  max-width: 16ch;
   color: var(--text-primary);
   font-weight: var(--font-weight-bold);
-  width: 100%;
-  max-width: 100%;
+  line-height: 1.12;
   text-wrap: balance;
+  margin: 0;
 }
 
 .ctaText {
-  font-size: clamp(var(--font-size-md), 1.7vw, var(--font-size-lg));
+  font-size: clamp(var(--font-size-lg), 1.9vw, var(--font-size-xl));
   color: var(--text-secondary);
-  max-width: 48ch;
+  max-width: 44ch;
   line-height: 1.55;
   text-wrap: pretty;
+  margin: 0;
 }
 
 .actions {
-  margin-top: var(--space-xs);
+  margin-top: var(--space-lg);
 }
 
 @media (max-width: 640px) {
   .ctaSurface {
     border-radius: var(--border-radius-lg);
+
+    &::before {
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--bg-secondary) 94%, transparent) 0%, color-mix(in srgb, var(--bg-secondary) 90%, transparent) 62%, color-mix(in srgb, var(--bg-secondary) 78%, transparent) 100%),
+        linear-gradient(90deg, var(--bg-secondary) 0%, color-mix(in srgb, var(--bg-secondary) 88%, transparent) 62%, transparent 100%);
+    }
+
+    &::after {
+      width: 170px;
+      height: 170px;
+      right: -24px;
+      bottom: -24px;
+      opacity: 0.34;
+    }
   }
 
   .ctaContent {
-    gap: var(--space-lg);
+    width: 100%;
+    max-width: 100%;
+    gap: var(--space-sm);
     padding: var(--space-xxl) var(--space-xl);
+
+    .ctaHeading {
+      font-size: var(--font-size-xxl);
+      max-width: 100%;
+      text-wrap: pretty;
+    }
+
+    .ctaText {
+      font-size: var(--font-size-lg);
+      max-width: 100%;
+      line-height: 1.6;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .ctaSurface {
+    &::after {
+      width: 130px;
+      height: 130px;
+      right: -20px;
+      bottom: -18px;
+      opacity: 0.28;
+    }
+  }
+
+  .ctaContent {
+    max-width: 100%;
+    padding: var(--space-xl) var(--space-lg);
+
+    .ctaHeading {
+      font-size: var(--font-size-xl);
+      max-width: 100%;
+    }
+
+    .ctaText {
+      font-size: var(--font-size-md);
+      max-width: 100%;
+    }
   }
 }

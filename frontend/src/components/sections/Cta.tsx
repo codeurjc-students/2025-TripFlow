@@ -14,12 +14,12 @@ export default function Cta() {
     >
       <div className={styles.ctaSurface}>
         <div className={styles.ctaContent}>
-          <p className={styles.ctaLead}>
-            Diseña tu itinerario en minutos y organiza cada parada en un solo
-            lugar.
-          </p>
+          <h3 className={styles.ctaHeading}>
+            Diseña tu itinerario en minutos
+          </h3>
           <p className={styles.ctaText}>
-            Prueba la demo y empieza a planificar hoy.
+            Organiza cada parada en un solo lugar. Prueba la demo y empieza a
+            planificar hoy.
           </p>
           <div className={styles.actions}>
             <DemoButton style="primary" />
