@@ -30,6 +30,7 @@ public class AIItineraryPromptTest {
         assertTrue(result.systemMessage().contains(request.lodging()), "System message should contain lodging");
         assertTrue(result.systemMessage().contains(request.duration()), "System message should contain duration");
         assertTrue(result.systemMessage().contains(request.interests().toString()), "System message should contain interests");
+        assertTrue(result.systemMessage().contains("Fecha actual:"), "System message should contain current date label");
 
         // No unresolved placeholders
         assertFalse(result.systemMessage().contains("{{place}}"), "Placeholder {{place}} should be replaced");
@@ -38,6 +39,7 @@ public class AIItineraryPromptTest {
         assertFalse(result.systemMessage().contains("{{lodging}}"), "Placeholder {{lodging}} should be replaced");
         assertFalse(result.systemMessage().contains("{{duration}}"), "Placeholder {{duration}} should be replaced");
         assertFalse(result.systemMessage().contains("{{interests}}"), "Placeholder {{interests}} should be replaced");
+        assertFalse(result.systemMessage().contains("{{current_date}}"), "Placeholder {{current_date}} should be replaced");
     }
 
     @Test
