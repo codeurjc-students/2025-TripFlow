@@ -7,6 +7,7 @@ import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.tripflow.dto.ai.AIGenerationRequest;
 import com.tripflow.dto.itinerary.ExtendedItineraryDTO;
+import com.tripflow.util.ItinerarySanitizer;
 import com.tripflow.utils.AIItineraryMock;
 import com.tripflow.utils.AIItineraryPrompt;
 import com.tripflow.utils.AIPromptResult;
@@ -54,7 +55,8 @@ public class AIGenerationService {
             .replace("```", "");
 
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(response, ExtendedItineraryDTO.class);
+        ExtendedItineraryDTO parsed = objectMapper.readValue(response, ExtendedItineraryDTO.class);
+        return ItinerarySanitizer.sanitizeExtendedItinerary(parsed);
     }
 
     /**

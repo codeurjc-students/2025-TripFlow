@@ -35,6 +35,7 @@ import com.tripflow.model.itinerary.ItineraryCollaborator;
 import com.tripflow.model.types.CollaboratorRole;
 import com.tripflow.model.types.InvitationStatus;
 import com.tripflow.service.KafkaService;
+import com.tripflow.util.ItinerarySanitizer;
 
 import jakarta.transaction.Transactional;
 
@@ -102,12 +103,13 @@ public class ItineraryService {
      * @return the created ExtendedItineraryResponseDTO
      */
     public ExtendedItineraryResponseDTO createItinerary(User user, ExtendedItineraryDTO itineraryDTO) {
+        ExtendedItineraryDTO sanitizedItinerary = ItinerarySanitizer.sanitizeExtendedItinerary(itineraryDTO);
         Itinerary newItinerary = new Itinerary();
         
         // Assign basic details from the DTO to the entity
-        this.assignExtraDetails(newItinerary, itineraryDTO);
+        this.assignExtraDetails(newItinerary, sanitizedItinerary);
 
-        List<ItineraryDayDTO> days = itineraryDTO.days();
+        List<ItineraryDayDTO> days = sanitizedItinerary.days();
 
         // Iterate through days in the itinerary and create each day
         for (ItineraryDayDTO day : days) {
@@ -119,7 +121,7 @@ public class ItineraryService {
         user.addItinerary(newItinerary);
         newItinerary.setUser(user);
 
-        ExternalImage coverImage = this.externalImageService.getOrCreateImageByQuery(itineraryDTO.place());
+        ExternalImage coverImage = this.externalImageService.getOrCreateImageByQuery(sanitizedItinerary.place());
         newItinerary.setCoverImage(coverImage);
 
         Itinerary savedItinerary = this.itineraryRepository.save(newItinerary);
@@ -226,6 +228,7 @@ public class ItineraryService {
      */
     @Transactional
     public ExtendedItineraryResponseDTO updateItinerary(Long id, ExtendedItineraryDTO itineraryDTO) throws ResponseStatusException {
+        ExtendedItineraryDTO sanitizedItinerary = ItinerarySanitizer.sanitizeExtendedItinerary(itineraryDTO);
         Itinerary itinerary = this.itineraryRepository.findById(id).orElseThrow(
             () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Itinerary with ID %d not found", id))
         );
@@ -237,14 +240,14 @@ public class ItineraryService {
         }
 
         // Update basic details
-        this.assignExtraDetails(itinerary, itineraryDTO);
+        this.assignExtraDetails(itinerary, sanitizedItinerary);
 
         // Clear existing days
         this.itineraryDayService.deleteAllDaysByItinerary(itinerary);
 
         // Iterate through the new days in the itinerary and create each day
         List<ItineraryDay> days = new ArrayList<>();
-        for (ItineraryDayDTO dayDTO : itineraryDTO.days()) {
+        for (ItineraryDayDTO dayDTO : sanitizedItinerary.days()) {
             ItineraryDay newDay = this.itineraryDayService.createItineraryDayEntity(dayDTO, itinerary);
             days.add(newDay);
         }
