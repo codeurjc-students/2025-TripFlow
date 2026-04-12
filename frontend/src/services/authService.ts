@@ -1,4 +1,11 @@
-import type { AuthResponse, LoginRequest, RegisterRequest, VerifyAccountRequest } from "@/types/auth";
+import type {
+  AuthResponse,
+  ForgotPasswordRequest,
+  LoginRequest,
+  RegisterRequest,
+  ResetPasswordOtpRequest,
+  VerifyAccountRequest,
+} from "@/types/auth";
 import { http } from "@services/httpService";
 
 const BASE_PATH = "/api/auth";
@@ -59,4 +66,12 @@ export async function verify(request: VerifyAccountRequest): Promise<AuthRespons
  */
 export async function resendCode(username: string): Promise<AuthResponse> {
   return http<AuthResponse>(`${BASE_PATH}/resend-code`, "POST", { username });
+}
+
+export async function forgotPassword(request: ForgotPasswordRequest): Promise<AuthResponse> {
+  return http<AuthResponse>(`${BASE_PATH}/forgot-password`, "POST", request);
+}
+
+export async function resetPassword(request: ResetPasswordOtpRequest): Promise<AuthResponse> {
+  return http<AuthResponse>(`${BASE_PATH}/reset-password`, "POST", request);
 }

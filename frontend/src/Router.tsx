@@ -7,6 +7,8 @@ import IndexPage from "@pages/Index";
 import LoginPage from "@pages/Login";
 import RegisterPage from "@pages/Register";
 import VerifyPage from "@pages/Verify";
+import ForgotPasswordPage from "@pages/ForgotPassword";
+import ResetPasswordPage from "@pages/ResetPassword";
 import HelpPage from "@pages/Help";
 import DashboardPage from "@pages/Dashboard";
 import ItinerariesPage from "@pages/itineraries/Itineraries";
@@ -99,6 +101,8 @@ export default function Router() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<RegisterPage />} />
                 <Route path="/verify" element={<VerifyPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/help" element={<HelpPage />} />
                 <Route path="/share/:token" element={<SharedItineraryPage />} />
 
