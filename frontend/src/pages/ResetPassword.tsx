@@ -2,7 +2,7 @@ import styles from "@styles/components/form/Form.module.css";
 import resetStyles from "@styles/pages/ResetPassword.module.css";
 
 import { useEffect, useRef, useState } from "react";
-import { NavLink, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 import { LockIcon, UserIcon } from "lucide-react";
 
