@@ -18,6 +18,7 @@ export function useBasicInfoFormFields(
     const endDate = useMemo(() => {
         if (!itinerary.date || !itinerary.days.length) return "";
         const start = new Date(itinerary.date);
+        if (Number.isNaN(start.getTime())) return "";
         // Duration is inclusive, so add days.length - 1
         const end = new Date(start);
         end.setDate(start.getDate() + itinerary.days.length - 1);
@@ -42,6 +43,7 @@ export function useBasicInfoFormFields(
 
         const start = new Date(itinerary.date);
         const end = new Date(newEndDateStr);
+        if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return;
 
         // Calculate difference in days (inclusive)
         const diffTime = end.getTime() - start.getTime();

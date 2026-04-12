@@ -8,14 +8,35 @@ interface FormatDateOptions {
     shortMonth?: boolean;
 }
 
+const INVALID_DATE_LABEL = "Fecha por definir";
+
+function parseDate(value: string): Date | null {
+    if (!value || typeof value !== "string") {
+        return null;
+    }
+
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+        return null;
+    }
+
+    return parsed;
+}
+
 export const getDate = (initialDate: string, offset: number) => {
-    const date = new Date(initialDate);
+    const baseDate = parseDate(initialDate) || new Date();
+    const date = new Date(baseDate);
     date.setDate(date.getDate() + offset);
     return date.toISOString().split('T')[0];
 }
 
 export const formatDate = (dateString: string, options?: FormatDateOptions) => {
-    return new Date(dateString).toLocaleDateString("es-ES", {
+    const date = parseDate(dateString);
+    if (!date) {
+        return INVALID_DATE_LABEL;
+    }
+
+    return date.toLocaleDateString("es-ES", {
         year: options?.excludeYear ? undefined : "numeric",
         month: options?.excludeMonth ? undefined : options?.shortMonth ? "short" : "long",
         day: options?.excludeDay ? undefined : "2-digit",
