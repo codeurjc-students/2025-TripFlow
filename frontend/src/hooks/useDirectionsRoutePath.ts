@@ -102,6 +102,10 @@ export function useDirectionsRoutePath(
             })
             .catch(() => {
                 if (!isMounted) return;
+                console.warn("[maps] directions request failed; falling back to base path", {
+                    profile,
+                    waypointCount: basePath.length,
+                });
                 setRoutePath(basePath);
             })
             .finally(() => {

@@ -22,23 +22,30 @@ export default function MapPoiCard({
     onClick,
     distanceKm,
 }: MapPoiCardProps) {
-    const hasAddress = Boolean((place.fullAddress || place.placeFormatted).trim());
-    const featureType = (place.featureType || "poi").toLowerCase();
+    const name = typeof place.name === "string" && place.name.trim().length > 0 ? place.name.trim() : "Lugar";
+    const addressSource = typeof place.fullAddress === "string" && place.fullAddress.trim().length > 0
+        ? place.fullAddress
+        : place.placeFormatted;
+    const address = typeof addressSource === "string" ? addressSource.trim() : "";
+    const hasAddress = address.length > 0;
+    const featureTypeRaw = typeof place.featureType === "string" ? place.featureType : "poi";
+    const featureType = featureTypeRaw.toLowerCase();
     const featureLabel = FEATURE_LABELS[featureType] || featureType;
-    const primaryCategory = place.categories.find((category) => category && category.toLowerCase() !== "poi");
+    const categories = Array.isArray(place.categories) ? place.categories : [];
+    const primaryCategory = categories.find((category) => typeof category === "string" && category.toLowerCase() !== "poi");
     const distanceLabel = typeof distanceKm === "number" ? `${distanceKm.toFixed(1)} km` : null;
 
     const metaParts = [primaryCategory, distanceLabel].filter(Boolean).join(" · ");
 
     return (
         <MapInfoCardBase
-            title={place.name}
-            subtitle={hasAddress ? (place.fullAddress || place.placeFormatted) : undefined}
+            title={name}
+            subtitle={hasAddress ? address : undefined}
             badge={featureLabel}
             meta={metaParts ? <span className={styles.meta}>{metaParts}</span> : undefined}
             isSelected={isSelected}
             onClick={onClick}
-            ariaLabel={`${place.name}${hasAddress ? ` - ${place.fullAddress || place.placeFormatted}` : ""}`}
+            ariaLabel={`${name}${hasAddress ? ` - ${address}` : ""}`}
         />
     );
 }

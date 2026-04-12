@@ -2,8 +2,9 @@ import { useEffect, useRef } from "react";
 import L from "leaflet";
 import type { MapWaypoint } from "@/utils/mapGeometry";
 
-function escapeHtml(value: string) {
-    return value
+function escapeHtml(value: unknown) {
+    const normalized = typeof value === "string" ? value : value == null ? "" : String(value);
+    return normalized
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -45,8 +46,8 @@ export default function ItineraryMarkersLayer({
 
         const newMarkers = waypoints.map((wp, index) => {
             const icon = index === selectedIndex ? SelectedIcon : DefaultIcon;
-            const title = escapeHtml(wp.activity.activity);
-            const location = escapeHtml(wp.activity.location.name);
+            const title = escapeHtml(wp.activity.activity || "Actividad");
+            const location = escapeHtml(wp.activity.location.name || "Ubicacion");
             const time = wp.activity.time ? escapeHtml(wp.activity.time) : "";
             const marker = L.marker(wp.position, { icon })
                 .addTo(map)

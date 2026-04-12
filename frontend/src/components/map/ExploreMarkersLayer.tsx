@@ -4,8 +4,9 @@ import L from "leaflet";
 import type { MapSuggestion } from "@/types/map";
 import buttonStyles from "@styles/components/shared/Button.module.css";
 
-function escapeHtml(value: string) {
-    return value
+function escapeHtml(value: unknown) {
+    const normalized = typeof value === "string" ? value : value == null ? "" : String(value);
+    return normalized
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
