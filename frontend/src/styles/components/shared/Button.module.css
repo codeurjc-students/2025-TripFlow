@@ -285,6 +285,8 @@
 
 @media (max-width: 1024px) {
     .route {
+        width: auto;
+        flex: 1 1 0;
         height: var(--sidebar-mobile-height);
         flex-direction: column;
         justify-content: center;
@@ -293,6 +295,7 @@
         outline: none;
         box-shadow: none;
         background: none;
+        border: 2px solid transparent;
 
         &.withChildren {
             gap: var(--space-xs);
@@ -303,9 +306,14 @@
             box-shadow: none;
         }
 
+        &:active {
+            transform: none;
+            background: none;
+        }
+
         &.active {
             background: none;
-            border: none;
+            border: 2px solid transparent;
         }
 
         @media (hover: hover) {
