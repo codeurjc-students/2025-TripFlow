@@ -867,6 +867,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AuthResponse"
+  /api/auth/reset-password:
+    post:
+      tags:
+      - Authentication
+      summary: Reset Password with OTP
+      description: "Resets password using username/email, OTP code, and new password."
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordOtpRequest"
+        required: true
+      responses:
+        "200":
+          description: Password reset successful
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Password reset failed
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
   /api/auth/resend-code:
     post:
       tags:
@@ -987,6 +1013,26 @@ paths:
                 $ref: "#/components/schemas/AuthResponse"
         "401":
           description: User login failed
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/auth/forgot-password:
+    post:
+      tags:
+      - Authentication
+      summary: Forgot Password Endpoint
+      description: Sends a one-time code to reset account password.
+      operationId: forgotPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordRequest"
+        required: true
+      responses:
+        "200":
+          description: Request processed
           content:
             '*/*':
               schema:
@@ -1840,6 +1886,26 @@ components:
             type: string
         user:
           $ref: "#/components/schemas/PublicUserDTO"
+    ResetPasswordOtpRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+        code:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+        confirmPassword:
+          type: string
+          minLength: 1
+      required:
+      - code
+      - confirmPassword
+      - password
+      - username
     ResendCodeRequest:
       type: object
       properties:
@@ -1881,6 +1947,14 @@ components:
           minLength: 1
       required:
       - password
+      - username
+    ForgotPasswordRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+      required:
       - username
     Pageable:
       type: object
