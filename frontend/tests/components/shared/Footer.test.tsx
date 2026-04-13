@@ -30,10 +30,10 @@ describe("Footer Component", () => {
   it("displays copyright information", () => {
     render(<Footer />);
 
-    const copyright = screen.getByText(
-      /©(20\d{2}) TripFlow\. Todos los derechos reservados\./
-    );
+    const copyright = screen.getByText(/©20\d{2} TripFlow\./);
     expect(copyright).toBeInTheDocument();
+
+    expect(screen.getByText(/Todos los derechos reservados\./)).toBeInTheDocument();
   });
 
   it("TripFlow link points to home page", () => {
