@@ -10,6 +10,7 @@ import VerifyPage from "@pages/Verify";
 import ForgotPasswordPage from "@pages/ForgotPassword";
 import ResetPasswordPage from "@pages/ResetPassword";
 import HelpPage from "@pages/Help";
+import PrivacyPage from "@pages/Privacy";
 import DashboardPage from "@pages/Dashboard";
 import ItinerariesPage from "@pages/itineraries/Itineraries";
 import ItineraryDetailPage from "@pages/itineraries/ItineraryDetail";
@@ -104,6 +105,7 @@ export default function Router() {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/help" element={<HelpPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/share/:token" element={<SharedItineraryPage />} />
 
                 {/* Private routes */}

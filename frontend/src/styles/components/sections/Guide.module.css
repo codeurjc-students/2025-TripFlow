@@ -62,7 +62,7 @@
     }
 
     .guideImage {
-        margin-top: var(--space-larger);
+        margin-top: var(--space-largest);
 
         .imageContainer {
             .image {

@@ -1,4 +1,5 @@
 import styles from "@styles/components/shared/Footer.module.css";
+import { NavLink } from "react-router";
 
 import { GithubIcon, LinkedinIcon } from "lucide-react";
 
@@ -16,7 +17,9 @@ export default function Footer() {
                     </p>
                 </div>
                 <div className={styles.right}>
-                    <span className={styles.author}>Creado por <strong>CuB1z</strong></span>
+                    <span className={styles.author}>
+                        Creado por <span className={styles.authorName}>CuB1z</span>
+                    </span>
                     <div className={styles.socials}>
                         <Button
                             style={["tool"]}
@@ -35,10 +38,19 @@ export default function Footer() {
                     </div>
                 </div>
             </div>
-            <Divider maxWidth={1200} />
-            <p className={styles.copyright}>
-                ©2025 TripFlow. Todos los derechos reservados.
-            </p>
+            <Divider maxWidth="100%" />
+            <div className={styles.footer_bottom}>
+                <p className={styles.copyright}>
+                    ©2026 TripFlow.
+                    <br />
+                    Todos los derechos reservados.
+                </p>
+                <nav className={styles.legalLinks} aria-label="Enlaces legales">
+                    <NavLink to="/help" className={styles.legalLink}>Ayuda</NavLink>
+                    <span className={styles.separator}>•</span>
+                    <NavLink to="/privacy" className={styles.legalLink}>Privacidad</NavLink>
+                </nav>
+            </div>
         </footer>
     );
 }
