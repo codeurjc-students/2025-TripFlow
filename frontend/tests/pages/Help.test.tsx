@@ -21,10 +21,10 @@ describe("HelpPage", () => {
         const generalBtn = screen.getByRole("button", { name: /¿Es gratuito TripFlow\?/i });
         const itineraryBtn = screen.getByRole("button", { name: /¿Cómo funciona la generación por IA\?/i });
 
-        expect(generalBtn).toHaveAttribute("aria-expanded", "false");
+        expect(generalBtn).toHaveAttribute("aria-expanded", "true");
 
         fireEvent.click(generalBtn);
-        expect(generalBtn).toHaveAttribute("aria-expanded", "true");
+        expect(generalBtn).toHaveAttribute("aria-expanded", "false");
 
         fireEvent.click(itineraryBtn);
         expect(itineraryBtn).toHaveAttribute("aria-expanded", "true");

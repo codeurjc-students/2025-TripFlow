@@ -20,9 +20,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.tripflow.dto.user.PublicUserDTO;
 import com.tripflow.dto.user.RegisterUserRequest;
-import com.tripflow.dto.user.UserMapper;
 import com.tripflow.exception.EmailAlreadyExistsException;
 import com.tripflow.exception.UsernameAlreadyExistsException;
+import com.tripflow.mappers.UserMapper;
 import com.tripflow.model.User;
 import com.tripflow.model.types.UserType;
 import com.tripflow.repository.UserRepository;

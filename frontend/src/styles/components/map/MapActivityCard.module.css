@@ -1,0 +1,23 @@
+.metaItem {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    white-space: nowrap;
+}
+
+.dayText {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+}
+
+.cardDuration {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.metaIcon {
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+}

@@ -26,6 +26,12 @@ export interface ItineraryDay {
     activities: Activity[];
 }
 
+export interface Permissions {
+    view: boolean;
+    edit: boolean;
+    delete: boolean;
+}
+
 export interface Itinerary {
     id: number;
     title: string;
@@ -37,8 +43,18 @@ export interface Itinerary {
     countDays: number;
     tags: string[];
     coverImage: ItineraryCoverImage;
+    permissions: Permissions;
 }
 
 export interface ExtendedItinerary extends Itinerary {
     days: ItineraryDay[];
+}
+
+export type ItineraryChangeType = "UPDATED";
+
+export interface ItineraryChangeEvent {
+    itineraryId: number;
+    changeType: ItineraryChangeType;
+    actorUsername: string;
+    timestamp: string;
 }

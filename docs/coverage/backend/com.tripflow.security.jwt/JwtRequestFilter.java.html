@@ -2,6 +2,8 @@
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,45 +21,55 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
+<span class="fc" id="L24">    private static final Logger log = LoggerFactory.getLogger(JwtRequestFilter.class);</span>
+
     private final UserDetailsService userDetailsService;
 	private final JwtTokenProvider jwtTokenProvider;
 
-<span class="fc" id="L25">    public JwtRequestFilter(UserDetailsService userDetailsService, JwtTokenProvider jwtTokenProvider) {</span>
-<span class="fc" id="L26">        this.userDetailsService = userDetailsService;</span>
-<span class="fc" id="L27">        this.jwtTokenProvider = jwtTokenProvider;</span>
-<span class="fc" id="L28">    }</span>
+<span class="fc" id="L29">    public JwtRequestFilter(UserDetailsService userDetailsService, JwtTokenProvider jwtTokenProvider) {</span>
+<span class="fc" id="L30">        this.userDetailsService = userDetailsService;</span>
+<span class="fc" id="L31">        this.jwtTokenProvider = jwtTokenProvider;</span>
+<span class="fc" id="L32">    }</span>
 
 	@Override
 	protected void doFilterInternal(
         HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
     ) throws ServletException, IOException {
-<span class="fc" id="L34">        String token = jwtTokenProvider.getTokenFromCookies(request, TokenType.AUTH_TOKEN);</span>
+<span class="fc" id="L38">        String token = jwtTokenProvider.getTokenFromCookies(request, TokenType.AUTH_TOKEN);</span>
 
         // If the token is null, continue the filter chain without authentication
-<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (token == null) {</span>
-<span class="fc" id="L38">            filterChain.doFilter(request, response);</span>
-<span class="fc" id="L39">            return;</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (token == null) {</span>
+<span class="fc" id="L42">            filterChain.doFilter(request, response);</span>
+<span class="fc" id="L43">            return;</span>
         }
 
-<span class="fc" id="L42">        Claims claims = jwtTokenProvider.validateToken(token);</span>
+        Claims claims;
+        try {
+<span class="fc" id="L48">            claims = jwtTokenProvider.validateToken(token);</span>
+<span class="fc" id="L49">        } catch (Exception e) {</span>
+<span class="fc" id="L50">            log.debug(&quot;Rejected invalid auth token for request {} {}&quot;, request.getMethod(), request.getRequestURI());</span>
+<span class="fc" id="L51">            filterChain.doFilter(request, response);</span>
+<span class="fc" id="L52">            return;</span>
+<span class="fc" id="L53">        }</span>
         UserDetails userDetails;
 
         // If the token is invalid, continue the filter chain without authentication
         try {
-<span class="fc" id="L47">            userDetails = userDetailsService.loadUserByUsername(claims.getSubject());</span>
-<span class="nc" id="L48">        } catch (UsernameNotFoundException e) {</span>
-<span class="nc" id="L49">            filterChain.doFilter(request, response);</span>
-<span class="nc" id="L50">            return;</span>
-<span class="fc" id="L51">        }</span>
+<span class="fc" id="L58">            userDetails = userDetailsService.loadUserByUsername(claims.getSubject());</span>
+<span class="nc" id="L59">        } catch (UsernameNotFoundException e) {</span>
+<span class="nc" id="L60">            log.debug(&quot;Token subject not found in user store: {}&quot;, claims.getSubject());</span>
+<span class="nc" id="L61">            filterChain.doFilter(request, response);</span>
+<span class="nc" id="L62">            return;</span>
+<span class="fc" id="L63">        }</span>
 
-<span class="fc" id="L53">        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(</span>
-<span class="fc" id="L54">            userDetails, null, userDetails.getAuthorities()</span>
+<span class="fc" id="L65">        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(</span>
+<span class="fc" id="L66">            userDetails, null, userDetails.getAuthorities()</span>
         );
 
-<span class="fc" id="L57">        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));</span>
-<span class="fc" id="L58">        SecurityContextHolder.getContext().setAuthentication(authentication);</span>
+<span class="fc" id="L69">        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));</span>
+<span class="fc" id="L70">        SecurityContextHolder.getContext().setAuthentication(authentication);</span>
 
-<span class="fc" id="L60">		filterChain.doFilter(request, response);</span>
-<span class="fc" id="L61">	}</span>
+<span class="fc" id="L72">		filterChain.doFilter(request, response);</span>
+<span class="fc" id="L73">	}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

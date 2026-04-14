@@ -5,7 +5,7 @@ import ProfileEditForm from "@components/form/ProfileEditForm";
 
 export default function ProfileEditPage() {
     return (
-        <AppLayout>
+        <AppLayout innerPage>
             <InnerTabHeader
                 title="Tu Perfil"
                 back={{

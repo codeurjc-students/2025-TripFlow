@@ -57,6 +57,12 @@ import jakarta.persistence.OneToMany;
     @OneToMany(mappedBy = &quot;itinerary&quot;, cascade = CascadeType.ALL)
     private List&lt;ItineraryDay&gt; days;
 
+    @OneToMany(mappedBy = &quot;itinerary&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List&lt;ItineraryCollaborator&gt; collaborators;
+
+    @OneToMany(mappedBy = &quot;itinerary&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List&lt;ItineraryShareLink&gt; shareLinks;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private Timestamp createdAt;
@@ -73,124 +79,140 @@ import jakarta.persistence.OneToMany;
      * @param day the itinerary day to add
      */
     public void addDay(ItineraryDay day) {
-<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        if (day != null) {</span>
-<span class="fc bfc" id="L77" title="All 2 branches covered.">            if (this.days == null) this.days = new java.util.ArrayList&lt;&gt;();</span>
-<span class="fc" id="L78">            this.days.add(day);</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        if (day != null) {</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            if (this.days == null) this.days = new java.util.ArrayList&lt;&gt;();</span>
+<span class="fc" id="L84">            this.days.add(day);</span>
         }
-<span class="fc" id="L80">    }</span>
+<span class="fc" id="L86">    }</span>
 
     // [Getters and Setters] ==========================================
 
     public Long getId() {
-<span class="fc" id="L85">        return id;</span>
+<span class="fc" id="L91">        return id;</span>
     }
 
     public void setId(Long id) {
-<span class="fc" id="L89">        this.id = id;</span>
-<span class="fc" id="L90">    }</span>
+<span class="fc" id="L95">        this.id = id;</span>
+<span class="fc" id="L96">    }</span>
 
     public String getTitle() {
-<span class="fc" id="L93">        return title;</span>
+<span class="fc" id="L99">        return title;</span>
     }
 
     public void setTitle(String title) {
-<span class="fc" id="L97">        this.title = title;</span>
-<span class="fc" id="L98">    }</span>
+<span class="fc" id="L103">        this.title = title;</span>
+<span class="fc" id="L104">    }</span>
 
     public String getPlace() {
-<span class="fc" id="L101">        return place;</span>
+<span class="fc" id="L107">        return place;</span>
     }
 
     public void setPlace(String place) {
-<span class="fc" id="L105">        this.place = place;</span>
-<span class="fc" id="L106">    }</span>
+<span class="fc" id="L111">        this.place = place;</span>
+<span class="fc" id="L112">    }</span>
 
     public int getPeople() {
-<span class="fc" id="L109">        return people;</span>
+<span class="fc" id="L115">        return people;</span>
     }
 
     public void setPeople(int people) {
-<span class="fc" id="L113">        this.people = people;</span>
-<span class="fc" id="L114">    }</span>
+<span class="fc" id="L119">        this.people = people;</span>
+<span class="fc" id="L120">    }</span>
 
     public double getBudget() {
-<span class="fc" id="L117">        return budget;</span>
+<span class="fc" id="L123">        return budget;</span>
     }
 
     public void setBudget(double budget) {
-<span class="fc" id="L121">        this.budget = budget;</span>
-<span class="fc" id="L122">    }</span>
+<span class="fc" id="L127">        this.budget = budget;</span>
+<span class="fc" id="L128">    }</span>
 
     public String getDate() {
-<span class="fc" id="L125">        return date;</span>
+<span class="fc" id="L131">        return date;</span>
     }
 
     public void setDate(String date) {
-<span class="fc" id="L129">        this.date = date;</span>
-<span class="fc" id="L130">    }</span>
+<span class="fc" id="L135">        this.date = date;</span>
+<span class="fc" id="L136">    }</span>
 
     public List&lt;String&gt; getTags() {
-<span class="fc" id="L133">        return tags;</span>
+<span class="fc" id="L139">        return tags;</span>
     }
 
     public void setTags(List&lt;String&gt; tags) {
-<span class="fc" id="L137">        this.tags = tags;</span>
-<span class="fc" id="L138">    }</span>
+<span class="fc" id="L143">        this.tags = tags;</span>
+<span class="fc" id="L144">    }</span>
 
     public long getUpdatedCount() {
-<span class="fc" id="L141">        return updatedCount;</span>
+<span class="fc" id="L147">        return updatedCount;</span>
     }
 
     public void setUpdatedCount(long updatedCount) {
-<span class="fc" id="L145">        this.updatedCount = updatedCount;</span>
-<span class="fc" id="L146">    }</span>
+<span class="fc" id="L151">        this.updatedCount = updatedCount;</span>
+<span class="fc" id="L152">    }</span>
 
     public ItineraryStatus getStatus() {
-<span class="fc" id="L149">        return status;</span>
+<span class="fc" id="L155">        return status;</span>
     }
 
     public void setStatus(ItineraryStatus status) {
-<span class="fc" id="L153">        this.status = status;</span>
-<span class="fc" id="L154">    }</span>
+<span class="fc" id="L159">        this.status = status;</span>
+<span class="fc" id="L160">    }</span>
 
     public User getUser() {
-<span class="fc" id="L157">        return user;</span>
+<span class="fc" id="L163">        return user;</span>
     }
 
     public void setUser(User user) {
-<span class="fc" id="L161">        this.user = user;</span>
-<span class="fc" id="L162">    }</span>
+<span class="fc" id="L167">        this.user = user;</span>
+<span class="fc" id="L168">    }</span>
 
     public ExternalImage getCoverImage() {
-<span class="fc" id="L165">        return coverImage;</span>
+<span class="fc" id="L171">        return coverImage;</span>
     }
 
     public void setCoverImage(ExternalImage coverImage) {
-<span class="fc" id="L169">        this.coverImage = coverImage;</span>
-<span class="fc" id="L170">    }</span>
+<span class="fc" id="L175">        this.coverImage = coverImage;</span>
+<span class="fc" id="L176">    }</span>
 
     public List&lt;ItineraryDay&gt; getDays() {
-<span class="fc" id="L173">        return days;</span>
+<span class="fc" id="L179">        return days;</span>
     }
 
     public void setDays(List&lt;ItineraryDay&gt; days) {
-<span class="fc" id="L177">        this.days = days;</span>
-<span class="fc" id="L178">    }</span>
+<span class="fc" id="L183">        this.days = days;</span>
+<span class="fc" id="L184">    }</span>
+
+    public List&lt;ItineraryCollaborator&gt; getCollaborators() {
+<span class="nc" id="L187">        return collaborators;</span>
+    }
+
+    public void setCollaborators(List&lt;ItineraryCollaborator&gt; collaborators) {
+<span class="nc" id="L191">        this.collaborators = collaborators;</span>
+<span class="nc" id="L192">    }</span>
+
+    public List&lt;ItineraryShareLink&gt; getShareLinks() {
+<span class="nc" id="L195">        return shareLinks;</span>
+    }
+
+    public void setShareLinks(List&lt;ItineraryShareLink&gt; shareLinks) {
+<span class="nc" id="L199">        this.shareLinks = shareLinks;</span>
+<span class="nc" id="L200">    }</span>
 
     public Timestamp getCreatedAt() {
-<span class="nc" id="L181">        return createdAt;</span>
+<span class="nc" id="L203">        return createdAt;</span>
     }
 
     public void setCreatedAt(Timestamp createdAt) {
-<span class="nc" id="L185">        this.createdAt = createdAt;</span>
-<span class="nc" id="L186">    }</span>
+<span class="nc" id="L207">        this.createdAt = createdAt;</span>
+<span class="nc" id="L208">    }</span>
 
     public Timestamp getUpdatedAt() {
-<span class="nc" id="L189">        return updatedAt;</span>
+<span class="nc" id="L211">        return updatedAt;</span>
     }
 
     public void setUpdatedAt(Timestamp updatedAt) {
-<span class="nc" id="L193">        this.updatedAt = updatedAt;</span>
-<span class="nc" id="L194">    }</span>
+<span class="nc" id="L215">        this.updatedAt = updatedAt;</span>
+<span class="nc" id="L216">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

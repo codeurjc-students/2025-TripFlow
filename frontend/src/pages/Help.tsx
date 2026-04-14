@@ -6,9 +6,12 @@ import { FAQ_CATEGORIES } from "@/constants/faqs";
 
 import Layout from "@/layouts/Layout";
 import AccordionItem from "@/components/shared/Accordion";
+import Badge from "@/components/shared/Badge";
+
+import { CircleHelpIcon } from "lucide-react";
 
 export default function HelpPage() {
-    const [openId, setOpenId] = useState<string | null>(null);
+    const [openId, setOpenId] = useState<string | null>("0-0");
 
     const toggleAccordion = (categoryId: number, itemId: number) => {
         const id = `${categoryId}-${itemId}`;
@@ -19,11 +22,31 @@ export default function HelpPage() {
         <Layout>
             <div className={styles.container}>
                 <section className={styles.section}>
-                    <h2 className={styles.sectionTitle}>Preguntas Frecuentes</h2>
+                    <div className={styles.headerBlock}>
+                        <div className={styles.headerTopRow}>
+                            <h2 className={styles.sectionTitle}>Preguntas Frecuentes</h2>
+                            <div className={styles.helpChip}>
+                                <Badge style="default">
+                                    <>
+                                        <CircleHelpIcon size={16} />
+                                        Centro de ayuda
+                                    </>
+                                </Badge>
+                            </div>
+                        </div>
+                        <p className={styles.sectionDescription}>
+                            Encuentra respuestas rápidas sobre cuentas, itinerarios, colaboración y uso diario de TripFlow.
+                        </p>
+                    </div>
                     <div className={styles.faqWrapper}>
                         {FAQ_CATEGORIES.map((category, catIndex) => (
                             <div key={catIndex} className={styles.categorySection}>
-                                <h3 className={styles.categoryTitle}>{category.title}</h3>
+                                <div className={styles.categoryHeader}>
+                                    <h3 className={styles.categoryTitle}>{category.title}</h3>
+                                    <span className={styles.categoryCount}>
+                                        {category.items.length} preguntas
+                                    </span>
+                                </div>
                                 <div className={styles.categoryItems}>
                                     {category.items.map((faq, itemIndex) => (
                                         <AccordionItem
@@ -39,6 +62,10 @@ export default function HelpPage() {
                             </div>
                         ))}
                     </div>
+
+                    <p className={styles.legalNote}>
+                        Al usar TripFlow aceptas nuestra <a href="/privacy">Política de Privacidad</a>.
+                    </p>
                 </section>
             </div>
         </Layout>

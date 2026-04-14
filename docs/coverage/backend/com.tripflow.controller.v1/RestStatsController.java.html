@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.tripflow.dto.stats.UserStatsDTO;
+import com.tripflow.dto.stats.UsersByPlanStatsDTO;
 import com.tripflow.service.StatsService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,9 +22,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 public class RestStatsController {
     private final StatsService statsService;
 
-<span class="fc" id="L24">    public RestStatsController(StatsService statsService) {</span>
-<span class="fc" id="L25">        this.statsService = statsService;</span>
-<span class="fc" id="L26">    }</span>
+<span class="fc" id="L25">    public RestStatsController(StatsService statsService) {</span>
+<span class="fc" id="L26">        this.statsService = statsService;</span>
+<span class="fc" id="L27">    }</span>
 
     @GetMapping(&quot;/user&quot;)
     @Operation(
@@ -37,8 +38,25 @@ public class RestStatsController {
         @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
     })
     public ResponseEntity&lt;UserStatsDTO&gt; getUserStats() throws Exception {
-<span class="fc" id="L40">        UserStatsDTO stats = this.statsService.getUserStats();</span>
-<span class="fc" id="L41">        return ResponseEntity.ok(stats);</span>
+<span class="fc" id="L41">        UserStatsDTO stats = this.statsService.getUserStats();</span>
+<span class="fc" id="L42">        return ResponseEntity.ok(stats);</span>
+    }
+
+    @GetMapping(&quot;/users-by-plan&quot;)
+    @Operation(
+        summary = &quot;Get Users By Plan Statistics&quot;,
+        description = &quot;Retrieves user distribution grouped by subscription plan. Admin only endpoint.&quot;,
+        security = @SecurityRequirement(name = &quot;auth_token&quot;)
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Users by plan statistics retrieved successfully&quot;),
+        @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized access&quot;),
+        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Admin role required&quot;),
+        @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
+    })
+    public ResponseEntity&lt;UsersByPlanStatsDTO&gt; getUsersByPlanStats() {
+<span class="fc" id="L58">        UsersByPlanStatsDTO stats = this.statsService.getUsersByPlanStats();</span>
+<span class="fc" id="L59">        return ResponseEntity.ok(stats);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -3,6 +3,7 @@ import styles from "@styles/components/form/Form.module.css";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import type { ChangeEvent, FormEvent } from "react";
+import type { ReactNode } from "react";
 
 import type { Field } from "@/types/form";
 
@@ -25,6 +26,7 @@ type AuthFormProps<T extends Record<string, any>> = {
   buttonLabel: string;
   onSubmit: (values: T) => void;
   errors?: Errors | null;
+  belowSubmit?: ReactNode;
 };
 
 export default function AuthForm<T extends Record<string, any>>({
@@ -33,6 +35,7 @@ export default function AuthForm<T extends Record<string, any>>({
   buttonLabel,
   onSubmit,
   errors,
+  belowSubmit,
 }: AuthFormProps<T>) {
   const [values, setValues] = useState<T>({} as T);
   const navigate = useNavigate();
@@ -76,6 +79,7 @@ export default function AuthForm<T extends Record<string, any>>({
       {errors && errors["global"] && (
         <div className={styles.error}>{errors["global"]}</div>
       )}
+      {belowSubmit && <div className={styles.helperRow}>{belowSubmit}</div>}
       {!navigator.onLine && (
         <div className={styles.offlineWarning}>
           <p>

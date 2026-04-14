@@ -13,9 +13,10 @@
         height: 100%;
         border: 2px solid var(--border-secondary);
         border-left: none;
+        border-right: none;
         padding-left: 0;
         background-color: var(--bg-secondary);
-        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        border-radius: 0;
         transition: all 0.2s ease;
 
         &:focus {
@@ -47,10 +48,41 @@
         }
     }
 
+    .clearButton {
+        color: var(--text-tertiary);
+        border: 2px solid var(--border-secondary);
+        border-left: none;
+        background-color: var(--bg-secondary);
+        height: 100%;
+        aspect-ratio: 1;
+        padding: var(--space-sm);
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        @media (hover: hover) {
+            &:hover {
+                color: var(--primary);
+            }
+        }
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    &:not(:has(.clearButton)) {
+        .input {
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            border-right: 2px solid var(--border-secondary);
+        }
+    }
+
     &:has(.input:focus) {
 
         .input,
-        .button {
+        .button,
+        .clearButton {
             backdrop-filter: blur(24px);
             border-color: var(--primary);
         }
@@ -60,7 +92,8 @@
         &:hover {
 
             .input,
-            .button {
+            .button,
+            .clearButton {
                 backdrop-filter: blur(24px);
                 border-color: var(--primary);
             }

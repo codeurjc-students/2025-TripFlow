@@ -36,14 +36,39 @@ public class AIUsageService {
 
         AIUsage usage;
 
-<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        if (op.isPresent()) {</span>
-<span class="nc" id="L40">            usage = op.get();</span>
-<span class="nc" id="L41">            usage.increment();</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (op.isPresent()) {</span>
+<span class="fc" id="L40">            usage = op.get();</span>
+<span class="fc" id="L41">            usage.increment();</span>
         } else {
 <span class="fc" id="L43">            usage = new AIUsage(user, today, 1);</span>
         }
 
 <span class="fc" id="L46">        return this.aiMapper.toDTO(this.aiUsageRepository.save(usage));</span>
+    }
+
+    /**
+     * Reduces the AI usage for the given user for today.
+     * 
+     * If an entry for today exists, decrements the usage count.
+     * If the usage count becomes negative, it is set to 0.
+     * Otherwise, creates a new entry with usage count set to 0.
+     * 
+     * @param user The user for whom to reduce the AI usage.
+     */
+    public AIUsageDTO reduceUsage(User user) {
+<span class="fc" id="L59">        LocalDate today = LocalDate.now();</span>
+<span class="fc" id="L60">        Optional&lt;AIUsage&gt; op = this.aiUsageRepository.findByUserAndDate(user, today);</span>
+
+        AIUsage usage;
+
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (op.isPresent()) {</span>
+<span class="fc" id="L65">            usage = op.get();</span>
+<span class="fc" id="L66">            usage.decrement();</span>
+        } else {
+<span class="fc" id="L68">            usage = new AIUsage(user, today, 0);</span>
+        }
+
+<span class="fc" id="L71">        return this.aiMapper.toDTO(this.aiUsageRepository.save(usage));</span>
     }
 
     /**
@@ -53,22 +78,22 @@ public class AIUsageService {
      * @return true if the user can use AI services, false otherwise.
      */
     public boolean canUseAI(User user) {
-<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (user.getProcessingAI()) {</span>
-<span class="nc" id="L57">            return false;</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if (user.getProcessingAI()) {</span>
+<span class="fc" id="L82">            return false;</span>
         }
 
-<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        if (user.getPlan().equals(PlanType.PREMIUM)) {</span>
-<span class="nc" id="L61">            return true;</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (user.getPlan().equals(PlanType.PREMIUM)) {</span>
+<span class="fc" id="L86">            return true;</span>
         }
 
-<span class="fc" id="L64">        LocalDate today = LocalDate.now();</span>
-<span class="fc" id="L65">        Optional&lt;AIUsage&gt; op = this.aiUsageRepository.findByUserAndDate(user, today);</span>
+<span class="fc" id="L89">        LocalDate today = LocalDate.now();</span>
+<span class="fc" id="L90">        Optional&lt;AIUsage&gt; op = this.aiUsageRepository.findByUserAndDate(user, today);</span>
 
-<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        if (op.isPresent()) {</span>
-<span class="nc" id="L68">            AIUsage usage = op.get();</span>
-<span class="nc bnc" id="L69" title="All 2 branches missed.">            return usage.getUsage() &lt; this.getDailyLimit(user);</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (op.isPresent()) {</span>
+<span class="fc" id="L93">            AIUsage usage = op.get();</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">            return usage.getUsage() &lt; this.getDailyLimit(user);</span>
         } else {
-<span class="fc" id="L71">            return true;</span>
+<span class="fc" id="L96">            return true;</span>
         }
     }
 
@@ -79,7 +104,7 @@ public class AIUsageService {
      * @return the daily limit for the user
      */
     public int getDailyLimit(User user) {
-<span class="fc" id="L82">        return user.getPlan().getDailyLimit();</span>
+<span class="fc" id="L107">        return user.getPlan().getDailyLimit();</span>
     }
 
     /**
@@ -89,14 +114,14 @@ public class AIUsageService {
      * @return the remaining requests for the user
      */
     public int getRemainingRequests(User user) {
-<span class="fc" id="L92">        LocalDate today = LocalDate.now();</span>
-<span class="fc" id="L93">        Optional&lt;AIUsage&gt; op = this.aiUsageRepository.findByUserAndDate(user, today);</span>
+<span class="fc" id="L117">        LocalDate today = LocalDate.now();</span>
+<span class="fc" id="L118">        Optional&lt;AIUsage&gt; op = this.aiUsageRepository.findByUserAndDate(user, today);</span>
 
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (op.isPresent()) {</span>
-<span class="nc" id="L96">            AIUsage usage = op.get();</span>
-<span class="nc" id="L97">            return this.getDailyLimit(user) - usage.getUsage();</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (op.isPresent()) {</span>
+<span class="fc" id="L121">            AIUsage usage = op.get();</span>
+<span class="fc" id="L122">            return this.getDailyLimit(user) - usage.getUsage();</span>
         } else {
-<span class="fc" id="L99">            return this.getDailyLimit(user);</span>
+<span class="fc" id="L124">            return this.getDailyLimit(user);</span>
         }
     }
 }

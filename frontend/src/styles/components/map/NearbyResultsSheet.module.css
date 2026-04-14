@@ -1,0 +1,50 @@
+.radiusRow {
+    min-height: fit-content;
+    display: flex;
+    gap: var(--space-xs);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.radiusRow::-webkit-scrollbar {
+    display: none;
+}
+
+.radiusChip {
+    border: 1px solid var(--border-secondary);
+    background: color-mix(in srgb, var(--bg-secondary) 88%, transparent);
+    color: var(--text-secondary);
+    border-radius: var(--border-radius-full);
+    padding: 6px 12px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.radiusChipActive {
+    color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 50%, var(--border-secondary));
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.list::-webkit-scrollbar {
+    display: none;
+}
+
+.message {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    padding: var(--space-sm);
+}

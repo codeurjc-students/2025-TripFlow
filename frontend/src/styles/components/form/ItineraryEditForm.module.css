@@ -11,6 +11,28 @@
     animation: fadeIn 0.3s ease-in-out;
 }
 
+.readOnly {
+    user-select: none;
+
+    button,
+    input,
+    textarea,
+    select {
+        pointer-events: none;
+        opacity: 0.8;
+    }
+}
+
+.readOnlyNotice {
+    width: 100%;
+    padding: var(--space-md);
+    border: 1px solid color-mix(in srgb, var(--warning) 40%, transparent);
+    border-radius: var(--border-radius-md);
+    background: color-mix(in srgb, var(--warning) 12%, var(--bg-secondary));
+    color: var(--warning);
+    font-size: var(--font-size-sm);
+}
+
 .formFooter {
     width: 100%;
     display: flex;

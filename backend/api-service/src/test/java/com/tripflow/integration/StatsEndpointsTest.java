@@ -11,6 +11,7 @@ import com.tripflow.dto.itinerary.ExtendedItineraryDTO;
 import com.tripflow.dto.itinerary.ItineraryDayDTO;
 import com.tripflow.dto.itinerary.ItineraryStatusDTO;
 import com.tripflow.dto.itinerary.LocationDTO;
+import com.tripflow.dto.auth.LoginRequest;
 import com.tripflow.integration.utils.AuthTestUtils;
 
 import io.restassured.RestAssured;
@@ -206,6 +207,47 @@ public class StatsEndpointsTest extends BaseIntegrationTest {
             .get("/v1/stats/user")
         .then()
             .statusCode(401);
+    }
+
+    @Test
+    @DisplayName("Test get users by plan stats as admin")
+    public void testGetUsersByPlanStatsAsAdmin() {
+        LoginRequest adminLogin = new LoginRequest("admin", "secure_password");
+
+        String adminToken = RestAssured
+        .given()
+            .contentType(ContentType.JSON)
+            .body(adminLogin)
+        .when()
+            .post("/auth/login")
+        .then()
+            .statusCode(200)
+            .extract()
+            .cookie("auth_token");
+
+        RestAssured
+        .given()
+            .cookie("auth_token", adminToken)
+        .when()
+            .get("/v1/stats/users-by-plan")
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body("items", Matchers.notNullValue());
+    }
+
+    @Test
+    @DisplayName("Test get users by plan stats forbidden for non-admin")
+    public void testGetUsersByPlanStatsForbiddenForUser() {
+        String userToken = AuthTestUtils.authenticateUserAndGetToken("regular_forbidden");
+
+        RestAssured
+        .given()
+            .cookie("auth_token", userToken)
+        .when()
+            .get("/v1/stats/users-by-plan")
+        .then()
+            .statusCode(403);
     }
 
     // [Helper Methods] ===============================================

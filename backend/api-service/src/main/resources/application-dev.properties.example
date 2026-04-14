@@ -3,6 +3,10 @@
 # This is a template file. Copy it to application-dev.properties and add your real secrets
 # application-dev.properties is in .gitignore and won't be committed
 
+# OpenAPI / Swagger
+springdoc.api-docs.enabled=true
+springdoc.swagger-ui.enabled=true
+
 # CORS Configuration
 origins.frontend=http://localhost
 
@@ -11,6 +15,19 @@ jwt.secret=your-jwt-secret-here
 
 # Unsplash API Configuration
 unsplash.api.key=your-unsplash-api-key
+
+# Maps API Configuration
+maps.enabled=true
+maps.provider=mock
+maps.timeout.ms=5000
+maps.cache.ttl-seconds.search=300
+maps.cache.ttl-seconds.directions=300
+
+# MapTiler API Configuration
+maptiler.api.key=your-maptiler-api-key
+
+# OpenRouteService API Configuration (Directions)
+openrouteservice.api.key=your-openrouteservice-api-key
 
 # Admin User Configuration
 admin.email=your-admin-email

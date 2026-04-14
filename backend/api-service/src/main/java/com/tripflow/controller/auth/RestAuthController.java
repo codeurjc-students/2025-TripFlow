@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import com.tripflow.dto.auth.AuthResponse;
 import com.tripflow.dto.auth.AuthStatus;
+import com.tripflow.dto.auth.ForgotPasswordRequest;
 import com.tripflow.dto.auth.LoginRequest;
+import com.tripflow.dto.auth.ResetPasswordOtpRequest;
 import com.tripflow.dto.auth.ResendCodeRequest;
 import com.tripflow.dto.auth.VerifyAccountRequest;
 import com.tripflow.dto.user.RegisterUserRequest;
@@ -42,7 +46,7 @@ public class RestAuthController {
         @ApiResponse(responseCode = "201", description = "User registered successfully"),
         @ApiResponse(responseCode = "400", description = "User registration failed")
     })
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterUserRequest request) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterUserRequest request) {
         AuthResponse response = authService.register(request);
         HttpStatusCode status = response.status() == AuthStatus.FAILURE
             ? HttpStatusCode.valueOf(400)
@@ -60,7 +64,7 @@ public class RestAuthController {
         @ApiResponse(responseCode = "200", description = "Account verified successfully"),
         @ApiResponse(responseCode = "400", description = "Account verification failed")
     })
-    public ResponseEntity<AuthResponse> verify(HttpServletResponse response, @RequestBody VerifyAccountRequest request) {
+    public ResponseEntity<AuthResponse> verify(HttpServletResponse response, @Valid @RequestBody VerifyAccountRequest request) {
         AuthResponse authResponse = authService.verify(response, request);
         HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE
             ? HttpStatusCode.valueOf(400)
@@ -78,7 +82,7 @@ public class RestAuthController {
         @ApiResponse(responseCode = "200", description = "Verification code sent successfully"),
         @ApiResponse(responseCode = "400", description = "Failed to resend verification code")
     })
-    public ResponseEntity<AuthResponse> resendCode(@RequestBody ResendCodeRequest request) {
+    public ResponseEntity<AuthResponse> resendCode(@Valid @RequestBody ResendCodeRequest request) {
         AuthResponse response = authService.resendVerificationCode(request.username());
         HttpStatusCode status = response.status() == AuthStatus.FAILURE
             ? HttpStatusCode.valueOf(400)
@@ -96,7 +100,7 @@ public class RestAuthController {
         @ApiResponse(responseCode = "200", description = "User logged in successfully"),
         @ApiResponse(responseCode = "401", description = "User login failed")
     })
-    public ResponseEntity<AuthResponse> login(HttpServletResponse response, @RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(HttpServletResponse response, @Valid @RequestBody LoginRequest request) {
         AuthResponse authResponse = authService.login(response, request);
         HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE
             ? HttpStatusCode.valueOf(401)
@@ -141,6 +145,40 @@ public class RestAuthController {
             ? HttpStatusCode.valueOf(401)
             : HttpStatusCode.valueOf(200);
         
+        return ResponseEntity.status(status).body(authResponse);
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(
+        summary = "Forgot Password Endpoint",
+        description = "Sends a one-time code to reset account password."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Request processed")
+    })
+    public ResponseEntity<AuthResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        AuthResponse authResponse = authService.forgotPassword(request);
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(authResponse);
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(
+        summary = "Reset Password with OTP",
+        description = "Resets password using username/email, OTP code, and new password."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Password reset successful"),
+        @ApiResponse(responseCode = "400", description = "Password reset failed")
+    })
+    public ResponseEntity<AuthResponse> resetPassword(
+        HttpServletResponse response,
+        @Valid @RequestBody ResetPasswordOtpRequest request
+    ) {
+        AuthResponse authResponse = authService.resetPasswordWithOtp(response, request);
+        HttpStatusCode status = authResponse.status() == AuthStatus.FAILURE
+            ? HttpStatusCode.valueOf(400)
+            : HttpStatusCode.valueOf(200);
+
         return ResponseEntity.status(status).body(authResponse);
     }
 }

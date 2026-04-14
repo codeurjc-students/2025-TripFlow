@@ -2,6 +2,7 @@ package com.tripflow.service.auth;
 
 import org.springframework.stereotype.Component;
 
+import com.tripflow.dto.auth.ResetPasswordOtpRequest;
 import com.tripflow.dto.user.RegisterUserRequest;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.Map;
 @Component
 public class AuthValidator {
     private static final String USERNAME_REGEX = "^[a-zA-Z0-9_]+$";
-    private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$";
+    private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
     private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
     private static final int MAX_USERNAME_LENGTH = 30;
     private static final int MIN_USERNAME_LENGTH = 3;
@@ -58,6 +59,31 @@ public class AuthValidator {
             errors.put(key, "Password must contain at least one uppercase letter, one lowercase letter, and one number.");
         } else if (!password.equals(request.confirmPassword())) {
             errors.put(key, "Password and confirmation do not match.");
+        }
+
+        return errors;
+    }
+
+    public Map<String, String> validateResetPasswordRequest(ResetPasswordOtpRequest request) {
+        Map<String, String> errors = new HashMap<>();
+
+        if (request.username() == null || request.username().trim().isEmpty()) {
+            errors.put("username", "Username or email is required.");
+        }
+
+        if (request.code() == null || request.code().trim().isEmpty()) {
+            errors.put("code", "Verification code is required.");
+        }
+
+        String password = request.password();
+        if (password == null || password.isEmpty()) {
+            errors.put("password", "Password is required.");
+        } else if (password.length() < MIN_PASSWORD_LENGTH) {
+            errors.put("password", "Password must be at least 8 characters long.");
+        } else if (!password.matches(PASSWORD_REGEX)) {
+            errors.put("password", "Password must contain at least one uppercase letter, one lowercase letter, and one number.");
+        } else if (!password.equals(request.confirmPassword())) {
+            errors.put("password", "Password and confirmation do not match.");
         }
 
         return errors;

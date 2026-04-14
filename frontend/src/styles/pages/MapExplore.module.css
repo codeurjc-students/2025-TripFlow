@@ -1,0 +1,124 @@
+@import url("../components/map/MapTheme.module.css");
+
+@media (max-width: 1024px) and (min-width: 769px) {
+    .topBarStack {
+        right: calc(var(--space-md) + 56px);
+    }
+}
+
+.page {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--bg-primary);
+}
+
+.mapContainer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.topBar {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: flex-start;
+}
+
+.topBarLeft {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.topBarStack {
+    position: absolute;
+    top: var(--space-md);
+    left: var(--space-md);
+    right: var(--space-md);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.topicRow {
+    display: flex;
+    gap: var(--space-xs);
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 2px;
+}
+
+.topicRow::-webkit-scrollbar {
+    display: none;
+}
+
+.topicChip {
+    border: 1px solid var(--border-secondary);
+    background: color-mix(in srgb, var(--bg-secondary) 85%, transparent);
+    color: var(--text-secondary);
+    border-radius: var(--border-radius-full);
+    padding: 6px 12px;
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.topicChipActive {
+    color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 50%, var(--border-secondary));
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.mapContainer :global(.explore-marker),
+.mapContainer :global(.current-location-marker) {
+    background: transparent;
+    border: none;
+}
+
+.mapContainer :global(.map-pin-dot) {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--border-radius-full);
+    border: 2px solid #ffffff;
+    display: block;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15), 0 2px 8px rgba(16, 25, 34, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.mapContainer :global(.current-location-marker .map-pin-dot) {
+    background: #8b5cf6;
+}
+
+.mapContainer :global(.explore-marker .map-pin-dot) {
+    background: #3ba6ff;
+}
+
+.mapContainer :global(.explore-marker-selected .map-pin-dot) {
+    background: #f38a25;
+    transform: scale(1.08);
+    box-shadow: 0 0 0 5px rgba(243, 138, 37, 0.24), 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.mapContainer :global(.current-location-tooltip) {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 2px solid var(--border-secondary);
+    border-radius: var(--border-radius-lg);
+    font-size: var(--font-size-xs);
+    padding: 6px 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.mapContainer :global(.current-location-tooltip::before) {
+    border-top-color: var(--border-secondary);
+}

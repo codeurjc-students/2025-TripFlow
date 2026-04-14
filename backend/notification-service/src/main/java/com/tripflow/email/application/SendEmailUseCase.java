@@ -1,6 +1,8 @@
 package com.tripflow.email.application;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.tripflow.email.domain.EmailMessage;
 import com.tripflow.email.domain.EmailService;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SendEmailUseCase {
+    private static final Logger log = LoggerFactory.getLogger(SendEmailUseCase.class);
+
     private final EmailService emailService;
 
     @Value("${spring.profiles.active}")
@@ -26,7 +30,7 @@ public class SendEmailUseCase {
      */
     public void execute(EmailMessage email) {
         if ("dev".equals(this.activeProfile)) {
-            System.out.println("Email sent to " + email.to() + " with subject " + email.subject());
+            log.info("Simulated email send in dev profile. to={}, subject={}", email.to(), email.subject());
             return;
         }
         

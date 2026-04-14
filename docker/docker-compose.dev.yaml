@@ -53,6 +53,8 @@ services:
     restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: dev
+      LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT:-INFO}
+      LOGGING_LEVEL_COM_TRIPFLOW: ${LOGGING_LEVEL_COM_TRIPFLOW:-INFO}
       POSTGRES_URL: jdbc:postgresql://postgres-api:5432/${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -63,6 +65,13 @@ services:
       JWT_SECRET: ${JWT_SECRET:-VGhpcyBpcyBhIHZlcnkgc2VjdXJlIGRldmVsb3BtZW50IHNlY3JldCEyMw==}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       UNSPLASH_API_KEY: ${UNSPLASH_API_KEY:-your_unsplash_api_key_here}
+      MAPS_ENABLED: ${MAPS_ENABLED:-false}
+      MAPS_PROVIDER: ${MAPS_PROVIDER:-mock}
+      MAPS_TIMEOUT_MS: ${MAPS_TIMEOUT_MS:-5000}
+      MAPS_CACHE_TTL_SECONDS_SEARCH: ${MAPS_CACHE_TTL_SECONDS_SEARCH:-300}
+      MAPS_CACHE_TTL_SECONDS_DIRECTIONS: ${MAPS_CACHE_TTL_SECONDS_DIRECTIONS:-300}
+      MAPTILER_API_KEY: ${MAPTILER_API_KEY:-your-maptiler-api-key-here}
+      OPENROUTESERVICE_API_KEY: ${OPENROUTESERVICE_API_KEY:-your-openrouteservice-api-key-here}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@admin.com}
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-secure_password}
@@ -78,6 +87,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - tripflow-network-dev
 
@@ -87,6 +101,8 @@ services:
     restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: dev
+      LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT:-INFO}
+      LOGGING_LEVEL_COM_TRIPFLOW: ${LOGGING_LEVEL_COM_TRIPFLOW:-INFO}
       JWT_SECRET: ${JWT_SECRET:-VGhpcyBpcyBhIHZlcnkgc2VjdXJlIGRldmVsb3BtZW50IHNlY3JldCEyMw==}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       AI_API_KEY: ${AI_API_KEY:-your-openai-api-key-here}
@@ -97,6 +113,11 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - tripflow-network-dev
 
@@ -106,6 +127,8 @@ services:
     restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: dev
+      LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT:-INFO}
+      LOGGING_LEVEL_COM_TRIPFLOW: ${LOGGING_LEVEL_COM_TRIPFLOW:-INFO}
       JWT_SECRET: ${JWT_SECRET:-VGhpcyBpcyBhIHZlcnkgc2VjdXJlIGRldmVsb3BtZW50IHNlY3JldCEyMw==}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       EMAIL_SENDER: ${EMAIL_SENDER:-your-email-sender-here}
@@ -115,6 +138,11 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - tripflow-network-dev
 

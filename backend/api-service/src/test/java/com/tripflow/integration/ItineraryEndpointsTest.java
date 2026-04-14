@@ -10,6 +10,8 @@ import com.tripflow.dto.itinerary.ExtendedItineraryDTO;
 import com.tripflow.dto.itinerary.ItineraryDayDTO;
 import com.tripflow.dto.itinerary.ItineraryStatusDTO;
 import com.tripflow.dto.itinerary.LocationDTO;
+import com.tripflow.dto.itinerary.collaborator.AddCollaboratorRequest;
+import com.tripflow.dto.itinerary.collaborator.CollaboratorRoleDTO;
 import com.tripflow.integration.utils.AuthTestUtils;
 
 import io.restassured.RestAssured;
@@ -45,7 +47,11 @@ public class ItineraryEndpointsTest extends BaseIntegrationTest {
             .body("days[0].activities", hasSize(1))
             .body("days[0].activities[0].activity", equalTo(
                 itineraryDTO.days().get(0).activities().get(0).activity()
-            ));
+            ))
+            .body("permissions", notNullValue())
+            .body("permissions.view", is(true))
+            .body("permissions.edit", is(true))
+            .body("permissions.delete", is(true));
     }
 
     @Test
@@ -97,7 +103,11 @@ public class ItineraryEndpointsTest extends BaseIntegrationTest {
             .body("itemsPerPage", equalTo(10))
             .body("totalItems", greaterThanOrEqualTo(1))
             .body("totalPages", greaterThanOrEqualTo(1))
-            .body("isLastPage", is(true));
+            .body("isLastPage", is(true))
+            .body("page[0].permissions", notNullValue())
+            .body("page[0].permissions.view", is(true))
+            .body("page[0].permissions.edit", is(true))
+            .body("page[0].permissions.delete", is(true));
     }
 
     @Test
@@ -182,7 +192,11 @@ public class ItineraryEndpointsTest extends BaseIntegrationTest {
             .statusCode(200)
             .body("id", equalTo(itineraryId.intValue()))
             .body("place", equalTo(itineraryDTO.place()))
-            .body("place", equalTo("Paris"));
+            .body("place", equalTo("Paris"))
+            .body("permissions", notNullValue())
+            .body("permissions.view", is(true))
+            .body("permissions.edit", is(true))
+            .body("permissions.delete", is(true));
     }
 
     @Test
@@ -394,6 +408,82 @@ public class ItineraryEndpointsTest extends BaseIntegrationTest {
             .body("days[1].activities[0].activity", equalTo("Visit Louvre"));
     }
 
+    @Test
+    @DisplayName("Viewer collaborator can view itinerary but cannot update or delete")
+    public void testViewerPermissions() {
+        String ownerName = AuthTestUtils.generateUniqueValue("owner_view");
+        String viewerName = AuthTestUtils.generateUniqueValue("viewer_view");
+        String ownerToken = AuthTestUtils.authenticateUserAndGetToken(ownerName, false);
+        String viewerToken = AuthTestUtils.authenticateUserAndGetToken(viewerName, false);
+
+        Long itineraryId = createItineraryAndGetId(ownerToken);
+        sendInvitation(ownerToken, itineraryId, viewerName, CollaboratorRoleDTO.VIEWER);
+        acceptInvitation(viewerToken, itineraryId, viewerName);
+
+        RestAssured
+            .given()
+                .cookie("auth_token", viewerToken)
+            .when()
+                .get("/v1/itineraries/{id}", itineraryId)
+            .then()
+                .statusCode(200)
+                .body("permissions.view", is(true))
+                .body("permissions.edit", is(false))
+                .body("permissions.delete", is(false));
+
+        ExtendedItineraryDTO updated = createUpdatePayload(itineraryId, "Viewer Update");
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+                .cookie("auth_token", viewerToken)
+                .body(updated)
+            .when()
+                .put("/v1/itineraries/{id}", itineraryId)
+            .then()
+                .statusCode(403);
+
+        RestAssured
+            .given()
+                .cookie("auth_token", viewerToken)
+            .when()
+                .delete("/v1/itineraries/{id}", itineraryId)
+            .then()
+                .statusCode(403);
+    }
+
+    @Test
+    @DisplayName("Editor collaborator can update but cannot delete")
+    public void testEditorPermissions() {
+        String ownerName = AuthTestUtils.generateUniqueValue("owner_edit");
+        String editorName = AuthTestUtils.generateUniqueValue("editor_edit");
+        String ownerToken = AuthTestUtils.authenticateUserAndGetToken(ownerName, false);
+        String editorToken = AuthTestUtils.authenticateUserAndGetToken(editorName, false);
+
+        Long itineraryId = createItineraryAndGetId(ownerToken);
+        sendInvitation(ownerToken, itineraryId, editorName, CollaboratorRoleDTO.EDITOR);
+        acceptInvitation(editorToken, itineraryId, editorName);
+
+        ExtendedItineraryDTO updated = createUpdatePayload(itineraryId, "Editor Update");
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+                .cookie("auth_token", editorToken)
+                .body(updated)
+            .when()
+                .put("/v1/itineraries/{id}", itineraryId)
+            .then()
+                .statusCode(200)
+                .body("title", equalTo("Editor Update"));
+
+        RestAssured
+            .given()
+                .cookie("auth_token", editorToken)
+            .when()
+                .delete("/v1/itineraries/{id}", itineraryId)
+            .then()
+                .statusCode(403);
+    }
+
     // [Helper Methods] ===============================================
 
     /**
@@ -411,6 +501,73 @@ public class ItineraryEndpointsTest extends BaseIntegrationTest {
             null, "Paris", "Paris",
             2, 1000.0, "2025-06-10", List.of("romantic", "city"),
             0L, ItineraryStatusDTO.DRAFT, List.of(day), 1, null
+        );
+    }
+
+    private Long createItineraryAndGetId(String ownerToken) {
+        ExtendedItineraryDTO itineraryDTO = createTestItinerary();
+
+        return RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+                .cookie("auth_token", ownerToken)
+                .body(itineraryDTO)
+            .when()
+                .post("/v1/itineraries")
+            .then()
+                .statusCode(201)
+                .extract()
+                .jsonPath()
+                .getLong("id");
+    }
+
+    private void sendInvitation(
+        String ownerToken,
+        Long itineraryId,
+        String collaboratorName,
+        CollaboratorRoleDTO role
+    ) {
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+                .cookie("auth_token", ownerToken)
+                .body(new AddCollaboratorRequest(collaboratorName, role))
+            .when()
+                .post("/v1/itineraries/{id}/collaborators", itineraryId)
+            .then()
+                .statusCode(201);
+    }
+
+    private void acceptInvitation(String collaboratorToken, Long itineraryId, String collaboratorName) {
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+                .cookie("auth_token", collaboratorToken)
+            .when()
+                .put("/v1/itineraries/{id}/collaborators/{username}/accept", itineraryId, collaboratorName)
+            .then()
+                .statusCode(200);
+    }
+
+    private ExtendedItineraryDTO createUpdatePayload(Long itineraryId, String title) {
+        CoordinatesDTO coordinates = new CoordinatesDTO(41.9028, 12.4964);
+        LocationDTO location = new LocationDTO("Colosseum", "Rome, Italy", coordinates);
+        ActivityDTO activity = new ActivityDTO("Visit Colosseum", "Sightseeing", location, "10:00", "2h");
+        ItineraryDayDTO day = new ItineraryDayDTO(1, List.of(activity));
+
+        return new ExtendedItineraryDTO(
+            itineraryId,
+            title,
+            "Rome",
+            2,
+            1500.0,
+            "2025-06-10",
+            List.of("history"),
+            1L,
+            ItineraryStatusDTO.DRAFT,
+            List.of(day),
+            1,
+            null
         );
     }
 }

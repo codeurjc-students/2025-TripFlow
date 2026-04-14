@@ -2,6 +2,8 @@ package com.tripflow.service.auth;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -12,11 +14,14 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tripflow.dto.auth.AuthResponse;
 import com.tripflow.dto.auth.AuthStatus;
+import com.tripflow.dto.auth.ForgotPasswordRequest;
 import com.tripflow.dto.auth.LoginRequest;
+import com.tripflow.dto.auth.ResetPasswordOtpRequest;
 import com.tripflow.dto.user.PublicUserDTO;
 import com.tripflow.exception.EmailAlreadyExistsException;
 import com.tripflow.exception.UsernameAlreadyExistsException;
@@ -36,6 +41,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class AuthService {
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -111,6 +118,7 @@ public class AuthService {
                 null
             );
         } catch (Exception e) {
+            log.error("Unexpected error during registration for username {}", request.username(), e);
             return new AuthResponse(
                 AuthStatus.FAILURE,
                 null,
@@ -155,6 +163,7 @@ public class AuthService {
                 null
             );
         } catch (Exception e) {
+            log.error("Unexpected error during account verification for username {}", request.username(), e);
             return new AuthResponse(
                 AuthStatus.FAILURE,
                 "Verification failed",
@@ -192,10 +201,68 @@ public class AuthService {
                 null
             );
         } catch (Exception e) {
+            log.error("Unexpected error while resending verification code for username {}", username, e);
             return new AuthResponse(
                 AuthStatus.FAILURE,
                 "Failed to resend verification code",
                 Map.of("error", e.getMessage()),
+                null
+            );
+        }
+    }
+
+    public AuthResponse forgotPassword(ForgotPasswordRequest request) {
+        try {
+            String usernameOrEmail = request.username();
+            User user = usernameOrEmail != null && usernameOrEmail.contains("@")
+                ? this.userService.getUserByEmail(usernameOrEmail)
+                : this.userService.getUserByUsername(usernameOrEmail);
+
+            VerificationCode code = this.userService.generatePasswordResetCode(user.getEmail());
+            this.sendPasswordResetEmail(user.getEmail(), code.code());
+        } catch (Exception e) {
+            log.info("Password reset requested for unknown identifier");
+        }
+
+        return new AuthResponse(
+            AuthStatus.SUCCESS,
+            "If the account exists, a reset code was sent.",
+            null,
+            null
+        );
+    }
+
+    public AuthResponse resetPasswordWithOtp(HttpServletResponse response, ResetPasswordOtpRequest request) {
+        Map<String, String> errors = this.authValidator.validateResetPasswordRequest(request);
+        if (!errors.isEmpty()) {
+            return new AuthResponse(AuthStatus.FAILURE, "Reset failed", errors, null);
+        }
+
+        try {
+            this.userService.resetPasswordWithCode(request.username(), request.code(), request.password());
+
+            response.addHeader(HttpHeaders.SET_COOKIE, this.removeTokenFromCookie(TokenType.AUTH_TOKEN).toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, this.removeTokenFromCookie(TokenType.REFRESH_TOKEN).toString());
+
+            return new AuthResponse(
+                AuthStatus.SUCCESS,
+                "Password reset successful",
+                null,
+                null
+            );
+        } catch (IllegalArgumentException e) {
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Reset failed",
+                Map.of("code", e.getMessage()),
+                null
+            );
+        } catch (Exception e) {
+            log.error("Unexpected error during password reset", e);
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Reset failed",
+                Map.of("unexpected", "An error occurred during reset"),
                 null
             );
         }
@@ -212,10 +279,19 @@ public class AuthService {
         // Retrieve username or email from the request
         String identifier = request.username();
         String username;
-        if (identifier != null && identifier.contains("@")) {
-            username = this.userService.getUserByEmail(identifier).getUsername();
-        } else {
-            username = identifier;
+        try {
+            if (identifier != null && identifier.contains("@")) {
+                username = this.userService.getUserByEmail(identifier).getUsername();
+            } else {
+                username = identifier;
+            }
+        } catch (UsernameNotFoundException e) {
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Invalid credentials",
+                null,
+                null
+            );
         }
 
         // Try to authenticate the user
@@ -237,10 +313,30 @@ public class AuthService {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Retrieve user details and public user information
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+        UserDetails userDetails;
+        try {
+            userDetails = this.userDetailsService.loadUserByUsername(username);
+        } catch (UsernameNotFoundException e) {
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Invalid credentials",
+                null,
+                null
+            );
+        }
         
         // Check if user is verified
-        User user = this.userService.getUserByUsername(username);
+        User user;
+        try {
+            user = this.userService.getUserByUsername(username);
+        } catch (UsernameNotFoundException e) {
+            return new AuthResponse(
+                AuthStatus.FAILURE,
+                "Invalid credentials",
+                null,
+                null
+            );
+        }
         if (!user.getVerified()) {
             this.sendVerificationEmail(user.getEmail());
 
@@ -315,6 +411,7 @@ public class AuthService {
                 publicUser
             );
         } catch (Exception e) {
+            log.warn("Refresh token validation failed", e);
             return new AuthResponse(
                 AuthStatus.FAILURE,
                 "Invalid refresh token",
@@ -375,5 +472,13 @@ public class AuthService {
 
         response.addHeader(HttpHeaders.SET_COOKIE, authCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+    }
+
+    private void sendPasswordResetEmail(String email, String code) {
+        this.kafkaService.sendEmailMessage(new EmailMessage(
+            email,
+            EmailType.PASSWORD_RESET_OTP,
+            Map.of("code", code, "expiryMinutes", "15")
+        ));
     }
 }

@@ -2,11 +2,22 @@ package com.tripflow.model;
 
 import java.time.Instant;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.tripflow.model.types.NotificationType;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Notification {
     
     @Id
@@ -19,18 +30,13 @@ public class Notification {
     @Column(nullable = false)
     private String message;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private NotificationType type;
 
+    @CreatedDate
     @Column(nullable = false, updatable = false)
     private Instant timestamp;
-
-    @PrePersist
-    protected void onCreate() {
-        if (timestamp == null) {
-            timestamp = Instant.now();
-        }
-    }
 
     // [Constructors] =================================================
 

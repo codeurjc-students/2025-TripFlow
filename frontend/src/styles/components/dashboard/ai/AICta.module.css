@@ -1,5 +1,4 @@
 .aiCtaSection {
-    max-width: 600px;
     width: 100%;
     padding-inline: var(--app-padding);
     display: flex;
@@ -22,39 +21,114 @@
     }
 
     .cta {
+        --cta-overlay: linear-gradient(
+            90deg, var(--bg-secondary) 0%,
+            color-mix(in srgb, var(--bg-secondary) 92%, transparent) 48%,
+            transparent 72%
+        );
         width: 100%;
         padding: var(--space-xl);
         display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: var(--space-md);
-        
+        align-items: center;
         background: var(--bg-secondary);
+        background-image: var(--cta-overlay), url("/assets/giddeon_2.png");
+        background-repeat: no-repeat;
+        background-position-y: 24px;
+        background-position-x: right;
+        background-size: cover, auto 115%;
         border-radius: var(--border-radius-lg);
         border: 2px solid var(--border-secondary);
+        position: relative;
+        overflow: hidden;
 
-        p {
-            color: var(--text-tertiary);
-            font-size: var(--font-size-md);
-            text-wrap: balance;
-            margin-bottom: var(--space-md);
+        .ctaContent {
+            width: min(64%, 720px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: var(--space-md);
+            z-index: 1;
+
+            .ctaEyebrow {
+                width: fit-content;
+                padding: 4px var(--space-sm);
+                border-radius: var(--border-radius-full);
+                border: 1px solid var(--info-border);
+                color: var(--info-text);
+                background: var(--info-bg);
+                font-size: var(--font-size-xs);
+                font-weight: var(--font-weight-medium);
+            }
+
+            .ctaHeading {
+                color: var(--text-primary);
+                font-size: var(--font-size-xxl);
+                line-height: 1.15;
+                text-wrap: balance;
+                margin: 0;
+            }
+
+            p {
+                color: var(--text-tertiary);
+                font-size: var(--font-size-md);
+                line-height: 1.6;
+                text-wrap: pretty;
+                margin: 0;
+                max-width: 56ch;
+            }
+
+            .ctaAction {
+                margin-top: var(--space-md);
+            }
         }
-
     }
 }
 
 @media (min-width: 768px) {
     .aiCtaSection {
-        max-width: 100%;
-        
         .cta {
             padding: var(--space-xxl);
+            background-size: cover, auto 115%;
 
-            p {
-                margin-bottom: var(--space-xl);
-                font-size: var(--font-size-md);
-                max-width: 100%;
+            .ctaContent {
+                .ctaHeading {
+                    font-size: var(--font-size-xxxl);
+                }
             }
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .aiCtaSection {
+        .cta {
+            --cta-overlay: linear-gradient(
+                -90deg,
+                var(--bg-secondary) 0%,
+                color-mix(in srgb, var(--bg-secondary) 60%, transparent) 44%,
+                transparent 100%
+                );
+            padding: var(--space-lg);
+            align-items: flex-start;
+            justify-content: flex-start;
+
+            .ctaContent {
+                width: 100%;
+                max-width: 100%;
+
+                .ctaHeading {
+                    font-size: var(--font-size-xl);
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .aiCtaSection {
+        .cta {
+            background-size: cover, auto 70%;
+            background-position: right 16px top 16px;
         }
     }
 }

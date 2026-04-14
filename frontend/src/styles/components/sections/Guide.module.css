@@ -1,70 +1,73 @@
 .guide {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  .content {
-    height: 100%;
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-  }
+    justify-content: space-between;
+    align-items: center;
 
-  .p,
-  .text {
-    font-size: var(--font-size-lg);
-  }
+    .content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+    }
 
-  .p {
-    margin-bottom: var(--space-xs);
-  }
+    .p,
+    .text {
+        font-size: var(--font-size-lg);
+    }
 
-  .text {
-    list-style: decimal;
-    margin-left: var(--space-xxxl);
-    padding-left: var(--space-md);
-  }
+    .p {
+        margin-bottom: var(--space-xs);
+    }
 
-  .subtitle {
-    font-size: var(--font-size-md);
-    font-weight: var(--font-weight-bold);
-    margin-top: var(--space-larger);
-    margin-bottom: var(--space-xl);
-  }
+    .text {
+        list-style: decimal;
+        margin-left: var(--space-xxxl);
+        padding-left: var(--space-md);
+    }
+
+    .subtitle {
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-bold);
+        margin-top: var(--space-larger);
+        margin-bottom: var(--space-xl);
+    }
 }
 
 .guideImage {
-  --size: 400px;
-  width: var(--size);
-  height: var(--size);
+    --size: 400px;
+    width: var(--size);
+    height: var(--size);
 
-  .imageContainer {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: var(--border-radius-lg);
-    overflow: hidden;
+    .imageContainer {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-    .image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: drop-shadow(0 0 24px #ff00a248);
+        .image {
+            max-height: 120%;
+            filter: drop-shadow(0 10px 20px rgba(0, 136, 255, 0.1));
+            transform: rotate(-5deg);
+        }
     }
-  }
 }
 
 @media (max-width: 900px) {
-  .guide {
-    flex-direction: column;
-    align-items: center;
-  }
+    .guide {
+        flex-direction: column;
+        align-items: center;
+    }
 
-  .guideImage {
-    --size: 300px;
-  }
+    .guideImage {
+        margin-top: var(--space-largest);
+
+        .imageContainer {
+            .image {
+                max-height: 110%;
+            }
+        }
+    }
 }

@@ -8,7 +8,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-larger);
+    gap: var(--space-xxxl);
 
     background-color: var(--bg-primary-alpha);
     backdrop-filter: blur(10px);
@@ -37,12 +37,25 @@
 
         .left {
             .description {
-                max-width: 350px;
+                max-width: 420px;
                 color: var(--text-tertiary);
+                font-weight: var(--font-weight-light);
+                text-wrap: pretty;
             }
         }
 
         .right {
+            .author {
+                color: var(--text-tertiary);
+                font-size: var(--font-size-sm);
+                line-height: 1.2;
+            }
+
+            .authorName {
+                color: var(--primary);
+                font-weight: var(--font-weight-bold);
+            }
+
             .socials {
                 width: 100%;
                 display: flex;
@@ -52,9 +65,46 @@
         }
     }
 
+    .footer_bottom {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-lg);
+    }
+
     .copyright {
         color: var(--text-tertiary);
-        text-align: center;
+        font-size: var(--font-size-sm);
+        margin: 0;
+        text-wrap: pretty;
+    }
+
+    .legalLinks {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+
+        .legalLink {
+            color: var(--text-tertiary);
+            font-size: var(--font-size-sm);
+            line-height: 1;
+            text-decoration: none;
+            transition: color 0.2s ease;
+
+            @media (hover: hover) {
+                &:hover {
+                    color: var(--text-secondary);
+                }
+            }
+        }
+
+        .separator {
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+            line-height: 1;
+        }
     }
 }
 
@@ -81,8 +131,21 @@
             }
         }
 
+        .footer_bottom {
+            flex-direction: column-reverse;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-xxl);
+        }
+
         .copyright {
             word-break: break-word;
+            text-align: center;
+        }
+
+        .legalLinks {
+            flex-wrap: wrap;
+            justify-content: center;
         }
     }
 }

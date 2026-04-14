@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ItineraryShareLink.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.model.itinerary</a> &gt; <span class="el_source">ItineraryShareLink.java</span></div><h1>ItineraryShareLink.java</h1><pre class="source lang-java linenums">package com.tripflow.model.itinerary;
+
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.tripflow.model.User;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = &quot;itinerary_share_link&quot;)
+@EntityListeners(AuditingEntityListener.class)
+<span class="fc" id="L23">public class ItineraryShareLink {</span>
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true, length = 64)
+    private String token;
+
+    @ManyToOne
+    @JoinColumn(name = &quot;itinerary_id&quot;, nullable = false)
+    private Itinerary itinerary;
+
+    @ManyToOne
+    @JoinColumn(name = &quot;created_by_user_id&quot;, nullable = false)
+    private User createdBy;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime expiresAt;
+
+    @Column
+    private LocalDateTime revokedAt;
+
+    public Long getId() {
+<span class="fc" id="L51">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L55">        this.id = id;</span>
+<span class="fc" id="L56">    }</span>
+
+    public String getToken() {
+<span class="fc" id="L59">        return token;</span>
+    }
+
+    public void setToken(String token) {
+<span class="fc" id="L63">        this.token = token;</span>
+<span class="fc" id="L64">    }</span>
+
+    public Itinerary getItinerary() {
+<span class="fc" id="L67">        return itinerary;</span>
+    }
+
+    public void setItinerary(Itinerary itinerary) {
+<span class="fc" id="L71">        this.itinerary = itinerary;</span>
+<span class="fc" id="L72">    }</span>
+
+    public User getCreatedBy() {
+<span class="nc" id="L75">        return createdBy;</span>
+    }
+
+    public void setCreatedBy(User createdBy) {
+<span class="fc" id="L79">        this.createdBy = createdBy;</span>
+<span class="fc" id="L80">    }</span>
+
+    public LocalDateTime getCreatedAt() {
+<span class="fc" id="L83">        return createdAt;</span>
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+<span class="fc" id="L87">        this.createdAt = createdAt;</span>
+<span class="fc" id="L88">    }</span>
+
+    public LocalDateTime getExpiresAt() {
+<span class="fc" id="L91">        return expiresAt;</span>
+    }
+
+    public void setExpiresAt(LocalDateTime expiresAt) {
+<span class="fc" id="L95">        this.expiresAt = expiresAt;</span>
+<span class="fc" id="L96">    }</span>
+
+    public LocalDateTime getRevokedAt() {
+<span class="fc" id="L99">        return revokedAt;</span>
+    }
+
+    public void setRevokedAt(LocalDateTime revokedAt) {
+<span class="fc" id="L103">        this.revokedAt = revokedAt;</span>
+<span class="fc" id="L104">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

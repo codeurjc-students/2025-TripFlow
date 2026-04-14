@@ -57,4 +57,18 @@ export const mockAuth = {
       notificationsAllowed: true
     },
   }),
+
+  "/api/auth/forgot-password": async (_method: string, _body?: unknown): Promise<AuthResponse> => ({
+    status: "SUCCESS",
+    message: "A reset code was sent to your email",
+    errors: {},
+    user: null as any,
+  }),
+
+  "/api/auth/reset-password": async (_method: string, _body?: unknown): Promise<AuthResponse> => ({
+    status: "SUCCESS",
+    message: "Password reset successful",
+    errors: {},
+    user: null as any,
+  }),
 };

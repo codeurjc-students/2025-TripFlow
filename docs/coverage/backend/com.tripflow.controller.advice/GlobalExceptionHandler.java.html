@@ -1,28 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.controller.advice</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.tripflow.controller.advice;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.tripflow.dto.shared.ErrorResponse;
+
 @RestControllerAdvice
-<span class="fc" id="L11">public class GlobalExceptionHandler {</span>
+<span class="fc" id="L18">public class GlobalExceptionHandler {</span>
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleValidationException(MethodArgumentNotValidException ex) {
+<span class="fc" id="L22">        Map&lt;String, String&gt; fieldErrors = ex.getBindingResult().getFieldErrors().stream()</span>
+<span class="fc" id="L23">            .collect(Collectors.toMap(</span>
+<span class="fc" id="L24">                error -&gt; error.getField(),</span>
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">                error -&gt; error.getDefaultMessage() != null ? error.getDefaultMessage() : &quot;Invalid value&quot;,</span>
+<span class="nc" id="L26">                (existing, replacement) -&gt; existing</span>
+            ));
+
+<span class="fc" id="L29">        return ResponseEntity.badRequest().body(new ErrorResponse(&quot;Validation failed&quot;, fieldErrors));</span>
+    }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity&lt;Void&gt; handleUsernameNotFoundException(UsernameNotFoundException ex) {
-<span class="fc" id="L15">        return ResponseEntity.notFound().build();</span>
+    public ResponseEntity&lt;ErrorResponse&gt; handleUsernameNotFoundException(UsernameNotFoundException ex) {
+<span class="fc" id="L34">        return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="fc" id="L35">            .body(new ErrorResponse(&quot;User not found&quot;, ex.getMessage()));</span>
     }
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity&lt;Void&gt; handleResponseStatusException(ResponseStatusException ex) {
-<span class="fc" id="L20">        return ResponseEntity.status(ex.getStatusCode()).build();</span>
+    public ResponseEntity&lt;ErrorResponse&gt; handleResponseStatusException(ResponseStatusException ex) {
+<span class="fc" id="L40">        return ResponseEntity.status(ex.getStatusCode())</span>
+<span class="fc" id="L41">            .body(new ErrorResponse(ex.getReason(), null));</span>
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleMissingServletRequestParameterException(
+        MissingServletRequestParameterException ex
+    ) {
+<span class="nc" id="L48">        return ResponseEntity.badRequest()</span>
+<span class="nc" id="L49">            .body(new ErrorResponse(ex.getMessage(), null));</span>
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity&lt;Void&gt; handleException(Exception ex) {
-<span class="nc" id="L25">        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();</span>
+    public ResponseEntity&lt;ErrorResponse&gt; handleException(Exception ex) {
+<span class="nc" id="L54">        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
+<span class="nc" id="L55">            .body(new ErrorResponse(&quot;Internal server error&quot;, null));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

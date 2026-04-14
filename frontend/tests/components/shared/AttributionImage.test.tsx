@@ -83,4 +83,13 @@ describe("AttributionImage Component", () => {
         );
         expect(screen.getByTestId("child-element")).toBeInTheDocument();
     });
+
+    it("renders fallback template when image fails to load", () => {
+        render(<AttributionImage {...defaultProps} />);
+
+        const image = screen.getByRole("img");
+        fireEvent.error(image);
+
+        expect(screen.getByText(/imagen no disponible sin conexión/i)).toBeInTheDocument();
+    });
 });

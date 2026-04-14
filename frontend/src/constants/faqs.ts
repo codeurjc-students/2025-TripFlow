@@ -4,23 +4,23 @@ export const FAQ_CATEGORIES = [
         items: [
             {
                 question: "¿Es gratuito TripFlow?",
-                answer: "Sí, TripFlow es completamente gratuito para uso personal. Puedes crear itinerarios ilimitados y utilizar nuestra IA sin coste."
+                answer: "Sí. Actualmente puedes usar TripFlow gratis para planificar viajes, crear itinerarios y probar sus funciones principales."
             },
             {
                 question: "¿Necesito conexión a internet?",
-                answer: "Sí, actualmente necesitas conexión a internet para generar itinerarios y acceder a todas las funcionalidades de la plataforma."
+                answer: "Para crear, editar o sincronizar itinerarios sí. Si pierdes conexión, TripFlow activa modo solo lectura y te permite consultar datos que ya estén en caché."
             },
             {
                 question: "¿TripFlow funciona en cualquier país?",
-                answer: "Sí, TripFlow es compatible con destinos de todo el mundo y adapta sus recomendaciones según el lugar y la cultura local."
+                answer: "Sí. Puedes planificar destinos internacionales y adaptar tu itinerario según tus fechas, intereses y ritmo de viaje."
             },
             {
                 question: "¿Puedo usarlo en el móvil?",
-                answer: "Sí, nuestra plataforma está totalmente optimizada para dispositivos móviles, facilitando la consulta de tu viaje mientras te desplazas."
+                answer: "Sí. TripFlow está optimizado para móvil y también puedes instalarlo como PWA para abrirlo más rápido y consultar tu viaje en movimiento."
             },
             {
                 question: "¿Necesito registrarme para usarlo?",
-                answer: "Para guardar tus itinerarios y acceder a ellos más tarde, necesitas crear una cuenta gratuita. El proceso es muy rápido y sencillo."
+                answer: "Para guardar, editar y compartir itinerarios sí. También puedes probar una demo para explorar la experiencia antes de crear tu cuenta."
             }
         ]
     },
@@ -29,15 +29,23 @@ export const FAQ_CATEGORIES = [
         items: [
             {
                 question: "¿Cómo funciona la generación por IA?",
-                answer: "Nuestra IA analiza tus preferencias de destino, presupuesto y ritmo de viaje para crear un itinerario personalizado en segundos."
+                answer: "La IA usa la información de tu viaje (destino, días y preferencias) para proponerte una base de itinerario que luego puedes ajustar a tu manera."
             },
             {
                 question: "¿Puedo personalizar mi itinerario?",
-                answer: "Por supuesto. La IA te da una base sólida, pero tú tienes el control total para añadir, eliminar o mover actividades y modificar horarios según tus necesidades."
+                answer: "Sí. Puedes editar días, actividades y detalles de cada parada. Tú decides el orden final y el ritmo de tu viaje."
             },
             {
-                question: "¿De dónde provienen las imágenes?",
-                answer: "Utilizamos la integración con Unsplash para mostrarte imágenes de alta calidad inspiradoras de los destinos que visitas."
+                question: "¿TripFlow optimiza automáticamente rutas?",
+                answer: "Actualmente no aplica un algoritmo automático de optimización de rutas. TripFlow te ayuda a visualizar y organizar paradas de forma clara para planificar mejor tus desplazamientos."
+            },
+            {
+                question: "¿Puedo ver el itinerario en mapa?",
+                answer: "Sí. Puedes abrir la vista de mapa para revisar tus puntos y rutas, y usarla como apoyo para decidir el orden de tus visitas."
+            },
+            {
+                question: "¿De dónde salen las imágenes de los destinos?",
+                answer: "Las imágenes se obtienen mediante integración con Unsplash para mostrar referencias visuales de cada lugar."
             }
         ]
     },
@@ -46,11 +54,15 @@ export const FAQ_CATEGORIES = [
         items: [
             {
                 question: "¿Cómo puedo personalizar mi perfil?",
-                answer: "Puedes subir una foto de avatar personalizada y actualizar tus datos básicos desde la sección de 'Mi Perfil'."
+                answer: "Desde tu perfil puedes actualizar tus datos básicos y tu avatar cuando lo necesites."
+            },
+            {
+                question: "¿Puedo compartir un itinerario con otras personas?",
+                answer: "Sí. Puedes invitar colaboradores, asignar permisos y trabajar en el mismo itinerario de forma compartida."
             },
             {
                 question: "¿Cómo puedo eliminar mi cuenta?",
-                answer: "Puedes gestionar la eliminación de tu cuenta y todos tus datos personales de forma permanente directamente desde la configuración de tu perfil."
+                answer: "Puedes eliminar tu cuenta desde la configuración de perfil. Esta acción elimina de forma permanente tu acceso y tus datos asociados."
             }
         ]
     }

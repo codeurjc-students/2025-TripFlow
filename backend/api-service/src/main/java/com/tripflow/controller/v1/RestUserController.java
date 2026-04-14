@@ -8,9 +8,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.tripflow.dto.shared.PaginatedDTO;
+import com.tripflow.dto.itinerary.collaborator.CollaboratorDTO;
 import com.tripflow.dto.user.PublicUserDTO;
 import com.tripflow.dto.user.UpdateUserRequest;
 import com.tripflow.service.UserService;
+import com.tripflow.service.itinerary.ItineraryCollaborationService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +21,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
@@ -33,15 +36,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api/v1/users")
 @Tag(name = "Users Management", description = "User management and operations")
 public class RestUserController {
     private final UserService userService;
+    private final ItineraryCollaborationService collaborationService;
 
-    public RestUserController(UserService userService) {
+    public RestUserController(
+        UserService userService,
+        ItineraryCollaborationService collaborationService
+    ) {
         this.userService = userService;
+        this.collaborationService = collaborationService;
     }
 
     @GetMapping("")
@@ -88,7 +98,7 @@ public class RestUserController {
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<PublicUserDTO> updateUser(
-        @PathVariable String username, @RequestBody UpdateUserRequest request
+        @PathVariable String username, @Valid @RequestBody UpdateUserRequest request
     ) throws Exception {
         PublicUserDTO user = this.userService.updateUser(username, request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
@@ -144,5 +154,20 @@ public class RestUserController {
     public ResponseEntity<Resource> getAvatar(@PathVariable String username) throws Exception {
         Resource resource = this.userService.getAvatar(username);
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);
+    }
+
+    @GetMapping("/{username}/invitations")
+    @Operation(
+        summary = "Get pending invitations",
+        description = "Retrieves all pending collaboration invitations for a user.",
+        security = @SecurityRequirement(name = "auth_token")
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Invitations retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    public ResponseEntity<List<CollaboratorDTO>> getPendingInvitations(@PathVariable String username) {
+        List<CollaboratorDTO> invitations = this.collaborationService.getPendingInvitations(username);
+        return ResponseEntity.ok(invitations);
     }
 }

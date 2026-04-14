@@ -1,0 +1,150 @@
+.mapContainer :global(.leaflet-container) {
+    background: var(--bg-primary);
+}
+
+.mapContainer :global(.leaflet-tile-pane),
+.mapContainer :global(.leaflet-tile) {
+    background: var(--bg-primary);
+}
+
+.mapContainer :global(.leaflet-tile-pane) {
+    filter: brightness(1.2) sepia(0.5) hue-rotate(170deg) saturate(2);
+}
+
+.mapContainer :global(.leaflet-control-container) {
+    z-index: 500;
+}
+
+.mapContainer :global(.leaflet-top.leaflet-right) {
+    top: calc(var(--space-md) + 42px + var(--space-sm));
+    right: var(--space-md);
+}
+
+.mapContainer :global(.leaflet-control-zoom.leaflet-bar) {
+    display: grid;
+    gap: var(--space-sm);
+    border: none;
+    box-shadow: none;
+    margin: 0;
+}
+
+.mapContainer :global(.leaflet-control-zoom.leaflet-bar a) {
+    --size: 42px;
+    width: var(--size);
+    height: var(--size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--border-secondary);
+    background-color: var(--bg-secondary);
+    color: var(--text-tertiary);
+    line-height: 1;
+    font-size: 24px;
+    font-weight: var(--font-weight-normal);
+    box-shadow: none;
+    border-radius: var(--border-radius-lg);
+    margin: 0;
+}
+
+.mapContainer :global(.leaflet-control-zoom.leaflet-bar a:hover) {
+    filter: brightness(1.2);
+    background-color: var(--bg-secondary);
+    color: var(--text-tertiary);
+}
+
+.mapContainer :global(.leaflet-control-zoom-in),
+.mapContainer :global(.leaflet-control-zoom-out) {
+    border-radius: var(--border-radius-lg);
+}
+
+.mapContainer :global(.itinerary-map-popup .leaflet-popup-content-wrapper),
+.mapContainer :global(.explore-map-popup .leaflet-popup-content-wrapper) {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 2px solid var(--border-secondary);
+    border-radius: var(--border-radius-lg);
+}
+
+.mapContainer :global(.itinerary-map-popup .leaflet-popup-tip),
+.mapContainer :global(.explore-map-popup .leaflet-popup-tip) {
+    background: var(--bg-primary);
+    border: 2px solid var(--border-secondary);
+}
+
+.mapContainer :global(.itinerary-map-popup .leaflet-popup-content),
+.mapContainer :global(.explore-map-popup .leaflet-popup-content) {
+    margin: var(--space-sm) var(--space-md);
+}
+
+.mapContainer :global(.explore-map-popup .leaflet-popup-close-button) {
+    display: none;
+}
+
+.mapContainer :global(.itinerary-popup-content) {
+    min-width: 170px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.mapContainer :global(.itinerary-popup-content strong) {
+    font-size: var(--font-size-sm);
+}
+
+.mapContainer :global(.itinerary-popup-location) {
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+}
+
+.mapContainer :global(.itinerary-popup-meta) {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-xxs);
+}
+
+.mapContainer :global(.explore-popup-card) {
+    min-width: 280px;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.mapContainer :global(.explore-popup-head) {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.mapContainer :global(.explore-popup-head strong) {
+    font-size: var(--font-size-sm);
+    line-height: 1.25;
+}
+
+.mapContainer :global(.explore-popup-location) {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-xs);
+    line-height: 1.4;
+}
+
+.mapContainer :global(.explore-popup-extra) {
+    display: flex;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+}
+
+.mapContainer :global(.explore-popup-meta) {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-xxs);
+    padding: 3px 8px;
+    border-radius: var(--border-radius-full);
+    background: color-mix(in srgb, var(--bg-secondary) 75%, transparent);
+    border: 1px solid var(--border-secondary);
+}
+
+.mapContainer :global(.explore-popup-actions) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}

@@ -2,7 +2,7 @@
 
 .hero {
     position: relative;
-    min-height: 80dvh;
+    min-height: 70vh;
     width: 100%;
     padding-top: var(--space-larger);
     display: flex;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { NavLink } from "react-router";
 
 import type { LoginRequest } from "@/types/auth";
 
@@ -72,7 +73,7 @@ export default function LoginPage() {
     };
 
     return (
-        <Layout single>
+        <Layout single centerContent>
             <AuthForm
                 active="login"
                 fields={[
@@ -93,6 +94,9 @@ export default function LoginPage() {
                 buttonLabel="Iniciar sesión"
                 onSubmit={(values: LoginRequest) => handleLogin(values)}
                 errors={errors}
+                belowSubmit={
+                    <NavLink to="/forgot-password">¿Olvidaste tu contraseña?</NavLink>
+                }
             />
         </Layout>
     );

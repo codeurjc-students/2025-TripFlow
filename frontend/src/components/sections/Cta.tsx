@@ -5,16 +5,25 @@ import DemoButton from "@components/buttons/DemoButton";
 
 export default function Cta() {
   return (
-    <Section title={<>¿Aún no te hemos convencido?</>}>
-      <div className={styles.ctaContent}>
-        <p className={styles.ctaText}>
-          Prueba nuestra demo y descubre si somos la solución que necesitas.
-        </p>
-        <p className={styles.ctaText}>
-          Si tienes alguna duda, no dudes en contactarnos.
-        </p>
-        <div className={styles.actions}>
-          <DemoButton style="primary" />
+    <Section
+      title={
+        <>
+          Empieza a planificar un viaje <strong>sin fricciones</strong>
+        </>
+      }
+    >
+      <div className={styles.ctaSurface}>
+        <div className={styles.ctaContent}>
+          <h3 className={styles.ctaHeading}>
+            Diseña tu itinerario en minutos
+          </h3>
+          <p className={styles.ctaText}>
+            Organiza cada parada en un solo lugar. Prueba la demo y empieza a
+            planificar hoy.
+          </p>
+          <div className={styles.actions}>
+            <DemoButton style="primary" />
+          </div>
         </div>
       </div>
     </Section>

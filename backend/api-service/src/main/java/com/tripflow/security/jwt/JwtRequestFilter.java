@@ -2,6 +2,8 @@ package com.tripflow.security.jwt;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +21,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
+    private static final Logger log = LoggerFactory.getLogger(JwtRequestFilter.class);
+
     private final UserDetailsService userDetailsService;
 	private final JwtTokenProvider jwtTokenProvider;
 
@@ -43,6 +47,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         try {
             claims = jwtTokenProvider.validateToken(token);
         } catch (Exception e) {
+            log.debug("Rejected invalid auth token for request {} {}", request.getMethod(), request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
@@ -52,6 +57,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         try {
             userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
         } catch (UsernameNotFoundException e) {
+            log.debug("Token subject not found in user store: {}", claims.getSubject());
             filterChain.doFilter(request, response);
             return;
         }

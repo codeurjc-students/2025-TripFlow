@@ -21,10 +21,10 @@ import org.springframework.web.server.ResponseStatusException;
 import com.tripflow.dto.shared.PaginatedDTO;
 import com.tripflow.exception.EmailAlreadyExistsException;
 import com.tripflow.exception.UsernameAlreadyExistsException;
+import com.tripflow.mappers.UserMapper;
 import com.tripflow.dto.user.PublicUserDTO;
 import com.tripflow.dto.user.RegisterUserRequest;
 import com.tripflow.dto.user.UpdateUserRequest;
-import com.tripflow.dto.user.UserMapper;
 import com.tripflow.dto.user.VerificationCode;
 import com.tripflow.model.User;
 import com.tripflow.model.types.UserType;
@@ -186,6 +186,40 @@ public class UserService {
             verificationCode,
             verificationCodeExpiresAt
         );
+    }
+
+    public VerificationCode generatePasswordResetCode(String usernameOrEmail) {
+        User user = this.findByUsernameOrEmail(usernameOrEmail);
+        String code = VerificationUtils.generateVerificationCode();
+        Instant expiresAt = VerificationUtils.generateVerificationCodeExpiresAt();
+
+        user.setPasswordResetCode(code);
+        user.setPasswordResetCodeExpiresAt(expiresAt);
+
+        this.userRepository.save(user);
+
+        return new VerificationCode(code, expiresAt);
+    }
+
+    public void resetPasswordWithCode(String usernameOrEmail, String code, String rawPassword) {
+        User user = this.findByUsernameOrEmail(usernameOrEmail);
+
+        if (user.getPasswordResetCode() == null || user.getPasswordResetCodeExpiresAt() == null) {
+            throw new IllegalArgumentException("Invalid reset code");
+        }
+
+        if (!user.getPasswordResetCode().equals(code)) {
+            throw new IllegalArgumentException("Invalid reset code");
+        }
+
+        if (user.getPasswordResetCodeExpiresAt().isBefore(Instant.now())) {
+            throw new IllegalArgumentException("Reset code has expired");
+        }
+
+        user.setHashedPassword(this.passwordEncoder.encode(rawPassword));
+        user.setPasswordResetCode(null);
+        user.setPasswordResetCodeExpiresAt(null);
+        this.userRepository.save(user);
     }
 
     /**
@@ -362,5 +396,12 @@ public class UserService {
         if (request.notificationsAllowed() != null) {
             user.setNotificationsAllowed(request.notificationsAllowed());
         }
+    }
+
+    private User findByUsernameOrEmail(String usernameOrEmail) {
+        if (usernameOrEmail != null && usernameOrEmail.contains("@")) {
+            return this.getUserByEmail(usernameOrEmail);
+        }
+        return this.getUserByUsername(usernameOrEmail);
     }
 }

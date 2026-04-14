@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tripflow.dto.unsplash.UnsplashResponse;
 import com.tripflow.utils.UnsplashResponseMock;
 
-import java.text.Normalizer;
+import com.tripflow.utils.Normalizer;
 import java.util.List;
 import java.util.Map;
 
@@ -48,48 +48,59 @@ public class UnsplashService {
 <span class="nc" id="L48">            return UnsplashResponseMock.getMock();</span>
         }
 
-<span class="nc" id="L51">        query = Normalizer</span>
-<span class="nc" id="L52">            .normalize(query, Normalizer.Form.NFD)</span>
-<span class="nc" id="L53">            .replaceAll(&quot;\\p{M}&quot;, &quot;&quot;);</span>
+<span class="nc" id="L51">        query = Normalizer.normalize(query).trim();</span>
         
-<span class="nc" id="L55">        String url = UriComponentsBuilder</span>
-<span class="nc" id="L56">            .fromUriString(UNSPLASH_API_BASE_URL + SEARCH_PHOTOS_ENDPOINT)</span>
-<span class="nc" id="L57">            .queryParam(&quot;query&quot;, query)</span>
-<span class="nc" id="L58">            .queryParam(&quot;page&quot;, 1)</span>
-<span class="nc" id="L59">            .queryParam(&quot;per_page&quot;, 1)</span>
-<span class="nc" id="L60">            .queryParam(&quot;client_id&quot;, apiKey)</span>
-<span class="nc" id="L61">            .toUriString();</span>
+<span class="nc" id="L53">        String url = this.buildUrl(query);</span>
+<span class="nc" id="L54">        UnsplashSearchResponse searchResponse = restTemplate.getForObject(url, UnsplashSearchResponse.class);</span>
         
-<span class="nc" id="L63">        UnsplashSearchResponse searchResponse = restTemplate.getForObject(url, UnsplashSearchResponse.class);</span>
-        
-<span class="nc bnc" id="L65" title="All 6 branches missed.">        if (searchResponse == null || searchResponse.results == null || searchResponse.results.isEmpty()) {</span>
-<span class="nc" id="L66">            throw new RuntimeException(&quot;No photos found for query: &quot; + query);</span>
+        // Fallback strategy
+<span class="nc bnc" id="L57" title="All 6 branches missed.">        if (searchResponse == null || searchResponse.results == null || searchResponse.results.isEmpty()) {</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">            if (query.contains(&quot; &quot;)) {</span>
+<span class="nc" id="L59">                String firstWord = query.split(&quot; &quot;)[0];</span>
+<span class="nc" id="L60">                url = this.buildUrl(firstWord);</span>
+<span class="nc" id="L61">                searchResponse = restTemplate.getForObject(url, UnsplashSearchResponse.class);</span>
+            }
+
+        }
+
+<span class="nc bnc" id="L66" title="All 6 branches missed.">        if (searchResponse == null || searchResponse.results == null || searchResponse.results.isEmpty()) {</span>
+<span class="nc" id="L67">            return UnsplashResponseMock.getMock();</span>
         }
         
-<span class="nc" id="L69">        UnsplashPhotoInternal photo = searchResponse.results.get(0);</span>
+<span class="nc" id="L70">        UnsplashPhotoInternal photo = searchResponse.results.get(0);</span>
         
         // Map to simplified response
-<span class="nc" id="L72">        return new UnsplashResponse(</span>
+<span class="nc" id="L73">        return new UnsplashResponse(</span>
             photo.altDescription,
-<span class="nc" id="L74">            photo.urls.get(&quot;regular&quot;),</span>
+<span class="nc" id="L75">            photo.urls.get(&quot;regular&quot;),</span>
             photo.user.username
         );
+    }
+
+    private String buildUrl(String query) {
+<span class="nc" id="L81">        return UriComponentsBuilder</span>
+<span class="nc" id="L82">            .fromUriString(UNSPLASH_API_BASE_URL + SEARCH_PHOTOS_ENDPOINT)</span>
+<span class="nc" id="L83">            .queryParam(&quot;query&quot;, query)</span>
+<span class="nc" id="L84">            .queryParam(&quot;page&quot;, 1)</span>
+<span class="nc" id="L85">            .queryParam(&quot;per_page&quot;, 1)</span>
+<span class="nc" id="L86">            .queryParam(&quot;client_id&quot;, apiKey)</span>
+<span class="nc" id="L87">            .toUriString();</span>
     }
     
     // Internal record classes for deserialization
     
-<span class="nc" id="L81">    private static record UnsplashSearchResponse(</span>
+<span class="nc" id="L92">    private static record UnsplashSearchResponse(</span>
         List&lt;UnsplashPhotoInternal&gt; results
     ) {}
     
-<span class="nc" id="L85">    private static record UnsplashPhotoInternal(</span>
+<span class="nc" id="L96">    private static record UnsplashPhotoInternal(</span>
         String id,
         @JsonProperty(&quot;alt_description&quot;) String altDescription,
         Map&lt;String, String&gt; urls,
         UnsplashUserInternal user
     ) {}
 
-<span class="nc" id="L92">    private static record UnsplashUserInternal(</span>
+<span class="nc" id="L103">    private static record UnsplashUserInternal(</span>
         String username
     ) {}
 }

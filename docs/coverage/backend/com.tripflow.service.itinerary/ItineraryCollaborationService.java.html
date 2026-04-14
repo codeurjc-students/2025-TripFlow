@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ItineraryCollaborationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.service.itinerary</a> &gt; <span class="el_source">ItineraryCollaborationService.java</span></div><h1>ItineraryCollaborationService.java</h1><pre class="source lang-java linenums">package com.tripflow.service.itinerary;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.tripflow.dto.itinerary.collaborator.AddCollaboratorRequest;
+import com.tripflow.dto.itinerary.collaborator.CollaboratorDTO;
+import com.tripflow.dto.itinerary.collaborator.CollaboratorRoleDTO;
+import com.tripflow.dto.itinerary.collaborator.UpdateCollaboratorRequest;
+import com.tripflow.mappers.CollaboratorMapper;
+import com.tripflow.model.User;
+import com.tripflow.model.itinerary.Itinerary;
+import com.tripflow.model.itinerary.ItineraryCollaborator;
+import com.tripflow.model.types.CollaboratorRole;
+import com.tripflow.model.types.InvitationStatus;
+import com.tripflow.repository.itinerary.ItineraryCollaboratorRepository;
+import com.tripflow.repository.itinerary.ItineraryRepository;
+import com.tripflow.dto.notification.NotificationTypeDTO;
+import com.tripflow.kafka.messages.CollaborationEventMessage;
+import com.tripflow.kafka.messages.CollaborationEventType;
+import com.tripflow.kafka.messages.NotificationMessage;
+import com.tripflow.service.KafkaService;
+import com.tripflow.service.UserService;
+
+import jakarta.transaction.Transactional;
+
+@Service
+@Transactional
+public class ItineraryCollaborationService {
+    private final ItineraryRepository itineraryRepository;
+    private final ItineraryCollaboratorRepository itineraryCollaboratorRepository;
+    private final UserService userService;
+    private final ItineraryPermissionService itineraryPermissionService;
+    private final CollaboratorMapper collaboratorMapper;
+    private final KafkaService kafkaService;
+
+    public ItineraryCollaborationService(
+        ItineraryRepository itineraryRepository,
+        ItineraryCollaboratorRepository itineraryCollaboratorRepository,
+        UserService userService,
+        ItineraryPermissionService itineraryPermissionService,
+        CollaboratorMapper collaboratorMapper,
+        KafkaService kafkaService
+<span class="fc" id="L49">    ) {</span>
+<span class="fc" id="L50">        this.itineraryRepository = itineraryRepository;</span>
+<span class="fc" id="L51">        this.itineraryCollaboratorRepository = itineraryCollaboratorRepository;</span>
+<span class="fc" id="L52">        this.userService = userService;</span>
+<span class="fc" id="L53">        this.itineraryPermissionService = itineraryPermissionService;</span>
+<span class="fc" id="L54">        this.collaboratorMapper = collaboratorMapper;</span>
+<span class="fc" id="L55">        this.kafkaService = kafkaService;</span>
+<span class="fc" id="L56">    }</span>
+
+    /**
+     * Retrieves the pending invitations for a user.
+     *
+     * @param username the username of the user
+     * @return a list of pending invitations
+     */
+    public List&lt;CollaboratorDTO&gt; getPendingInvitations(String username) {
+<span class="fc" id="L65">        User user = this.getUserOrThrow(username);</span>
+
+<span class="fc" id="L67">        User authenticatedUser = this.userService.getAuthenticatedUser();</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (!authenticatedUser.equals(user)) {</span>
+<span class="fc" id="L69">            throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;You can only view your own invitations&quot;);</span>
+        }
+
+<span class="fc" id="L72">        return this.collaboratorMapper.toDTOs(</span>
+<span class="fc" id="L73">            this.itineraryCollaboratorRepository.findByUserAndStatus(user, InvitationStatus.PENDING)</span>
+        );
+    }
+
+    /**
+     * Retrieves all collaborators of an itinerary (both pending and accepted).
+     *
+     * @param itineraryId the ID of the itinerary
+     * @return a list of collaborators
+     */
+    public List&lt;CollaboratorDTO&gt; getCollaborators(Long itineraryId) {
+<span class="fc" id="L84">        Itinerary itinerary = this.getItineraryOrThrow(itineraryId);</span>
+<span class="fc" id="L85">        User authenticatedUser = this.userService.getAuthenticatedUser();</span>
+
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (!this.itineraryPermissionService.canView(itinerary, authenticatedUser)) {</span>
+<span class="fc" id="L88">            throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;You do not have permission to view this itinerary's collaborators&quot;);</span>
+        }
+
+<span class="fc" id="L91">        return this.collaboratorMapper.toDTOs(</span>
+<span class="fc" id="L92">            this.itineraryCollaboratorRepository.findByItinerary(itinerary)</span>
+        );
+    }
+
+    /**
+     * Sends an invitation to a user to collaborate on an itinerary.
+     * Creates a collaborator record with PENDING status.
+     *
+     * @param itineraryId the ID of the itinerary
+     * @param request the request containing the username and role
+     * @return the created invitation (collaborator with PENDING status)
+     */
+    public CollaboratorDTO sendInvitation(Long itineraryId, AddCollaboratorRequest request) {
+<span class="fc" id="L105">        Itinerary itinerary = this.getItineraryOrThrow(itineraryId);</span>
+<span class="fc" id="L106">        User authenticatedUser = this.userService.getAuthenticatedUser();</span>
+
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        if (!this.itineraryPermissionService.canManageCollaborators(itinerary, authenticatedUser)) {</span>
+<span class="fc" id="L109">            throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;Only the owner can manage collaborators&quot;);</span>
+        }
+
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        if (request.role() == CollaboratorRoleDTO.OWNER) {</span>
+<span class="fc" id="L113">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Cannot assign OWNER role to collaborators&quot;);</span>
+        }
+
+<span class="fc" id="L116">        User userToInvite = this.getUserOrThrow(request.username());</span>
+        
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if (itinerary.getUser().equals(userToInvite)) {</span>
+<span class="fc" id="L119">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Owner cannot be a collaborator&quot;);</span>
+        }
+
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        if (this.itineraryCollaboratorRepository.existsByItineraryAndUser(itinerary, userToInvite)) {</span>
+<span class="fc" id="L123">            throw new ResponseStatusException(HttpStatus.CONFLICT, &quot;User already has a pending invitation or is already a collaborator&quot;);</span>
+        }
+
+<span class="fc" id="L126">        ItineraryCollaborator collaborator = new ItineraryCollaborator(</span>
+<span class="fc" id="L127">            CollaboratorRole.valueOf(request.role().name()),</span>
+            userToInvite,
+            itinerary
+        );
+
+<span class="fc" id="L132">        CollaboratorDTO result = this.collaboratorMapper.toDTO(this.itineraryCollaboratorRepository.save(collaborator));</span>
+        
+<span class="fc" id="L134">        this.kafkaService.sendNotificationMessage(new NotificationMessage(</span>
+<span class="fc" id="L135">            userToInvite.getUsername(),</span>
+<span class="fc" id="L136">            &quot;You have been invited to collaborate on the itinerary: &quot; + itinerary.getTitle(),</span>
+            NotificationTypeDTO.INVITATION_RECEIVED
+        ));
+
+<span class="fc" id="L140">        this.kafkaService.sendCollaborationEventMessage(new CollaborationEventMessage(</span>
+            itineraryId,
+            CollaborationEventType.INVITE_SENT,
+<span class="fc" id="L143">            authenticatedUser.getUsername(),</span>
+<span class="fc" id="L144">            userToInvite.getUsername(),</span>
+<span class="fc" id="L145">            request.role().name()</span>
+        ));
+
+<span class="fc" id="L148">        return result;</span>
+    }
+
+    /**
+     * Accepts a pending invitation to collaborate on an itinerary.
+     *
+     * @param itineraryId the ID of the itinerary
+     * @param username the username of the invited user
+     * @return the accepted collaborator
+     */
+    public CollaboratorDTO acceptInvitation(Long itineraryId, String username) {
+<span class="fc" id="L159">        Itinerary itinerary = this.getItineraryOrThrow(itineraryId);</span>
+<span class="fc" id="L160">        User user = this.getUserOrThrow(username);</span>
+
+<span class="fc" id="L162">        User authenticatedUser = this.userService.getAuthenticatedUser();</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">        if (!authenticatedUser.equals(user)) {</span>
+<span class="fc" id="L164">            throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;You can only accept your own invitations&quot;);</span>
+        }
+
+<span class="fc" id="L167">        ItineraryCollaborator collaborator = this.itineraryCollaboratorRepository</span>
+<span class="fc" id="L168">            .findByItineraryAndUser(itinerary, user)</span>
+<span class="fc" id="L169">            .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Invitation not found&quot;));</span>
+
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        if (collaborator.getStatus() != InvitationStatus.PENDING) {</span>
+<span class="fc" id="L172">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Invitation is not pending&quot;);</span>
+        }
+
+<span class="fc" id="L175">        collaborator.setStatus(InvitationStatus.ACCEPTED);</span>
+<span class="fc" id="L176">        collaborator.setAcceptedAt(LocalDateTime.now());</span>
+<span class="fc" id="L177">        CollaboratorDTO result = this.collaboratorMapper.toDTO(this.itineraryCollaboratorRepository.save(collaborator));</span>
+
+<span class="fc" id="L179">        this.kafkaService.sendNotificationMessage(new NotificationMessage(</span>
+<span class="fc" id="L180">            itinerary.getUser().getUsername(),</span>
+<span class="fc" id="L181">            user.getUsername() + &quot; has accepted your invitation to collaborate on: &quot; + itinerary.getTitle(),</span>
+            NotificationTypeDTO.INVITATION_ACCEPTED
+        ));
+
+<span class="fc" id="L185">        this.kafkaService.sendCollaborationEventMessage(new CollaborationEventMessage(</span>
+            itineraryId,
+            CollaborationEventType.INVITE_ACCEPTED,
+<span class="fc" id="L188">            user.getUsername(),</span>
+<span class="fc" id="L189">            user.getUsername(),</span>
+<span class="fc" id="L190">            collaborator.getRole().name()</span>
+        ));
+
+<span class="fc" id="L193">        return result;</span>
+    }
+
+    /**
+     * Declines a pending invitation.
+     *
+     * @param itineraryId the ID of the itinerary
+     * @param username the username of the invited user
+     */
+    public void declineInvitation(Long itineraryId, String username) {
+<span class="fc" id="L203">        Itinerary itinerary = this.getItineraryOrThrow(itineraryId);</span>
+<span class="fc" id="L204">        User user = this.getUserOrThrow(username);</span>
+
+<span class="fc" id="L206">        User authenticatedUser = this.userService.getAuthenticatedUser();</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">        if (!authenticatedUser.equals(user)) {</span>
+<span class="fc" id="L208">            throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;You can only decline your own invitations&quot;);</span>
+        }
+
+<span class="fc" id="L211">        ItineraryCollaborator collaborator = this.itineraryCollaboratorRepository</span>
+<span class="fc" id="L212">            .findByItineraryAndUser(itinerary, user)</span>
+<span class="fc" id="L213">            .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Invitation not found&quot;));</span>
+
+<span class="fc bfc" id="L215" title="All 2 branches covered.">        if (collaborator.getStatus() != InvitationStatus.PENDING) {</span>
+<span class="fc" id="L216">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Invitation is already accepted or invalid&quot;);</span>
+        }
+
+<span class="fc" id="L219">        this.itineraryCollaboratorRepository.delete(collaborator);</span>
+
+<span class="fc" id="L221">        this.kafkaService.sendCollaborationEventMessage(new CollaborationEventMessage(</span>
+            itineraryId,
+            CollaborationEventType.INVITE_DECLINED,
+<span class="fc" id="L224">            user.getUsername(),</span>
+<span class="fc" id="L225">            user.getUsername(),</span>
+<span class="fc" id="L226">            collaborator.getRole().name()</span>
+        ));
+<span class="fc" id="L228">    }</span>
+
+    /**
+     * Updates the role of a collaborator.
+     *
+     * @param itineraryId the ID of the itinerary
+     * @param username the username of the collaborator
+     * @param request the request containing the new role
+     * @return the updated collaborator
+     */
+    public CollaboratorDTO updateCollaboratorRole(
+        Long itineraryId, String username, UpdateCollaboratorRequest request
+    ) {
+<span class="fc" id="L241">        Itinerary itinerary = this.getItineraryOrThrow(itineraryId);</span>
+<span class="fc" id="L242">        User authenticatedUser = this.userService.getAuthenticatedUser();</span>
+
+<span class="fc bfc" id="L244" title="All 2 branches covered.">        if (!this.itineraryPermissionService.canManageCollaborators(itinerary, authenticatedUser)) {</span>
+<span class="fc" id="L245">            throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;Only the owner can manage collaborators&quot;);</span>
+        }
+
+<span class="fc bfc" id="L248" title="All 2 branches covered.">        if (request.role() == CollaboratorRoleDTO.OWNER) {</span>
+<span class="fc" id="L249">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Cannot assign OWNER role to collaborators&quot;);</span>
+        }
+
+<span class="fc" id="L252">        User collaboratorUser = this.getUserOrThrow(username);</span>
+        
+<span class="fc" id="L254">        ItineraryCollaborator collaborator = itineraryCollaboratorRepository.findByItineraryAndUser(itinerary, collaboratorUser)</span>
+<span class="fc" id="L255">            .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Collaborator not found&quot;));</span>
+
+<span class="fc bfc" id="L257" title="All 2 branches covered.">        if (collaborator.getStatus() != InvitationStatus.ACCEPTED) {</span>
+<span class="fc" id="L258">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Can only update the role of accepted collaborators&quot;);</span>
+        }
+
+<span class="fc" id="L261">        collaborator.setRole(CollaboratorRole.valueOf(request.role().name()));</span>
+<span class="fc" id="L262">        CollaboratorDTO result = this.collaboratorMapper.toDTO(this.itineraryCollaboratorRepository.save(collaborator));</span>
+
+<span class="fc" id="L264">        this.kafkaService.sendCollaborationEventMessage(new CollaborationEventMessage(</span>
+            itineraryId,
+            CollaborationEventType.ROLE_UPDATED,
+<span class="fc" id="L267">            authenticatedUser.getUsername(),</span>
+<span class="fc" id="L268">            collaboratorUser.getUsername(),</span>
+<span class="fc" id="L269">            request.role().name()</span>
+        ));
+
+<span class="fc" id="L272">        return result;</span>
+    }
+
+    /**
+     * Removes a collaborator from an itinerary.
+     *
+     * @param itineraryId the ID of the itinerary
+     * @param username the username of the collaborator to remove
+     */
+    public void removeCollaborator(Long itineraryId, String username) {
+<span class="fc" id="L282">        Itinerary itinerary = this.getItineraryOrThrow(itineraryId);</span>
+<span class="fc" id="L283">        User authenticatedUser = this.userService.getAuthenticatedUser();</span>
+<span class="fc" id="L284">        User userToRemove = this.getUserOrThrow(username);</span>
+
+<span class="fc" id="L286">        boolean isOwner = this.itineraryPermissionService.isOwner(itinerary, authenticatedUser);</span>
+<span class="fc" id="L287">        boolean isSelfRemoval = authenticatedUser.equals(userToRemove);</span>
+
+<span class="fc bfc" id="L289" title="All 4 branches covered.">        if (!isOwner &amp;&amp; !isSelfRemoval) {</span>
+<span class="fc" id="L290">            throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;You do not have permission to remove this collaborator&quot;);</span>
+        }
+        
+<span class="fc" id="L293">        ItineraryCollaborator collaborator = this.itineraryCollaboratorRepository.findByItineraryAndUser(itinerary, userToRemove)</span>
+<span class="fc" id="L294">            .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Collaborator not found&quot;));</span>
+
+<span class="fc" id="L296">        this.itineraryCollaboratorRepository.delete(collaborator);</span>
+
+<span class="fc" id="L298">        this.kafkaService.sendCollaborationEventMessage(new CollaborationEventMessage(</span>
+            itineraryId,
+            CollaborationEventType.COLLABORATOR_REMOVED,
+<span class="fc" id="L301">            authenticatedUser.getUsername(),</span>
+<span class="fc" id="L302">            userToRemove.getUsername(),</span>
+<span class="fc" id="L303">            collaborator.getRole().name()</span>
+        ));
+<span class="fc" id="L305">    }</span>
+
+    private Itinerary getItineraryOrThrow(Long id) {
+<span class="fc" id="L308">        return itineraryRepository.findById(id)</span>
+<span class="fc" id="L309">            .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Itinerary not found&quot;));</span>
+    }
+
+    private User getUserOrThrow(String username) {
+        try {
+<span class="fc" id="L314">            return this.userService.getUserByUsername(username);</span>
+<span class="fc" id="L315">        } catch (UsernameNotFoundException e) {</span>
+<span class="fc" id="L316">            throw new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;User not found&quot;);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

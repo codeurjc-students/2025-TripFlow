@@ -12,10 +12,11 @@ interface ItinerariesPreviewProps {
     isLoading: boolean;
     isLoadingMore: boolean;
     isLastPage: boolean;
+    canCreate?: boolean;
 }
 
 export default function ItinerariesPreview(
-    { itineraries, loadMore, isLoading, isLoadingMore, isLastPage }: ItinerariesPreviewProps
+    { itineraries, loadMore, isLoading, isLoadingMore, isLastPage, canCreate = true }: ItinerariesPreviewProps
 ) {
     if (isLoading) return <Loader size={24} />;
 
@@ -42,7 +43,7 @@ export default function ItinerariesPreview(
             {itineraries.length === 0 && (
                 <div className={styles.empty}>
                     <p>No tienes itinerarios todavía.</p>
-                    <Button style={["primary"]} label="Crear itinerario" to="/itineraries/new" />
+                    {canCreate && <Button style={["primary"]} label="Crear itinerario" to="/itineraries/new" />}
                 </div>
             )}
         </section>

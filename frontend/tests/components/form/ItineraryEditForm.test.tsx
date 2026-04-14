@@ -89,7 +89,8 @@ const mockItinerary: ExtendedItinerary = {
         altDescription: "Vista de la Torre Eiffel",
         imageUrl: "https://example.com/torre-eiffel.jpg",
         authorUsername: "usuario_ejemplo"
-    }
+    },
+    permissions: { view: true, edit: true, delete: true }
 };
 
 const mockEmptyItinerary: ExtendedItinerary = {
@@ -107,7 +108,8 @@ const mockEmptyItinerary: ExtendedItinerary = {
         altDescription: "",
         imageUrl: "",
         authorUsername: "",
-    }
+    },
+    permissions: { view: true, edit: true, delete: true }
 };
 
 describe("ItineraryEditForm Component", () => {
@@ -157,6 +159,19 @@ describe("ItineraryEditForm Component", () => {
 
         const deleteButton = screen.queryByText("Eliminar Itinerario");
         expect(deleteButton).not.toBeInTheDocument();
+    });
+
+    it("does not render delete button in read-only mode", () => {
+        render(<ItineraryEditForm itinerary={mockItinerary} {...mockHandlers} readOnly />);
+
+        const deleteButton = screen.queryByText("Eliminar Itinerario");
+        expect(deleteButton).not.toBeInTheDocument();
+    });
+
+    it("renders read-only notice in read-only mode", () => {
+        render(<ItineraryEditForm itinerary={mockItinerary} {...mockHandlers} readOnly />);
+
+        expect(screen.getByText(/modo offline: este itinerario está disponible solo para lectura/i)).toBeInTheDocument();
     });
 
     it("calls onDelete when delete button is clicked", () => {

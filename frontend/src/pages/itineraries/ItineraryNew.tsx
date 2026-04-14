@@ -7,6 +7,8 @@ import { createDefaultItinerary } from "@/hooks/useItineraryForm";
 import type { ExtendedItinerary } from "@/types/itinerary";
 
 import { createItinerary } from "@/services/itineraryService";
+import { OfflineReadOnlyError } from "@/services/httpService";
+import { useOfflineMode } from "@/hooks/useOfflineMode";
 
 import AppLayout from "@/layouts/AppLayout";
 import ItineraryEditor from "@/components/dashboard/itineraries/ItineraryEditor";
@@ -16,6 +18,7 @@ export default function ItineraryNewPage() {
 
     const { notify } = useNotification();
     const navigate = useNavigate();
+    const { readOnly } = useOfflineMode();
 
     const [searchParams] = useSearchParams();
     const editorType = searchParams.get("editorType") === "ai"
@@ -24,31 +27,48 @@ export default function ItineraryNewPage() {
 
     const handleSave = async (itinerary: ExtendedItinerary) => {
         setIsSaving(true);
-        const res = await createItinerary(itinerary);
-        setIsSaving(false);
+        try {
+            const res = await createItinerary(itinerary);
 
-        if (!res || !res.id) {
+            if (!res || !res.id) {
+                notify("Ha ocurrido un error al crear el itinerario.", "error", {
+                    title: "Error",
+                    duration: 5000
+                });
+                return;
+            }
+
+            notify("Itinerario creado correctamente.", "success", {
+                title: "Éxito",
+            });
+            navigate(`/itineraries/${res.id}`);
+        } catch (error) {
+            if (error instanceof OfflineReadOnlyError) {
+                notify("Sin conexión: no puedes crear itinerarios en modo offline.", "info", {
+                    title: "Modo offline",
+                });
+                navigate("/itineraries");
+                return;
+            }
+
             notify("Ha ocurrido un error al crear el itinerario.", "error", {
                 title: "Error",
                 duration: 5000
             });
-            return;
+        } finally {
+            setIsSaving(false);
         }
-
-        notify("Itinerario creado correctamente.", "success", {
-            title: "Éxito",
-        });
-        navigate(`/itineraries/${res.id}`);
     };
 
     return (
-        <AppLayout>
+        <AppLayout innerPage>
             <ItineraryEditor
                 key={editorType}
                 type={editorType}
                 initialItinerary={createDefaultItinerary()}
                 onSave={handleSave}
                 isSaving={isSaving}
+                readOnly={readOnly}
                 back={{ url: "/itineraries/", label: "Cancelar" }}
             />
         </AppLayout>

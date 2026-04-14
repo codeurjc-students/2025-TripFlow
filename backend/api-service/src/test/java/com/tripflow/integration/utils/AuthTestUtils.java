@@ -11,6 +11,9 @@ import static org.hamcrest.Matchers.*;
 
 public class AuthTestUtils {
 
+    private static final int MAX_USERNAME_LENGTH = 30;
+    private static final String EMAIL_DOMAIN = "@example.com";
+
     /**
      * Registers and logs in a user, returning the authentication token.
      * 
@@ -30,12 +33,12 @@ public class AuthTestUtils {
      */
     public static String authenticateUserAndGetToken(String username, boolean unique) {
         String uniqueUsername = unique
-            ? generateUniqueValue(username)
+            ? generateUniqueValidUsername(username)
             : username;
             
         String uniqueEmail = unique
-            ? generateUniqueEmail(uniqueUsername)
-            : uniqueUsername + "@example.com";
+            ? uniqueUsername + EMAIL_DOMAIN
+            : uniqueUsername + EMAIL_DOMAIN;
 
         // Register user
         RegisterUserRequest registerRequest = new RegisterUserRequest(
@@ -105,6 +108,24 @@ public class AuthTestUtils {
      * @return the unique email
      */
     public static String generateUniqueEmail(String prefix) {
-        return prefix + System.nanoTime() + "@example.com";
+        return prefix + System.nanoTime() + EMAIL_DOMAIN;
+    }
+
+    private static String generateUniqueValidUsername(String prefix) {
+        String normalizedPrefix = prefix == null
+            ? "user"
+            : prefix.replaceAll("[^a-zA-Z0-9_]", "");
+
+        if (normalizedPrefix.isBlank()) {
+            normalizedPrefix = "user";
+        }
+
+        String suffix = Long.toString(System.nanoTime(), 36);
+        int maxPrefixLength = Math.max(1, MAX_USERNAME_LENGTH - suffix.length() - 1);
+        if (normalizedPrefix.length() > maxPrefixLength) {
+            normalizedPrefix = normalizedPrefix.substring(0, maxPrefixLength);
+        }
+
+        return normalizedPrefix + "_" + suffix;
     }
 }

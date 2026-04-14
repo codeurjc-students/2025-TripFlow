@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestCollaborationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.controller.v1</a> &gt; <span class="el_source">RestCollaborationController.java</span></div><h1>RestCollaborationController.java</h1><pre class="source lang-java linenums">package com.tripflow.controller.v1;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
+
+import com.tripflow.dto.itinerary.collaborator.AddCollaboratorRequest;
+import com.tripflow.dto.itinerary.collaborator.CollaboratorDTO;
+import com.tripflow.dto.itinerary.collaborator.UpdateCollaboratorRequest;
+import com.tripflow.service.itinerary.ItineraryCollaborationService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@RestController
+@RequestMapping(&quot;/api/v1/itineraries&quot;)
+@Tag(name = &quot;Itinerary Collaboration&quot;, description = &quot;Endpoints for managing itinerary collaborators and invitations&quot;)
+public class RestCollaborationController {
+    private final ItineraryCollaborationService collaborationService;
+
+    public RestCollaborationController(
+        ItineraryCollaborationService collaborationService
+<span class="fc" id="L37">    ) {</span>
+<span class="fc" id="L38">        this.collaborationService = collaborationService;</span>
+<span class="fc" id="L39">    }</span>
+
+    @PostMapping(&quot;/{itineraryId}/collaborators&quot;)
+    @Operation(
+        summary = &quot;Send Invitation&quot;, 
+        description = &quot;Sends an invitation to a user to collaborate on an itinerary. Only owner can do this.&quot;,
+        security = @SecurityRequirement(name = &quot;auth_token&quot;)
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Invitation sent&quot;),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid request or user is owner&quot;),
+        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Forbidden&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Itinerary or user not found&quot;),
+        @ApiResponse(responseCode = &quot;409&quot;, description = &quot;User already has a pending invitation or is a collaborator&quot;)
+    })
+    public ResponseEntity&lt;CollaboratorDTO&gt; sendInvitation(
+        @PathVariable Long itineraryId,
+        @Valid @RequestBody AddCollaboratorRequest request
+    ) {
+<span class="fc" id="L58">        CollaboratorDTO collaborator = this.collaborationService.sendInvitation(itineraryId, request);</span>
+<span class="fc" id="L59">        return ResponseEntity.status(HttpStatus.CREATED).body(collaborator);</span>
+    }
+
+    @PutMapping(&quot;/{itineraryId}/collaborators/{username}/accept&quot;)
+    @Operation(
+        summary = &quot;Accept Invitation&quot;,
+        description = &quot;Accepts a pending invitation to collaborate on an itinerary.&quot;,
+        security = @SecurityRequirement(name = &quot;auth_token&quot;)
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Invitation accepted&quot;),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invitation is not pending&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Invitation not found&quot;)
+    })
+    public ResponseEntity&lt;CollaboratorDTO&gt; acceptInvitation(
+        @PathVariable Long itineraryId,
+        @PathVariable String username
+    ) {
+<span class="fc" id="L77">        CollaboratorDTO collaborator = this.collaborationService.acceptInvitation(itineraryId, username);</span>
+<span class="fc" id="L78">        return ResponseEntity.ok(collaborator);</span>
+    }
+
+    @DeleteMapping(&quot;/{itineraryId}/collaborators/{username}/decline&quot;)
+    @Operation(
+        summary = &quot;Decline Invitation&quot;,
+        description = &quot;Declines a pending invitation to collaborate on an itinerary.&quot;,
+        security = @SecurityRequirement(name = &quot;auth_token&quot;)
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = &quot;204&quot;, description = &quot;Invitation declined&quot;),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invitation is already accepted or invalid&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Invitation not found&quot;)
+    })
+    public ResponseEntity&lt;Void&gt; declineInvitation(
+        @PathVariable Long itineraryId,
+        @PathVariable String username
+    ) {
+<span class="fc" id="L96">        this.collaborationService.declineInvitation(itineraryId, username);</span>
+<span class="fc" id="L97">        return ResponseEntity.noContent().build();</span>
+    }
+
+    @GetMapping(&quot;/{itineraryId}/collaborators&quot;)
+    @Operation(
+        summary = &quot;Get Collaborators&quot;,
+        description = &quot;Gets all collaborators of an itinerary.&quot;,
+        security = @SecurityRequirement(name = &quot;auth_token&quot;)
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Collaborators found&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Itinerary not found&quot;)
+    })
+    public ResponseEntity&lt;List&lt;CollaboratorDTO&gt;&gt; getCollaborators(@PathVariable Long itineraryId) {
+<span class="fc" id="L111">        List&lt;CollaboratorDTO&gt; collaborators = this.collaborationService.getCollaborators(itineraryId);</span>
+<span class="fc" id="L112">        return ResponseEntity.ok(collaborators);</span>
+    }
+
+    @PutMapping(&quot;/{itineraryId}/collaborators/{username}&quot;)
+    @Operation(
+        summary = &quot;Update Collaborator Role&quot;,
+        description = &quot;Updates a collaborator's role. Only owner can do this.&quot;,
+        security = @SecurityRequirement(name = &quot;auth_token&quot;)
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Collaborator updated&quot;),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid request&quot;),
+        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Forbidden&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Itinerary or collaborator not found&quot;)
+    })
+    public ResponseEntity&lt;CollaboratorDTO&gt; updateCollaboratorRole(
+        @PathVariable Long itineraryId,
+        @PathVariable String username,
+        @Valid @RequestBody UpdateCollaboratorRequest request
+    ) {
+<span class="fc" id="L132">        CollaboratorDTO collaborator = this.collaborationService.updateCollaboratorRole(itineraryId, username, request);</span>
+<span class="fc" id="L133">        return ResponseEntity.ok(collaborator);</span>
+    }
+
+    @DeleteMapping(&quot;/{itineraryId}/collaborators/{username}&quot;)
+    @Operation(
+        summary = &quot;Remove Collaborator&quot;,
+        description = &quot;Removes a collaborator. Owner can remove anyone, collaborators can remove themselves.&quot;,
+        security = @SecurityRequirement(name = &quot;auth_token&quot;)
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = &quot;204&quot;, description = &quot;Collaborator removed&quot;),
+        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Forbidden&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Itinerary or collaborator not found&quot;)
+    })
+    public ResponseEntity&lt;Void&gt; removeCollaborator(
+        @PathVariable Long itineraryId,
+        @PathVariable String username
+    ) {
+<span class="fc" id="L151">        this.collaborationService.removeCollaborator(itineraryId, username);</span>
+<span class="fc" id="L152">        return ResponseEntity.noContent().build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

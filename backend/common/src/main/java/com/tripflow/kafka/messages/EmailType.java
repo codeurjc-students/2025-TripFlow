@@ -1,5 +1,6 @@
 package com.tripflow.kafka.messages;
 
 public enum EmailType {
-    VERIFICATION
+    VERIFICATION,
+    PASSWORD_RESET_OTP
 }

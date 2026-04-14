@@ -5,6 +5,7 @@ import { useLocation } from "react-router";
 import {
     HomeIcon,
     MapIcon,
+    SearchIcon,
     UserIcon,
 } from "lucide-react";
 
@@ -14,6 +15,7 @@ import Logo from "@components/shared/Logo";
 const ROUTES = [
     { path: "/dashboard", label: "Dashboard", icon: <HomeIcon /> },
     { path: "/itineraries", label: "Itinerarios", icon: <MapIcon /> },
+    { path: "/map/explore", label: "Explorar", icon: <SearchIcon /> },
     { path: "/profile", label: "Perfil", icon: <UserIcon /> },
 ];
 
@@ -21,12 +23,12 @@ const ADMIN_ROUTES = [
     { path: "/admin", label: "Admin", icon: <UserIcon /> },
 ];
 
-export default function Sidebar({ admin }: { admin?: boolean }) {
+export default function Sidebar({ admin, hideOnMobile = false }: { admin?: boolean; hideOnMobile?: boolean }) {
     const location = useLocation();
     const routes = admin ? ADMIN_ROUTES : ROUTES;
 
     return (
-        <aside className={styles.sidebar}>
+        <aside className={`${styles.sidebar} ${hideOnMobile ? styles.hideOnMobile : ""}`}>
             <div className={styles.logo}>
                 <Button style={["logo"]} to="/">
                     <Logo size="small" />

@@ -6,12 +6,15 @@ import { render } from "@testing-library/react";
 
 import { AuthProvider } from "@/providers/authProvider";
 import { DemoProvider } from "@/providers/demoProvider";
+import { OfflineProvider } from "@/providers/offlineProvider";
 
 // Wrapper component that includes all necessary providers for testing
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <BrowserRouter>
     <DemoProvider>
+      <OfflineProvider>
         <AuthProvider>{children}</AuthProvider>
+      </OfflineProvider>
     </DemoProvider>
   </BrowserRouter>
 );

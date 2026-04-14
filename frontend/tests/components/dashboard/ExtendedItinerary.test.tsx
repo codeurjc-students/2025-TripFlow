@@ -1,6 +1,6 @@
 import ExtendedItinerary from "@/components/dashboard/itineraries/ExtendedItinerary";
 
-import { render, screen } from "@tests/utils/testUtils";
+import { render, screen, fireEvent } from "@tests/utils/testUtils";
 import { describe, it, expect, vi } from "vitest";
 import type { ExtendedItinerary as ExtendedItineraryType } from "@/types/itinerary";
 
@@ -81,7 +81,8 @@ const mockItinerary: ExtendedItineraryType = {
         altDescription: "Vista del Monte Fuji",
         imageUrl: "https://example.com/monte-fuji.jpg",
         authorUsername: "fotografo123",
-    }
+    },
+    permissions: { view: true, edit: true, delete: true }
 };
 
 describe("ExtendedItinerary Component", () => {
@@ -205,5 +206,22 @@ describe("ExtendedItinerary Component", () => {
         render(<ExtendedItinerary itinerary={itineraryNoActivities} />);
 
         expect(screen.getByText(/Día 1/)).toBeInTheDocument();
+    });
+
+    it("renders and triggers pdf export action", () => {
+        const onExportPdf = vi.fn();
+
+        render(
+            <ExtendedItinerary
+                itinerary={mockItinerary}
+                onExportPdf={onExportPdf}
+            />
+        );
+
+        fireEvent.click(
+            screen.getByRole("button", { name: /exportar itinerario en pdf/i })
+        );
+
+        expect(onExportPdf).toHaveBeenCalledTimes(1);
     });
 });

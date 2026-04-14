@@ -14,18 +14,30 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
 
 import com.tripflow.dto.itinerary.ExtendedItineraryDTO;
+import com.tripflow.dto.itinerary.ExtendedItineraryResponseDTO;
+import com.tripflow.dto.itinerary.ActivityDTO;
+import com.tripflow.dto.itinerary.CoordinatesDTO;
 import com.tripflow.dto.itinerary.ItineraryDTO;
+import com.tripflow.dto.itinerary.ItineraryResponseDTO;
 import com.tripflow.dto.itinerary.ItineraryDayDTO;
+import com.tripflow.dto.itinerary.ItineraryStatusDTO;
+import com.tripflow.dto.itinerary.LocationDTO;
 import com.tripflow.dto.shared.PaginatedDTO;
+import com.tripflow.kafka.messages.ItineraryChangeMessage;
+import com.tripflow.kafka.messages.ItineraryChangeType;
 import com.tripflow.mappers.ItineraryMapper;
 import com.tripflow.model.User;
 import com.tripflow.model.itinerary.Itinerary;
 import com.tripflow.model.itinerary.ItineraryDay;
 import com.tripflow.repository.itinerary.ItineraryRepository;
+import com.tripflow.repository.itinerary.ItineraryCollaboratorRepository;
 import com.tripflow.service.ExternalImageService;
+import com.tripflow.service.KafkaService;
 import com.tripflow.service.UserService;
 import com.tripflow.service.itinerary.ItineraryDayService;
 import com.tripflow.service.itinerary.ItineraryService;
+import com.tripflow.service.itinerary.ItineraryPermissionService;
+import org.mockito.ArgumentCaptor;
 
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
@@ -37,6 +49,9 @@ public class ItineraryServiceTest {
     private ExternalImageService externalImageService;
     private ItineraryDayService itineraryDayService;
     private ItineraryMapper itineraryMapper;
+    private ItineraryPermissionService itineraryPermissionService;
+    private ItineraryCollaboratorRepository itineraryCollaboratorRepository;
+    private KafkaService kafkaService;
     private ItineraryService itineraryService;
 
     @BeforeEach
@@ -46,9 +61,15 @@ public class ItineraryServiceTest {
         this.externalImageService = mock(ExternalImageService.class);
         this.itineraryDayService = mock(ItineraryDayService.class);
         this.itineraryMapper = mock(ItineraryMapper.class);
+        this.itineraryPermissionService = mock(ItineraryPermissionService.class);
+
+        this.itineraryCollaboratorRepository = mock(ItineraryCollaboratorRepository.class);
+        this.kafkaService = mock(KafkaService.class);
 
         this.itineraryService = new ItineraryService(
-            itineraryRepository, userService, externalImageService, itineraryDayService, itineraryMapper
+            itineraryRepository, userService, externalImageService,
+            itineraryDayService, itineraryMapper, itineraryPermissionService,
+            itineraryCollaboratorRepository, kafkaService
         );
     }
 
@@ -75,12 +96,16 @@ public class ItineraryServiceTest {
         ExtendedItineraryDTO expectedDTO = mock(ExtendedItineraryDTO.class);
         when(itineraryMapper.toExtendedDTO(savedItinerary)).thenReturn(expectedDTO);
 
-        ExtendedItineraryDTO result = itineraryService.createItinerary(dto);
+        ExtendedItineraryResponseDTO result = itineraryService.createItinerary(dto);
 
-        assertEquals(expectedDTO, result);
+        assertEquals(expectedDTO, result.itinerary());
+        assertTrue(result.permissions().view());
+        assertTrue(result.permissions().edit());
+        assertTrue(result.permissions().delete());
         verify(itineraryRepository).save(any(Itinerary.class));
         verify(itineraryDayService).createItineraryDayEntity(any(), any());
         verify(user).addItinerary(any(Itinerary.class));
+        verify(itineraryCollaboratorRepository).save(any());
     }
 
     @Test
@@ -95,12 +120,17 @@ public class ItineraryServiceTest {
         Page<Itinerary> itineraryPage = new PageImpl<>(itineraryList, pageable, 1);
 
         when(userService.getAuthenticatedUser()).thenReturn(user);
-        when(itineraryRepository.findAllByUserOrderByUpdatedAtDesc(user, pageable)).thenReturn(itineraryPage);
+        when(itineraryRepository.findAllByUserOrCollaboratorOrderByUpdatedAtDesc(
+            user, pageable
+        )).thenReturn(itineraryPage);
 
         ItineraryDTO itineraryDTO = mock(ItineraryDTO.class);
         when(itineraryMapper.toDTOs(itineraryList)).thenReturn(List.of(itineraryDTO));
+        when(itineraryPermissionService.canView(itinerary, user)).thenReturn(true);
+        when(itineraryPermissionService.canEdit(itinerary, user)).thenReturn(true);
+        when(itineraryPermissionService.canDelete(itinerary, user)).thenReturn(false);
 
-        PaginatedDTO<ItineraryDTO> result = itineraryService.getAllItineraries(pageable, null);
+        PaginatedDTO<ItineraryResponseDTO> result = itineraryService.getAllItineraries(pageable, null);
 
         assertEquals(1, result.page().size());
         assertEquals(0, result.currentPage());
@@ -111,11 +141,70 @@ public class ItineraryServiceTest {
     }
 
     @Test
+    @DisplayName("ItineraryService should sanitize missing activity/location fields on create")
+    public void testCreateItinerarySanitizesNullActivityFields() {
+        User user = mock(User.class);
+        when(userService.getAuthenticatedUser()).thenReturn(user);
+
+        ActivityDTO activityWithNulls = new ActivityDTO(
+            null,
+            null,
+            new LocationDTO(null, null, new CoordinatesDTO(200.0, -500.0)),
+            null,
+            null
+        );
+        ItineraryDayDTO dayDTO = new ItineraryDayDTO(0, List.of(activityWithNulls));
+
+        ExtendedItineraryDTO dto = new ExtendedItineraryDTO(
+            null,
+            "",
+            null,
+            -2,
+            -10,
+            null,
+            Arrays.asList("  cultura ", "", null),
+            0L,
+            ItineraryStatusDTO.DRAFT,
+            List.of(dayDTO),
+            -1,
+            null
+        );
+
+        ItineraryDay dayEntity = mock(ItineraryDay.class);
+        when(itineraryDayService.createItineraryDayEntity(any(), any())).thenReturn(dayEntity);
+        doNothing().when(user).addItinerary(any(Itinerary.class));
+        when(externalImageService.getOrCreateImageByQuery(eq("Destino por definir"))).thenReturn(null);
+
+        Itinerary savedItinerary = mock(Itinerary.class);
+        when(itineraryRepository.save(any(Itinerary.class))).thenReturn(savedItinerary);
+
+        ExtendedItineraryDTO expectedDTO = mock(ExtendedItineraryDTO.class);
+        when(itineraryMapper.toExtendedDTO(savedItinerary)).thenReturn(expectedDTO);
+
+        itineraryService.createItinerary(dto);
+
+        ArgumentCaptor<ItineraryDayDTO> dayCaptor = ArgumentCaptor.forClass(ItineraryDayDTO.class);
+        verify(itineraryDayService).createItineraryDayEntity(dayCaptor.capture(), any(Itinerary.class));
+        ItineraryDayDTO sanitizedDay = dayCaptor.getValue();
+        ActivityDTO sanitizedActivity = sanitizedDay.activities().get(0);
+
+        assertEquals(1, sanitizedDay.day());
+        assertEquals("Actividad", sanitizedActivity.activity());
+        assertEquals("", sanitizedActivity.details());
+        assertEquals("", sanitizedActivity.time());
+        assertEquals("", sanitizedActivity.duration());
+        assertEquals("Sin ubicacion", sanitizedActivity.location().name());
+        assertEquals("", sanitizedActivity.location().address());
+        assertNull(sanitizedActivity.location().coordinates());
+    }
+
+    @Test
     @DisplayName("ItineraryService should update itinerary if user is owner")
     public void testUpdateItinerarySuccess() {
         Long itineraryId = 1L;
         User user = new User();
         user.setId(1L);
+        user.setUsername("owner");
 
         Itinerary itinerary = new Itinerary();
         itinerary.setUser(user);
@@ -128,6 +217,7 @@ public class ItineraryServiceTest {
 
         when(itineraryRepository.findById(itineraryId)).thenReturn(Optional.of(itinerary));
         when(userService.getAuthenticatedUser()).thenReturn(user);
+        when(itineraryPermissionService.canEdit(itinerary, user)).thenReturn(true);
 
         doNothing().when(itineraryDayService).deleteAllDaysByItinerary(itinerary);
         ItineraryDay dayEntity = mock(ItineraryDay.class);
@@ -139,9 +229,16 @@ public class ItineraryServiceTest {
         ExtendedItineraryDTO expectedDTO = mock(ExtendedItineraryDTO.class);
         when(itineraryMapper.toExtendedDTO(updatedItinerary)).thenReturn(expectedDTO);
 
-        ExtendedItineraryDTO result = itineraryService.updateItinerary(itineraryId, dto);
+        ExtendedItineraryResponseDTO result = itineraryService.updateItinerary(itineraryId, dto);
 
-        assertEquals(expectedDTO, result);
+        assertEquals(expectedDTO, result.itinerary());
+        assertTrue(result.permissions().edit());
+        ArgumentCaptor<ItineraryChangeMessage> messageCaptor = ArgumentCaptor.forClass(ItineraryChangeMessage.class);
+        verify(kafkaService).sendItineraryChangeMessage(messageCaptor.capture());
+        ItineraryChangeMessage message = messageCaptor.getValue();
+        assertEquals(itineraryId, message.itineraryId());
+        assertEquals(ItineraryChangeType.UPDATED, message.changeType());
+        assertEquals("owner", message.actorUsername());
         verify(itineraryDayService).deleteAllDaysByItinerary(itinerary);
         verify(itineraryDayService).createItineraryDayEntity(any(), eq(itinerary));
         verify(itineraryRepository).save(itinerary);
@@ -171,6 +268,7 @@ public class ItineraryServiceTest {
 
         when(itineraryRepository.findById(1L)).thenReturn(Optional.of(itinerary));
         when(userService.getAuthenticatedUser()).thenReturn(otherUser);
+        when(itineraryPermissionService.canEdit(itinerary, otherUser)).thenReturn(false);
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class, () ->
             itineraryService.updateItinerary(1L, mock(ExtendedItineraryDTO.class))
@@ -189,13 +287,15 @@ public class ItineraryServiceTest {
 
         when(itineraryRepository.findById(1L)).thenReturn(Optional.of(itinerary));
         when(userService.getAuthenticatedUser()).thenReturn(user);
+        when(itineraryPermissionService.canView(itinerary, user)).thenReturn(true);
 
         ExtendedItineraryDTO expectedDTO = mock(ExtendedItineraryDTO.class);
         when(itineraryMapper.toExtendedDTO(itinerary)).thenReturn(expectedDTO);
 
-        ExtendedItineraryDTO result = itineraryService.getItineraryById(1L);
+        ExtendedItineraryResponseDTO result = itineraryService.getItineraryById(1L);
 
-        assertEquals(expectedDTO, result);
+        assertEquals(expectedDTO, result.itinerary());
+        assertTrue(result.permissions().view());
     }
 
     @Test
@@ -222,6 +322,7 @@ public class ItineraryServiceTest {
 
         when(itineraryRepository.findById(1L)).thenReturn(Optional.of(itinerary));
         when(userService.getAuthenticatedUser()).thenReturn(otherUser);
+        when(itineraryPermissionService.canView(itinerary, otherUser)).thenReturn(false);
 
         ResponseStatusException ex = assertThrows(
             ResponseStatusException.class, () -> itineraryService.getItineraryById(1L),
@@ -242,6 +343,7 @@ public class ItineraryServiceTest {
 
         when(itineraryRepository.findById(1L)).thenReturn(Optional.of(itinerary));
         when(userService.getAuthenticatedUser()).thenReturn(user);
+        when(itineraryPermissionService.canDelete(itinerary, user)).thenReturn(true);
 
         itineraryService.deleteItinerary(1L);
 
@@ -272,6 +374,7 @@ public class ItineraryServiceTest {
 
         when(itineraryRepository.findById(1L)).thenReturn(Optional.of(itinerary));
         when(userService.getAuthenticatedUser()).thenReturn(otherUser);
+        when(itineraryPermissionService.canDelete(itinerary, otherUser)).thenReturn(false);
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class, () ->
             itineraryService.deleteItinerary(1L)

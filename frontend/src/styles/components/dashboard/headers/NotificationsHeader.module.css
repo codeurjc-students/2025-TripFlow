@@ -1,0 +1,57 @@
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding-inline: var(--app-padding);
+    width: 100%;
+    height: var(--header-mobile-height);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--space-lg);
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-secondary);
+}
+
+.left {
+    display: flex;
+    align-items: center;
+}
+
+.bellWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+}
+
+.badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding-inline: var(--space-xs);
+    border-radius: var(--border-radius-full);
+    background: var(--primary);
+    color: white;
+    font-size: 10px;
+    font-weight: var(--font-weight-bold);
+    line-height: 1;
+}
+
+.title {
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}

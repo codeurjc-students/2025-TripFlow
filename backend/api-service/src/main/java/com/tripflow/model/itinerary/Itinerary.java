@@ -57,6 +57,12 @@ public class Itinerary {
     @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL)
     private List<ItineraryDay> days;
 
+    @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItineraryCollaborator> collaborators;
+
+    @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItineraryShareLink> shareLinks;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private Timestamp createdAt;
@@ -175,6 +181,22 @@ public class Itinerary {
 
     public void setDays(List<ItineraryDay> days) {
         this.days = days;
+    }
+
+    public List<ItineraryCollaborator> getCollaborators() {
+        return collaborators;
+    }
+
+    public void setCollaborators(List<ItineraryCollaborator> collaborators) {
+        this.collaborators = collaborators;
+    }
+
+    public List<ItineraryShareLink> getShareLinks() {
+        return shareLinks;
+    }
+
+    public void setShareLinks(List<ItineraryShareLink> shareLinks) {
+        this.shareLinks = shareLinks;
     }
 
     public Timestamp getCreatedAt() {

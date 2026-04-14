@@ -13,7 +13,10 @@ export default defineConfig({
         VitePWA({
             registerType: "autoUpdate",
             workbox: {
-                globPatterns: [],
+                globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest}"],
+                maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+                navigateFallback: "/index.html",
+                navigateFallbackDenylist: [/^\/api\//, /^\/ws\//],
                 runtimeCaching: [
                     {
                         urlPattern: ({ url }) =>
@@ -32,6 +35,23 @@ export default defineConfig({
                             expiration: {
                                 maxEntries: 20,
                                 maxAgeSeconds: 60 * 60 * 24 * 365,
+                            },
+                        },
+                    },
+                    {
+                        urlPattern: ({ url }) =>
+                            url.hostname === "images.unsplash.com" ||
+                            url.hostname === "source.unsplash.com" ||
+                            url.hostname === "plus.unsplash.com",
+                        handler: "CacheFirst",
+                        options: {
+                            cacheName: "unsplash-images",
+                            cacheableResponse: {
+                                statuses: [0, 200],
+                            },
+                            expiration: {
+                                maxEntries: 200,
+                                maxAgeSeconds: 60 * 60 * 24 * 30,
                             },
                         },
                     },

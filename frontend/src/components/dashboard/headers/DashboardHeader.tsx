@@ -1,6 +1,6 @@
 import styles from "@styles/components/dashboard/headers/DashboardHeader.module.css";
 
-import { PlusIcon } from "lucide-react";
+import { BellIcon } from "lucide-react";
 
 import Button from "@/components/shared/Button";
 import Avatar from "@/components/shared/Avatar";
@@ -21,10 +21,10 @@ export default function DashboardHeader({ name } : DashboardHeaderProps) {
             </div>
             <Button
                 style={["tool_bordered"]}
-                label="Crear Itinerario"
-                to="/itineraries/new"
+                label="Notificaciones"
+                to="/dashboard/notifications"
             >
-                <PlusIcon />
+                <BellIcon />
             </Button>
         </header>
     );

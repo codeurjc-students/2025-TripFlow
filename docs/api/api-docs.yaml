@@ -9,10 +9,16 @@ servers:
 security:
 - auth_token: []
 tags:
+- name: Itinerary Share Links
+  description: Endpoints for generating and consuming itinerary share links
+- name: Map Integration
+  description: Map search and directions proxy endpoints
 - name: AI Generation
   description: AI generation and processing
 - name: Statistics
   description: Endpoints for retrieving statistics
+- name: Itinerary Collaboration
+  description: Endpoints for managing itinerary collaborators and invitations
 - name: Users Management
   description: User management and operations
 - name: Health Check
@@ -114,6 +120,126 @@ paths:
           description: Internal server error
       security:
       - auth_token: []
+  /api/v1/itineraries/{itineraryId}/collaborators/{username}:
+    put:
+      tags:
+      - Itinerary Collaboration
+      summary: Update Collaborator Role
+      description: Updates a collaborator's role. Only owner can do this.
+      operationId: updateCollaboratorRole
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCollaboratorRequest"
+        required: true
+      responses:
+        "200":
+          description: Collaborator updated
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+        "400":
+          description: Invalid request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+        "404":
+          description: Itinerary or collaborator not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+      security:
+      - auth_token: []
+    delete:
+      tags:
+      - Itinerary Collaboration
+      summary: Remove Collaborator
+      description: "Removes a collaborator. Owner can remove anyone, collaborators\
+        \ can remove themselves."
+      operationId: removeCollaborator
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Collaborator removed
+        "403":
+          description: Forbidden
+        "404":
+          description: Itinerary or collaborator not found
+      security:
+      - auth_token: []
+  /api/v1/itineraries/{itineraryId}/collaborators/{username}/accept:
+    put:
+      tags:
+      - Itinerary Collaboration
+      summary: Accept Invitation
+      description: Accepts a pending invitation to collaborate on an itinerary.
+      operationId: acceptInvitation
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Invitation accepted
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+        "400":
+          description: Invitation is not pending
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+        "404":
+          description: Invitation not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+      security:
+      - auth_token: []
   /api/v1/itineraries/{id}:
     get:
       tags:
@@ -135,31 +261,31 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "401":
           description: Unauthorized access
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "404":
           description: Itinerary not found
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "403":
           description: Access to the itinerary is forbidden
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "500":
           description: Internal server error
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
       security:
       - auth_token: []
     put:
@@ -187,37 +313,37 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "400":
           description: Invalid itinerary data provided
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "401":
           description: Unauthorized access
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "404":
           description: Itinerary not found
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "403":
           description: Access to the itinerary is forbidden
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "500":
           description: Internal server error
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
       security:
       - auth_token: []
     delete:
@@ -326,6 +452,209 @@ paths:
                 $ref: "#/components/schemas/PublicUserDTO"
       security:
       - auth_token: []
+  /api/v1/maps/directions:
+    post:
+      tags:
+      - Map Integration
+      summary: Get route directions
+      description: Returns optimized route geometry and summary from ordered waypoints.
+      operationId: directions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MapDirectionsRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: Directions retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapDirectionsResponseDTO"
+        "400":
+          description: Invalid request payload
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapDirectionsResponseDTO"
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapDirectionsResponseDTO"
+        "503":
+          description: Map service unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapDirectionsResponseDTO"
+      security:
+      - auth_token: []
+  /api/v1/itineraries/{itineraryId}/share-links:
+    get:
+      tags:
+      - Itinerary Share Links
+      summary: Get Active Share Links
+      description: Returns active share links for an itinerary. Owner and accepted
+        collaborators can view.
+      operationId: getActiveShareLinks
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Share links retrieved
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ShareLinkDTO"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ShareLinkDTO"
+        "404":
+          description: Itinerary not found
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ShareLinkDTO"
+      security:
+      - auth_token: []
+    post:
+      tags:
+      - Itinerary Share Links
+      summary: Generate Share Link
+      description: Generates a public read-only share link with fixed expiration.
+        Only itinerary owner can generate.
+      operationId: generateShareLink
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "201":
+          description: Share link generated
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ShareLinkDTO"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ShareLinkDTO"
+        "404":
+          description: Itinerary not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ShareLinkDTO"
+      security:
+      - auth_token: []
+  /api/v1/itineraries/{itineraryId}/collaborators:
+    get:
+      tags:
+      - Itinerary Collaboration
+      summary: Get Collaborators
+      description: Gets all collaborators of an itinerary.
+      operationId: getCollaborators
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Collaborators found
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollaboratorDTO"
+        "404":
+          description: Itinerary not found
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollaboratorDTO"
+      security:
+      - auth_token: []
+    post:
+      tags:
+      - Itinerary Collaboration
+      summary: Send Invitation
+      description: Sends an invitation to a user to collaborate on an itinerary. Only
+        owner can do this.
+      operationId: sendInvitation
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddCollaboratorRequest"
+        required: true
+      responses:
+        "201":
+          description: Invitation sent
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+        "400":
+          description: Invalid request or user is owner
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+        "404":
+          description: Itinerary or user not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+        "409":
+          description: User already has a pending invitation or is a collaborator
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CollaboratorDTO"
+      security:
+      - auth_token: []
   /api/v1/itineraries:
     get:
       tags:
@@ -351,19 +680,19 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PaginatedDTOItineraryDTO"
+                $ref: "#/components/schemas/PaginatedDTOItineraryResponseDTO"
         "401":
           description: Unauthorized access
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PaginatedDTOItineraryDTO"
+                $ref: "#/components/schemas/PaginatedDTOItineraryResponseDTO"
         "500":
           description: Internal server error
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PaginatedDTOItineraryDTO"
+                $ref: "#/components/schemas/PaginatedDTOItineraryResponseDTO"
       security:
       - auth_token: []
     post:
@@ -384,19 +713,19 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "400":
           description: Invalid itinerary data provided
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "401":
           description: Unauthorized access
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
       security:
       - auth_token: []
   /api/v1/itineraries/:
@@ -424,19 +753,19 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PaginatedDTOItineraryDTO"
+                $ref: "#/components/schemas/PaginatedDTOItineraryResponseDTO"
         "401":
           description: Unauthorized access
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PaginatedDTOItineraryDTO"
+                $ref: "#/components/schemas/PaginatedDTOItineraryResponseDTO"
         "500":
           description: Internal server error
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PaginatedDTOItineraryDTO"
+                $ref: "#/components/schemas/PaginatedDTOItineraryResponseDTO"
       security:
       - auth_token: []
     post:
@@ -457,19 +786,19 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "400":
           description: Invalid itinerary data provided
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
         "401":
           description: Unauthorized access
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ExtendedItineraryDTO"
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
       security:
       - auth_token: []
   /api/v1/ai:
@@ -534,6 +863,32 @@ paths:
                 $ref: "#/components/schemas/AuthResponse"
         "400":
           description: Account verification failed
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/auth/reset-password:
+    post:
+      tags:
+      - Authentication
+      summary: Reset Password with OTP
+      description: "Resets password using username/email, OTP code, and new password."
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordOtpRequest"
+        required: true
+      responses:
+        "200":
+          description: Password reset successful
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Password reset failed
           content:
             '*/*':
               schema:
@@ -662,6 +1017,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AuthResponse"
+  /api/auth/forgot-password:
+    post:
+      tags:
+      - Authentication
+      summary: Forgot Password Endpoint
+      description: Sends a one-time code to reset account password.
+      operationId: forgotPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordRequest"
+        required: true
+      responses:
+        "200":
+          description: Request processed
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
   /api/v1/users:
     get:
       tags:
@@ -693,6 +1068,73 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PaginatedDTOPublicUserDTO"
+  /api/v1/users/{username}/invitations:
+    get:
+      tags:
+      - Users Management
+      summary: Get pending invitations
+      description: Retrieves all pending collaboration invitations for a user.
+      operationId: getPendingInvitations
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Invitations retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollaboratorDTO"
+        "404":
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollaboratorDTO"
+      security:
+      - auth_token: []
+  /api/v1/stats/users-by-plan:
+    get:
+      tags:
+      - Statistics
+      summary: Get Users By Plan Statistics
+      description: Retrieves user distribution grouped by subscription plan. Admin
+        only endpoint.
+      operationId: getUsersByPlanStats
+      responses:
+        "200":
+          description: Users by plan statistics retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UsersByPlanStatsDTO"
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UsersByPlanStatsDTO"
+        "403":
+          description: Admin role required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UsersByPlanStatsDTO"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UsersByPlanStatsDTO"
+      security:
+      - auth_token: []
   /api/v1/stats/user:
     get:
       tags:
@@ -719,6 +1161,172 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UserStatsDTO"
+      security:
+      - auth_token: []
+  /api/v1/share/{token}:
+    get:
+      tags:
+      - Itinerary Share Links
+      summary: Get Shared Itinerary
+      description: Returns a read-only itinerary by share token. Public endpoint.
+      operationId: getSharedItinerary
+      parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Shared itinerary retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
+        "403":
+          description: Share link expired or revoked
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
+        "404":
+          description: Share link not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExtendedItineraryResponseDTO"
+  /api/v1/maps/search/suggest:
+    get:
+      tags:
+      - Map Integration
+      summary: Suggest places
+      description: Returns autocomplete location suggestions through backend map proxy.
+      operationId: suggest
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: language
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: proximity
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: bbox
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: country
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: lat
+        in: query
+        required: false
+        schema:
+          type: number
+          format: double
+      - name: lon
+        in: query
+        required: false
+        schema:
+          type: number
+          format: double
+      - name: radiusKm
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: category
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Suggestions retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapSuggestResponseDTO"
+        "400":
+          description: Invalid query parameters
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapSuggestResponseDTO"
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapSuggestResponseDTO"
+        "503":
+          description: Map service unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapSuggestResponseDTO"
+      security:
+      - auth_token: []
+  /api/v1/maps/search/retrieve/{id}:
+    get:
+      tags:
+      - Map Integration
+      summary: Retrieve place details
+      description: Returns place details and coordinates from selected suggestion.
+      operationId: retrieve
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: language
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Place details retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapPlaceDTO"
+        "400":
+          description: Invalid query parameters
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapPlaceDTO"
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapPlaceDTO"
+        "404":
+          description: Place not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MapPlaceDTO"
       security:
       - auth_token: []
   /api/v1/ai/status:
@@ -781,6 +1389,63 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+  /api/v1/itineraries/{itineraryId}/share-links/{shareLinkId}:
+    delete:
+      tags:
+      - Itinerary Share Links
+      summary: Revoke Share Link
+      description: Revokes a share link. Only itinerary owner can revoke.
+      operationId: revokeShareLink
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: shareLinkId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Share link revoked
+        "403":
+          description: Forbidden
+        "404":
+          description: Itinerary or share link not found
+      security:
+      - auth_token: []
+  /api/v1/itineraries/{itineraryId}/collaborators/{username}/decline:
+    delete:
+      tags:
+      - Itinerary Collaboration
+      summary: Decline Invitation
+      description: Declines a pending invitation to collaborate on an itinerary.
+      operationId: declineInvitation
+      parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Invitation declined
+        "400":
+          description: Invitation is already accepted or invalid
+        "404":
+          description: Invitation not found
+      security:
+      - auth_token: []
 components:
   schemas:
     UpdateUserRequest:
@@ -788,10 +1453,16 @@ components:
       properties:
         name:
           type: string
+          maxLength: 50
+          minLength: 0
         description:
           type: string
+          maxLength: 500
+          minLength: 0
         location:
           type: string
+          maxLength: 100
+          minLength: 0
         notificationsAllowed:
           type: boolean
     PublicUserDTO:
@@ -821,6 +1492,49 @@ components:
           - FREE
           - PRO
           - PREMIUM
+    UpdateCollaboratorRequest:
+      type: object
+      properties:
+        role:
+          type: string
+          enum:
+          - EDITOR
+          - VIEWER
+          - OWNER
+      required:
+      - role
+    CollaboratorDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user:
+          $ref: "#/components/schemas/PublicUserDTO"
+        fromUser:
+          type: string
+        role:
+          type: string
+          enum:
+          - EDITOR
+          - VIEWER
+          - OWNER
+        status:
+          type: string
+          enum:
+          - PENDING
+          - ACCEPTED
+        invitedAt:
+          type: string
+          format: date-time
+        acceptedAt:
+          type: string
+          format: date-time
+        itineraryId:
+          type: integer
+          format: int64
+        itineraryTitle:
+          type: string
     ActivityDTO:
       type: object
       properties:
@@ -851,8 +1565,12 @@ components:
           format: int64
         title:
           type: string
+          maxLength: 200
+          minLength: 0
         place:
           type: string
+          maxLength: 200
+          minLength: 0
         people:
           type: integer
           format: int32
@@ -861,10 +1579,14 @@ components:
           format: double
         date:
           type: string
+          maxLength: 50
+          minLength: 0
         tags:
           type: array
           items:
             type: string
+          maxItems: 30
+          minItems: 0
         updatedCount:
           type: integer
           format: int64
@@ -884,6 +1606,8 @@ components:
           format: int32
         coverImage:
           $ref: "#/components/schemas/ExternalImageDTO"
+      required:
+      - title
     ExternalImageDTO:
       type: object
       properties:
@@ -912,26 +1636,205 @@ components:
           type: string
         coordinates:
           $ref: "#/components/schemas/CoordinatesDTO"
+    ExtendedItineraryResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+          maxLength: 200
+          minLength: 0
+        place:
+          type: string
+          maxLength: 200
+          minLength: 0
+        people:
+          type: integer
+          format: int32
+        budget:
+          type: number
+          format: double
+        date:
+          type: string
+          maxLength: 50
+          minLength: 0
+        tags:
+          type: array
+          items:
+            type: string
+          maxItems: 30
+          minItems: 0
+        updatedCount:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - PLANNED
+          - ONGOING
+          - COMPLETED
+        days:
+          type: array
+          items:
+            $ref: "#/components/schemas/ItineraryDayDTO"
+        countDays:
+          type: integer
+          format: int32
+        coverImage:
+          $ref: "#/components/schemas/ExternalImageDTO"
+        permissions:
+          $ref: "#/components/schemas/PermissionsDTO"
+      required:
+      - title
+    PermissionsDTO:
+      type: object
+      properties:
+        view:
+          type: boolean
+        edit:
+          type: boolean
+        delete:
+          type: boolean
+    MapCoordinateDTO:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          maximum: 90.0
+          minimum: -90.0
+        longitude:
+          type: number
+          format: double
+          maximum: 180.0
+          minimum: -180.0
+      required:
+      - latitude
+      - longitude
+    MapDirectionsRequestDTO:
+      type: object
+      properties:
+        profile:
+          type: string
+          enum:
+          - DRIVING
+          - DRIVING_TRAFFIC
+          - WALKING
+          - CYCLING
+        waypoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapCoordinateDTO"
+          maxItems: 25
+          minItems: 2
+        alternatives:
+          type: boolean
+        steps:
+          type: boolean
+      required:
+      - profile
+      - waypoints
+    MapDirectionsResponseDTO:
+      type: object
+      properties:
+        routes:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapRouteDTO"
+    MapRouteDTO:
+      type: object
+      properties:
+        distance:
+          type: number
+          format: double
+        duration:
+          type: number
+          format: double
+        geometry:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapCoordinateDTO"
+        legs:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapRouteLegDTO"
+    MapRouteLegDTO:
+      type: object
+      properties:
+        distance:
+          type: number
+          format: double
+        duration:
+          type: number
+          format: double
+        summary:
+          type: string
+    ShareLinkDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        token:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        active:
+          type: boolean
+    AddCollaboratorRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+        role:
+          type: string
+          enum:
+          - EDITOR
+          - VIEWER
+          - OWNER
+      required:
+      - role
+      - username
     AIGenerationRequest:
       type: object
       properties:
         aiPrompt:
           type: string
+          maxLength: 2000
+          minLength: 0
         destination:
           type: string
+          maxLength: 200
+          minLength: 0
         style:
           type: string
+          maxLength: 100
+          minLength: 0
         budget:
           type: number
           format: double
         lodging:
           type: string
+          maxLength: 100
+          minLength: 0
         duration:
           type: string
+          maxLength: 50
+          minLength: 0
         interests:
           type: array
           items:
             type: string
+          maxItems: 20
+          minItems: 0
     AIResponse:
       type: object
       properties:
@@ -959,8 +1862,14 @@ components:
       properties:
         username:
           type: string
+          minLength: 1
         code:
           type: string
+          maxLength: 10
+          minLength: 0
+      required:
+      - code
+      - username
     AuthResponse:
       type: object
       properties:
@@ -977,29 +1886,76 @@ components:
             type: string
         user:
           $ref: "#/components/schemas/PublicUserDTO"
+    ResetPasswordOtpRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+        code:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+        confirmPassword:
+          type: string
+          minLength: 1
+      required:
+      - code
+      - confirmPassword
+      - password
+      - username
     ResendCodeRequest:
       type: object
       properties:
         username:
           type: string
+          minLength: 1
+      required:
+      - username
     RegisterUserRequest:
       type: object
       properties:
         email:
           type: string
+          format: email
+          maxLength: 255
+          minLength: 0
         username:
           type: string
+          minLength: 1
         password:
           type: string
+          minLength: 1
         confirmPassword:
           type: string
+          minLength: 1
+      required:
+      - confirmPassword
+      - email
+      - password
+      - username
     LoginRequest:
       type: object
       properties:
         username:
           type: string
+          minLength: 1
         password:
           type: string
+          minLength: 1
+      required:
+      - password
+      - username
+    ForgotPasswordRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+      required:
+      - username
     Pageable:
       type: object
       properties:
@@ -1036,6 +1992,21 @@ components:
           format: int64
         isLastPage:
           type: boolean
+    UsersByPlanItemDTO:
+      type: object
+      properties:
+        plan:
+          type: string
+        count:
+          type: integer
+          format: int64
+    UsersByPlanStatsDTO:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/UsersByPlanItemDTO"
     StatDTO:
       type: object
       properties:
@@ -1051,7 +2022,52 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/StatDTO"
-    ItineraryDTO:
+    MapSuggestResponseDTO:
+      type: object
+      properties:
+        suggestions:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapSuggestionDTO"
+    MapSuggestionDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        fullAddress:
+          type: string
+        placeFormatted:
+          type: string
+        featureType:
+          type: string
+        center:
+          $ref: "#/components/schemas/MapCoordinateDTO"
+        categories:
+          type: array
+          items:
+            type: string
+    MapPlaceDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        fullAddress:
+          type: string
+        placeFormatted:
+          type: string
+        featureType:
+          type: string
+        center:
+          $ref: "#/components/schemas/MapCoordinateDTO"
+        categories:
+          type: array
+          items:
+            type: string
+    ItineraryResponseDTO:
       type: object
       properties:
         id:
@@ -1088,13 +2104,15 @@ components:
           - COMPLETED
         coverImage:
           $ref: "#/components/schemas/ExternalImageDTO"
-    PaginatedDTOItineraryDTO:
+        permissions:
+          $ref: "#/components/schemas/PermissionsDTO"
+    PaginatedDTOItineraryResponseDTO:
       type: object
       properties:
         page:
           type: array
           items:
-            $ref: "#/components/schemas/ItineraryDTO"
+            $ref: "#/components/schemas/ItineraryResponseDTO"
         currentPage:
           type: integer
           format: int64

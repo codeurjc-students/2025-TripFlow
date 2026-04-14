@@ -3,7 +3,7 @@
 > **Project Deadline**: June 2026
 >
 > This roadmap outlines the development phases and tasks for the TripFlow TFG project.
-> Each phase might be modified based on project progress and requirements.
+> Status is updated for the v1.0.0 milestone.
 
 ---
 
@@ -60,7 +60,7 @@
   - [x] {Integration-Backend} User authentication endpoints
   - [x] {Integration-Backend} Itinerary endpoints
 - [x] {Integration-Frontend} Frontend-backend communication tests
-- [x] {E2E} User flow tests (Puppeteer)
+- [x] {E2E} User flow tests (Playwright)
 - [x] {Security} Authorization tests for protected resources
 
 ---
@@ -176,47 +176,99 @@
 
 ### 🔧 Backend
 
-- [ ] {Feature} Collaborative Itineraries
-  - [ ] {Model} Collaboration entity (User-Itinerary-Role)
-  - [ ] {API} Invite user endpoint - `POST /api/v1/itineraries/{id}/invite`
-  - [ ] {Access} Permission logic (VIEWER, EDITOR, OWNER)
-  - [ ] {WebSocket} Real-time collaboration updates synchronization
-- [ ] {Feature} Basic Backend Support for Maps
-  - [ ] {Model} Extension of Location entity to support coordinates/GeoJSON
-- [ ] {Feature} Location Discovery
-  - [ ] {Concept} Exploration of nearby places / points of interest (Implementation TBD)
+- [x] {Feature} Collaborative Itineraries
+  - [x] {Model} Collaboration entity (User-Itinerary-Role)
+  - [x] {API} Invite user endpoint - `POST /api/v1/itineraries/{itineraryId}/collaborators`
+  - [x] {API} Accept invitation endpoint - `PUT /api/v1/itineraries/{itineraryId}/collaborators/{username}/accept`
+  - [x] {API} Decline invitation endpoint - `DELETE /api/v1/itineraries/{itineraryId}/collaborators/{username}/decline`
+  - [x] {API} Pending invitations endpoint - `GET /api/v1/users/{username}/invitations`
+  - [x] {API} Get collaborators endpoint - `GET /api/v1/itineraries/{itineraryId}/collaborators`
+  - [x] {API} Update collaborator role endpoint - `PUT /api/v1/itineraries/{itineraryId}/collaborators/{username}`
+  - [x] {API} Remove collaborator endpoint - `DELETE /api/v1/itineraries/{itineraryId}/collaborators/{username}`
+  - [x] {Access} Permission logic (VIEWER, EDITOR, OWNER + invitation status PENDING/ACCEPTED)
+  - [x] {Event} Collaboration events and notifications (invite, accept, decline)
+  - [x] {WebSocket} Real-time collaboration refresh synchronization
+  - [x] {Feature} Share Links
+    - [x] {Model} Share link entity (token + expiration + revocation)
+    - [x] {API} Generate share link endpoint - `POST /api/v1/itineraries/{itineraryId}/share-links`
+    - [x] {API} Get active share links endpoint - `GET /api/v1/itineraries/{itineraryId}/share-links`
+    - [x] {API} Revoke share link endpoint - `DELETE /api/v1/itineraries/{itineraryId}/share-links/{shareLinkId}`
+    - [x] {API} Public shared itinerary endpoint - `GET /api/v1/share/{token}`
+    - [x] {Security} Public read-only access via token + owner-only link management
+    - [x] {Config} Fixed TTL policy for shared links
+- [x] {Feature} Basic Backend Support for Maps
+  - [x] {Model} Extension of Location entity to support coordinates (lat/lng)
+  - [x] {API} Suggest places endpoint - `GET /api/v1/maps/search/suggest`
+  - [x] {API} Retrieve place details endpoint - `GET /api/v1/maps/search/retrieve/{id}`
+  - [x] {API} Directions endpoint - `POST /api/v1/maps/directions`
+  - [x] {Architecture} Provider-agnostic map service (mock + real providers)
+  - [x] {Cache} Persisted map cache for search/retrieve/directions responses
+  - [x] {Validation} Nearby discovery with optional query and strict radius filtering
+- [x] {Feature} Location Discovery
+  - [x] {Backend} Nearby places / points of interest support via maps suggest API
 
 ### ⚛️ Frontend
 
-- [ ] {Feature} Interactive Maps Integration
-  - [ ] {UI} Map visualization component (Leaflet/Mapbox)
-  - [ ] {UI} Plotting daily itinerary routes
-- [ ] {Feature} Collaborative Itineraries UI
-  - [ ] {UI} Share Itinerary Modal & Link generation
-  - [ ] {UI} Role attribution interface
-- [ ] {PWA} Offline Access
-  - [ ] {Config} Service Worker configuration
-  - [ ] {Cache} Caching strategies for itinerary data
-  - [ ] {UI} Offline mode indicator and read-only access
-- [ ] {Feature} Client-Side PDF Export
-  - [ ] {Library} Integration with PDF library (e.g., react-pdf / jsPDF)
-  - [ ] {UI} Export button and layout generation
+- [x] {Feature} Interactive Maps Integration
+  - [x] {UI} Map visualization component (Leaflet)
+  - [x] {UI} Plotting daily itinerary routes
+  - [x] {UI} New map explore screen with geolocation-first nearby discovery (`/map/explore`)
+  - [x] {UI} Search UX for nearby points of interest (query + radius)
+  - [x] {UI} Add recommendation directly into itinerary day from explore screen
+  - [x] {UI} Explore popup actions prioritized for add-to-trip (`Agregar al viaje` / `Navegar`)
+  - [x] {UI} Travel mode parity for external navigation URLs (driving/walking/cycling mapping)
+  - [x] {UI} Post-add success flow with stay-in-explore default (`Seguir explorando` / `Ver viaje`)
+- [x] {Feature} Collaborative Itineraries UI
+  - [x] {UI} Collaboration modal (invite, role update, remove/leave)
+  - [x] {UI} Invitations center (pending invitations list + accept/decline)
+  - [x] {UI} Real-time itinerary refresh on collaboration changes
+  - [x] {UI} Share link generation
+  - [x] {UI} Share link listing + revocation controls
+  - [x] {UI} Copy share link action
+  - [x] {Route} Public shared itinerary page - `/share/{token}`
+  - [x] {Access} Read-only shared itinerary view
+- [x] {PWA} Offline Access
+  - [x] {Config} Service Worker configuration
+  - [x] {Cache} Caching strategies for itinerary data
+  - [x] {UI} Read-only access in offline mode
+- [x] {Feature} Client-Side PDF Export
+  - [x] {Library} Integration with PDF library (e.g., react-pdf / jsPDF)
+  - [x] {UI} Export button and layout generation
 
 ### ⚙️ Testing
 
-- [ ] {Unit-Backend} Permission service tests (Roles logic)
-- [ ] {Integration-Backend} Collaboration endpoints
-- [ ] {E2E} Offline mode behavior
-- [ ] {E2E} Collaborative flow
+- [x] {Unit-Backend} Permission service tests (Roles logic)
+- [x] {Unit-Backend} Collaboration service tests (invitations and role management)
+- [x] {Integration-Backend} Collaboration endpoints (invite, accept, decline, list, update role, remove)
+- [x] {Integration-Backend} Share link endpoints (generate/list/revoke/public access)
+- [x] {Unit-Backend} Maps provider resolver and directions cache key tests
+- [x] {Unit-Backend} POI relevance filtering tests for maps suggestions
+- [x] {Unit-Frontend} Maps service tests (suggest/retrieve/directions integration)
+- [x] {Unit-Frontend} Map navigation URL mapping tests by profile (DRIVING/WALKING/CYCLING)
+- [x] {Unit-Frontend} Add-to-trip hook tests (append activity + persisted itinerary/day defaults)
+- [x] {Integration-Backend} Full Docker-backed map endpoints suite in CI environment
+- [x] {Security} Share link expiration and revocation behavior
+- [x] {Unit-Frontend} Collaboration hook tests for share links (list/generate/revoke flows)
+- [x] {E2E} Share link lifecycle (generate, open in read-only mode, revoke)
+- [x] {E2E} Collaborative flow
 
 ---
 
-## ⭐ Future & Nice-to-Have
+## ✅ v1.0.0 Milestone Status
 
-- [ ] {Feature} Route Optimization Algorithms (TSP)
+- [x] Core MVP features delivered
+- [x] Intermediate features delivered (AI, notifications, profile, admin)
+- [x] Advanced v2 scope delivered (maps, collaboration, share links, PWA, PDF)
+- [x] CI/CD release workflows and deployment automation consolidated
+
+---
+
+## ⭐ Future & Nice-to-Have (Post-v1)
+
+- [ ] {Feature} Smart Budget Planner (daily cost forecasting + alerts)
+- [ ] {Feature} Plans & Payment Integration (checkout, upgrades, renewals, billing history)
 - [ ] {Feature} Travel Achievements & Gamification
 - [ ] {Feature} User Travel Preferences
-- [ ] {Feature} Advanced Location Discovery (Filters, Categories)
 
 ---
 

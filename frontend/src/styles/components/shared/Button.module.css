@@ -4,6 +4,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: var(--space-sm);
     padding: var(--space-sm) var(--space-lg);
 
     text-decoration: none;
@@ -40,15 +41,30 @@
     }
 }
 
-.primary {
-    border: none;
+.small {
+    height: 32px;
+    padding: 0 var(--space-sm);
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-normal);
-    background: var(--gradient-primary);
+    border-radius: var(--border-radius-md);
+
+    &.tool,
+    &.tool_bordered,
+    &.bordered {
+        --size: 32px;
+    }
+}
+
+.primary {
+    border: 1px solid var(--primary);
+    font-weight: var(--font-weight-bold);
+    background: var(--primary);
     color: var(--gradient-primary-text);
     text-transform: capitalize;
 
     &.danger {
         background: var(--error);
+        border-color: var(--error);
     }
 
     @media (hover: hover) {
@@ -63,19 +79,19 @@
 }
 
 .secondary {
-    border: 2px solid var(--border-secondary);
+    border: 1px solid var(--border-secondary);
     background-color: var(--bg-secondary);
-    color: var(--text-secondary);
+    color: var(--text-primary);
     font-weight: var(--font-weight-normal);
     text-transform: capitalize;
 
     &.danger {
-        border: 2px solid var(--error);
+        border: 1px solid var(--error);
         color: var(--error);
     }
 
     &.info {
-        border: 2px solid var(--info-border);
+        border: 1px solid var(--info-border);
         color: var(--info-text);
     }
 
@@ -150,7 +166,7 @@
     }
 }
 
-.tool_bordered {
+.tool_bordered, .bordered {
     --size: 42px;
     height: var(--size);
     width: var(--size);
@@ -188,8 +204,11 @@
     }
 
     &.active {
-        color: var(--primary);
         filter: brightness(1.20);
+    }
+
+    &:active {
+        transform: scale(0.985);
     }
 
     &.rounded {
@@ -201,6 +220,11 @@
             filter: none;
         }
     }
+}
+
+.bordered {
+    width: max-content;
+    padding-inline: var(--space-sm);
 }
 
 .inline {
@@ -261,6 +285,8 @@
 
 @media (max-width: 1024px) {
     .route {
+        width: auto;
+        flex: 1 1 0;
         height: var(--sidebar-mobile-height);
         flex-direction: column;
         justify-content: center;
@@ -269,6 +295,7 @@
         outline: none;
         box-shadow: none;
         background: none;
+        border: 2px solid transparent;
 
         &.withChildren {
             gap: var(--space-xs);
@@ -279,9 +306,14 @@
             box-shadow: none;
         }
 
+        &:active {
+            transform: none;
+            background: none;
+        }
+
         &.active {
             background: none;
-            border: none;
+            border: 2px solid transparent;
         }
 
         @media (hover: hover) {

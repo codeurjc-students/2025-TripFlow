@@ -1,0 +1,75 @@
+@import url("../../animations.css");
+
+.container {
+    position: relative;
+    display: inline-block;
+}
+
+.menu {
+    position: fixed;
+    min-width: 180px;
+    padding: var(--space-xs);
+    
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 9999;
+    animation: fadeIn 0.1s ease;
+}
+
+.menuItem {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    background: transparent;
+    
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover:not(:disabled) {
+        background-color: var(--bg-tertiary);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: var(--text-tertiary);
+    }
+
+    .label {
+        flex: 1;
+        white-space: nowrap;
+    }
+
+    &.danger {
+        color: var(--error);
+        
+        .icon {
+            color: var(--error);
+        }
+
+        &:hover:not(:disabled) {
+            background-color: var(--error-bg);
+        }
+    }
+}

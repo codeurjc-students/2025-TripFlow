@@ -1,5 +1,6 @@
 import styles from "@styles/components/shared/AttributionImage.module.css";
-import type { ComponentProps } from "react";
+import { ImageOff } from "lucide-react";
+import { useEffect, useState, type ComponentProps } from "react";
 
 interface AttributionImageProps extends ComponentProps<"div"> {
   src: string;
@@ -21,19 +22,33 @@ export default function AttributionImage({
   children,
   ...props
 }: AttributionImageProps) {
+  const [hasLoadError, setHasLoadError] = useState(false);
+
+  useEffect(() => {
+    setHasLoadError(false);
+  }, [src]);
+
   return (
     <div className={`${styles.container} ${className || ""}`} {...props}>
-      <img
-        className={styles.image}
-        src={src}
-        alt={alt}
-        decoding="async"
-        loading={loading}
-      />
+      {!hasLoadError ? (
+        <img
+          className={styles.image}
+          src={src}
+          alt={alt}
+          decoding="async"
+          loading={loading}
+          onError={() => setHasLoadError(true)}
+        />
+      ) : (
+        <div className={styles.fallbackTemplate} role="img" aria-label={alt || "Imagen no disponible"}>
+          <ImageOff size={22} />
+          <span>Imagen no disponible sin conexión</span>
+        </div>
+      )}
 
       {children}
 
-      <div className={styles.overlay}>
+      <div className={`${styles.overlay} ${hasLoadError ? styles.overlayVisible : ""}`}>
         <span>{attributionPrefix}</span>
         <span
           className={styles.authorLink}

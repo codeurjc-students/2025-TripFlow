@@ -260,4 +260,49 @@ describe("FormGroup Component", () => {
         const input = container.querySelector("input") as HTMLInputElement;
         expect(input.value).toBe("42");
     });
+
+    it("renders custom select for select field", () => {
+        const selectField: Field = {
+            name: "trip-status",
+            label: "Estado",
+            type: "select",
+            value: "PLANNED",
+            options: [
+                { value: "DRAFT", label: "Borrador" },
+                { value: "PLANNED", label: "Planificado" },
+            ],
+        };
+
+        render(<FormGroup field={selectField} handleChange={vi.fn()} />);
+
+        expect(screen.getByRole("button", { name: /estado/i })).toBeInTheDocument();
+        expect(screen.getByText(/planificado/i)).toBeInTheDocument();
+    });
+
+    it("calls handleChange when selecting custom select option", () => {
+        const mockHandleChange = vi.fn();
+        const selectField: Field = {
+            name: "trip-status",
+            label: "Estado",
+            type: "select",
+            value: "DRAFT",
+            options: [
+                { value: "DRAFT", label: "Borrador" },
+                { value: "PLANNED", label: "Planificado" },
+            ],
+        };
+
+        render(<FormGroup field={selectField} handleChange={mockHandleChange} />);
+
+        fireEvent.click(screen.getByRole("button", { name: /estado/i }));
+        fireEvent.click(screen.getByRole("menuitem", { name: /planificado/i }));
+
+        expect(mockHandleChange).toHaveBeenCalledTimes(1);
+        expect(mockHandleChange.mock.calls[0][0]).toMatchObject({
+            target: {
+                name: "trip-status",
+                value: "PLANNED",
+            },
+        });
+    });
 });

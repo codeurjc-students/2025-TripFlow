@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ItineraryPermissionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.service.itinerary</a> &gt; <span class="el_source">ItineraryPermissionService.java</span></div><h1>ItineraryPermissionService.java</h1><pre class="source lang-java linenums">package com.tripflow.service.itinerary;
+
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import com.tripflow.model.User;
+import com.tripflow.model.itinerary.Itinerary;
+import com.tripflow.model.itinerary.ItineraryCollaborator;
+import com.tripflow.model.types.CollaboratorRole;
+import com.tripflow.model.types.InvitationStatus;
+import com.tripflow.repository.itinerary.ItineraryCollaboratorRepository;
+
+@Service
+public class ItineraryPermissionService {
+    
+    private final ItineraryCollaboratorRepository itineraryCollaboratorRepository;
+
+<span class="fc" id="L19">    public ItineraryPermissionService(ItineraryCollaboratorRepository itineraryCollaboratorRepository) {</span>
+<span class="fc" id="L20">        this.itineraryCollaboratorRepository = itineraryCollaboratorRepository;</span>
+<span class="fc" id="L21">    }</span>
+
+    /**
+     * Checks if the user has permission to view the itinerary.
+     * 
+     * @param itinerary The itinerary to check.
+     * @param user The user to check.
+     * @return true if the user has permission to view the itinerary, false otherwise.
+     */
+    public boolean canView(Itinerary itinerary, User user) {
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        if (isOwner(itinerary, user)) {</span>
+<span class="fc" id="L32">            return true;</span>
+        }
+
+<span class="fc" id="L35">        return itineraryCollaboratorRepository.existsByItineraryAndUserAndStatus(itinerary, user, InvitationStatus.ACCEPTED);</span>
+    }
+
+    /**
+     * Checks if the user has permission to edit the itinerary.
+     * 
+     * @param itinerary The itinerary to check.
+     * @param user The user to check.
+     * @return true if the user has permission to edit the itinerary, false otherwise.
+     */
+    public boolean canEdit(Itinerary itinerary, User user) {
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (isOwner(itinerary, user)) {</span>
+<span class="fc" id="L47">            return true;</span>
+        }
+
+<span class="fc" id="L50">        Optional&lt;ItineraryCollaborator&gt; collaborator = itineraryCollaboratorRepository.findByItineraryAndUser(itinerary, user);</span>
+<span class="fc bfc" id="L51" title="All 4 branches covered.">        return collaborator.map(c -&gt; c.getStatus() == InvitationStatus.ACCEPTED &amp;&amp; c.getRole() == CollaboratorRole.EDITOR).orElse(false);</span>
+    }
+
+    /**
+     * Checks if the user has permission to delete the itinerary.
+     * 
+     * @param itinerary The itinerary to check.
+     * @param user The user to check.
+     * @return true if the user has permission to delete the itinerary, false otherwise.
+     */
+    public boolean canDelete(Itinerary itinerary, User user) {
+<span class="fc" id="L62">        return isOwner(itinerary, user);</span>
+    }
+
+    /**
+     * Checks if the user has permission to manage collaborators of the itinerary.
+     * 
+     * @param itinerary The itinerary to check.
+     * @param user The user to check.
+     * @return true if the user has permission to manage collaborators of the itinerary, false otherwise.
+     */
+    public boolean canManageCollaborators(Itinerary itinerary, User user) {
+<span class="fc" id="L73">        return isOwner(itinerary, user);</span>
+    }
+
+    /**
+     * Checks if the user is the owner of the itinerary.
+     * 
+     * @param itinerary The itinerary to check.
+     * @param user The user to check.
+     * @return true if the user is the owner of the itinerary, false otherwise.
+     */
+    public boolean isOwner(Itinerary itinerary, User user) {
+<span class="fc" id="L84">        return itinerary.getUser().equals(user);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

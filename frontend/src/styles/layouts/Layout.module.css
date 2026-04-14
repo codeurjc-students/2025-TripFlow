@@ -20,6 +20,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+    }
+
+    .mainCentered {
         justify-content: center;
     }
 }

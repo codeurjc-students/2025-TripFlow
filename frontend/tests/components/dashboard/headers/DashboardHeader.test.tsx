@@ -15,10 +15,10 @@ describe("DashboardHeader Component", () => {
         expect(screen.getByText("John")).toBeInTheDocument();
     });
 
-    it("renders 'Crear Itinerario' button", () => {
+    it("renders notifications button", () => {
         render(<DashboardHeader />);
-        const button = screen.getByRole("link", { name: "Crear Itinerario" });
+        const button = screen.getByRole("link", { name: "Notificaciones" });
         expect(button).toBeInTheDocument();
-        expect(button).toHaveAttribute("href", "/itineraries/new");
+        expect(button).toHaveAttribute("href", "/dashboard/notifications");
     });
 });

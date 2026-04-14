@@ -48,29 +48,33 @@ public class AIUsage {
     // [Methods] ======================================================
 
     public void increment() {
-<span class="nc" id="L51">        this.usage++;</span>
-<span class="nc" id="L52">    }</span>
+<span class="fc" id="L51">        this.usage++;</span>
+<span class="fc" id="L52">    }</span>
+
+    public void decrement() {
+<span class="fc" id="L55">        this.usage = Math.max(this.usage - 1, 0);</span>
+<span class="fc" id="L56">    }</span>
 
     // [Getters and Setters] ==========================================
 
     public Long getId() {
-<span class="nc" id="L57">        return id;</span>
+<span class="nc" id="L61">        return id;</span>
     }
 
     public User getUser() {
-<span class="fc" id="L61">        return user;</span>
+<span class="fc" id="L65">        return user;</span>
     }
 
     public LocalDate getDate() {
-<span class="fc" id="L65">        return date;</span>
+<span class="fc" id="L69">        return date;</span>
     }
 
     public int getUsage() {
-<span class="fc" id="L69">        return usage;</span>
+<span class="fc" id="L73">        return usage;</span>
     }
 
     public void setUsage(int usage) {
-<span class="nc" id="L73">        this.usage = usage;</span>
-<span class="nc" id="L74">    }</span>
+<span class="nc" id="L77">        this.usage = usage;</span>
+<span class="nc" id="L78">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

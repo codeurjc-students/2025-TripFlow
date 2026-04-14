@@ -21,6 +21,17 @@ export interface ResendCodeRequest {
     username: string;
 }
 
+export interface ForgotPasswordRequest {
+    username: string;
+}
+
+export interface ResetPasswordOtpRequest {
+    username: string;
+    code: string;
+    password: string;
+    confirmPassword: string;
+}
+
 export interface AuthResponse {
     status: AuthStatus;
     message: string;

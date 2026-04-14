@@ -70,7 +70,8 @@ const mockItinerary: ExtendedItinerary = {
         altDescription: "A beautiful view of Mount Fuji",
         imageUrl: "https://example.com/mount-fuji.jpg",
         authorUsername: "photographer123",
-    }
+    },
+    permissions: { view: true, edit: true, delete: true }
 };
 
 describe("ItineraryEdit Component", () => {

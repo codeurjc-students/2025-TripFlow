@@ -1,5 +1,7 @@
 import { mockAuth } from "./auth";
+import { mockCollaboration } from "./collaboration";
 import { mockItineraries } from "./itineraries";
+import { mockMaps } from "./maps";
 import { mockStats } from "./stats";
 import { mockUser } from "./user";
 
@@ -11,7 +13,9 @@ type MockHandler = (
 
 const mockRegistry: Record<string, MockHandler> = {
   ...mockAuth,
+  ...mockCollaboration,
   ...mockItineraries,
+  ...mockMaps,
   ...mockStats,
   ...mockUser
 };

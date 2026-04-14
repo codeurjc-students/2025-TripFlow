@@ -1,37 +1,43 @@
 ## 🎯 Objectives
 
-> **✅ Functional Objectives**
-> 
-> The goal of the application is to allow users to plan, organize, and optimize their travel itineraries in a personalized and intelligent way. Users will be able to manage trips, add activities and interact with features that enrich their travel experience.
-> 
+> **✅ Functional Objectives (v1.0.0 Status)**
+>
+> The goal of TripFlow is to allow users to plan, organize, and improve travel itineraries in a personalized and intelligent way.
+>
 > - Users can create, edit, and delete travel itineraries.
 > - Each itinerary can include multiple days and scheduled activities.
-> - Activities can be manually added or automatically generated through AI.
-> - Users can visualize trip statistics such as total distance or days planned.
-> - The app will offer an optimization algorithm service to improve daily routes.
-> - Users can unlock achievements based on usage and travel goals.
+> - Activities can be manually added or automatically generated with AI.
+> - Users can visualize trip statistics (trips, days, destinations).
+> - Itineraries can be shared with collaborators and public share links.
 > - Itineraries can be exported as PDF files.
 > - A responsive web interface allows access across devices.
-> - The app will ensure offline access.
+> - The app supports offline mode (PWA) for read-focused usage.
 
 > ---
 
-> **🧪 Technical Objectives**
+> **🧪 Technical Objectives (v1.0.0 Status)**
 >
-> The technical objectives focus on the implementation of a full-stack application using modern technologies and best practices in software development. It will follow a client-server architecture with a RESTful API, it will integrate AI services and an optimization service for route planning enhancement.
-> 
-> - Client-side application developed using React-Router + Vite + TypeScript.
-> - Server-side infrastructure based on a **Microservices Architecture** using Spring Boot (API, AI, Notification services).
-> - Event-driven communication implemented with **Apache Kafka**.
-> - Testing coverage for both frontend and backend using JUnit, TestingContainers, Vitest, and Puppeteer.
-> - Database management using PostgreSQL with JPA Repository from SpringBoot.
-> - Integration with OpenRouter API for AI itinerary generation.
-> - Implementation of TSP optimization algorithms.
-> - Use of Docker for containerization and making easier CI/CD processes.
-> - Implementation of a Progressive Web App (PWA) with offline capabilities.
+> TripFlow is implemented as a full-stack platform with modern development and deployment practices.
+>
+> - Client-side application developed using React Router + Vite + TypeScript.
+> - Server-side infrastructure based on a microservices architecture with Spring Boot (API, AI, Notification).
+> - Event-driven communication implemented with Apache Kafka.
+> - Testing strategy with JUnit, Testcontainers, Vitest, and Playwright.
+> - Database management with PostgreSQL (API service) and JPA repositories.
+> - Integration with AI providers for itinerary generation.
+> - Docker-based environments and CI/CD workflows with GitHub Actions.
+> - Progressive Web App (PWA) capabilities and service-worker caching.
 > - User authentication and session management using JWT tokens.
-> - Generation of PDF summaries through PDFjs library.
-> - Data visualization using interactive charts.
+> - Client-side PDF generation for itinerary summaries.
+
+> ---
+
+> **🔭 Post-v1 Objectives**
+>
+> - Smart budget planner with per-day spend forecasting.
+> - Subscription plans integration with payment methods and billing lifecycle.
+> - Travel achievements and gamification.
+> - Extended user travel preferences and personalization rules.
 
 ---
 

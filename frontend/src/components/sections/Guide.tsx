@@ -41,8 +41,8 @@ export default function Guide() {
         <div className={styles.guideImage}>
           <div className={styles.imageContainer}>
             <img
-              src="/assets/brain.webp"
-              alt="Big pink brain - Guide"
+              src="/assets/mobile_showcase.webp"
+              alt="Mobile TripFlow showcase app"
               className={styles.image}
             />
           </div>

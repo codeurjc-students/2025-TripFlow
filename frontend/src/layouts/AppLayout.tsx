@@ -6,14 +6,17 @@ import Sidebar from "@components/shared/Sidebar";
 
 interface LayoutProps {
     admin?: boolean;
+    external?: boolean;
+    immersive?: boolean;
+    innerPage?: boolean;
     children: ReactNode;
 }
 
-export default function AppLayout({ admin, children }: LayoutProps) {
+export default function AppLayout({ admin, external = false, immersive = false, innerPage = false, children }: LayoutProps) {
     return (
-        <div className={styles.layout}>
-            <Sidebar admin={admin} />
-            <main className={styles.main}>
+        <div className={`${styles.layout} ${external ? styles.external : ""} ${immersive ? styles.immersive : ""}`}>
+            {!external && <Sidebar admin={admin} hideOnMobile={innerPage} />}
+            <main className={`${styles.main} ${external ? styles.mainExternal : ""}`}>
                 {children}
             </main>
         </div>

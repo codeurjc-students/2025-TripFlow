@@ -1,0 +1,121 @@
+.warning {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--font-size-xxs);
+    color: var(--warning);
+    white-space: nowrap;
+}
+
+.filters {
+    display: flex;
+    gap: var(--space-xm);
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-shrink: 0;
+}
+
+.filters::-webkit-scrollbar {
+    display: none;
+}
+
+.chip {
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--border-radius-full);
+    border: 2px solid var(--border-secondary);
+    background: var(--bg-secondary);
+    color: var(--text-tertiary);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-normal);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    font-family: inherit;
+}
+
+.chip:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.chip:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.chipActive {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.chipActive:hover {
+    color: white;
+    opacity: 0.9;
+}
+
+.cardList {
+    display: flex;
+    gap: var(--space-sm);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    min-height: 0;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cardList::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.cardList::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: var(--border-radius-full);
+}
+
+.emptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-lg);
+    color: var(--text-muted);
+}
+
+.emptyState p {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+}
+
+@media (min-width: 769px) {
+    .cardList {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        overflow-x: hidden;
+        overflow-y: auto;
+        gap: var(--space-md);
+        align-content: start;
+        padding-right: 2px;
+    }
+}
+
+@media (max-width: 768px) {
+    .chip {
+        font-size: var(--font-size-xxs);
+    }
+
+    .cardList {
+        flex-direction: column;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding-right: 2px;
+        scrollbar-width: none;
+    }
+
+    .cardList::-webkit-scrollbar {
+        display: none;
+    }
+}

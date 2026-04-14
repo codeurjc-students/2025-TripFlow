@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CollaboratorMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.mappers</a> &gt; <span class="el_source">CollaboratorMapperImpl.java</span></div><h1>CollaboratorMapperImpl.java</h1><pre class="source lang-java linenums">package com.tripflow.mappers;
+
+import com.tripflow.dto.itinerary.collaborator.CollaboratorDTO;
+import com.tripflow.dto.itinerary.collaborator.CollaboratorRoleDTO;
+import com.tripflow.dto.itinerary.collaborator.InvitationStatusDTO;
+import com.tripflow.dto.user.PublicUserDTO;
+import com.tripflow.model.User;
+import com.tripflow.model.itinerary.Itinerary;
+import com.tripflow.model.itinerary.ItineraryCollaborator;
+import com.tripflow.model.types.CollaboratorRole;
+import com.tripflow.model.types.InvitationStatus;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.processing.Generated;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2026-04-05T10:10:13+0200&quot;,
+    comments = &quot;version: 1.6.3, compiler: javac, environment: Java 21 (Eclipse Adoptium)&quot;
+)
+@Component
+<span class="fc" id="L25">public class CollaboratorMapperImpl implements CollaboratorMapper {</span>
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Override
+    public CollaboratorDTO toDTO(ItineraryCollaborator collaborator) {
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if ( collaborator == null ) {</span>
+<span class="nc" id="L33">            return null;</span>
+        }
+
+<span class="fc" id="L36">        Long itineraryId = null;</span>
+<span class="fc" id="L37">        String itineraryTitle = null;</span>
+<span class="fc" id="L38">        String fromUser = null;</span>
+<span class="fc" id="L39">        Long id = null;</span>
+<span class="fc" id="L40">        PublicUserDTO user = null;</span>
+<span class="fc" id="L41">        CollaboratorRoleDTO role = null;</span>
+<span class="fc" id="L42">        InvitationStatusDTO status = null;</span>
+<span class="fc" id="L43">        LocalDateTime invitedAt = null;</span>
+<span class="fc" id="L44">        LocalDateTime acceptedAt = null;</span>
+
+<span class="fc" id="L46">        itineraryId = collaboratorItineraryId( collaborator );</span>
+<span class="fc" id="L47">        itineraryTitle = collaboratorItineraryTitle( collaborator );</span>
+<span class="fc" id="L48">        fromUser = collaboratorItineraryUserUsername( collaborator );</span>
+<span class="fc" id="L49">        id = collaborator.getId();</span>
+<span class="fc" id="L50">        user = userMapper.toPublicUserDTO( collaborator.getUser() );</span>
+<span class="fc" id="L51">        role = collaboratorRoleToCollaboratorRoleDTO( collaborator.getRole() );</span>
+<span class="fc" id="L52">        status = invitationStatusToInvitationStatusDTO( collaborator.getStatus() );</span>
+<span class="fc" id="L53">        invitedAt = collaborator.getInvitedAt();</span>
+<span class="fc" id="L54">        acceptedAt = collaborator.getAcceptedAt();</span>
+
+<span class="fc" id="L56">        CollaboratorDTO collaboratorDTO = new CollaboratorDTO( id, user, fromUser, role, status, invitedAt, acceptedAt, itineraryId, itineraryTitle );</span>
+
+<span class="fc" id="L58">        return collaboratorDTO;</span>
+    }
+
+    @Override
+    public List&lt;CollaboratorDTO&gt; toDTOs(List&lt;ItineraryCollaborator&gt; collaborators) {
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if ( collaborators == null ) {</span>
+<span class="nc" id="L64">            return null;</span>
+        }
+
+<span class="fc" id="L67">        List&lt;CollaboratorDTO&gt; list = new ArrayList&lt;CollaboratorDTO&gt;( collaborators.size() );</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        for ( ItineraryCollaborator itineraryCollaborator : collaborators ) {</span>
+<span class="fc" id="L69">            list.add( toDTO( itineraryCollaborator ) );</span>
+<span class="fc" id="L70">        }</span>
+
+<span class="fc" id="L72">        return list;</span>
+    }
+
+    private Long collaboratorItineraryId(ItineraryCollaborator itineraryCollaborator) {
+<span class="fc" id="L76">        Itinerary itinerary = itineraryCollaborator.getItinerary();</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        if ( itinerary == null ) {</span>
+<span class="nc" id="L78">            return null;</span>
+        }
+<span class="fc" id="L80">        return itinerary.getId();</span>
+    }
+
+    private String collaboratorItineraryTitle(ItineraryCollaborator itineraryCollaborator) {
+<span class="fc" id="L84">        Itinerary itinerary = itineraryCollaborator.getItinerary();</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if ( itinerary == null ) {</span>
+<span class="nc" id="L86">            return null;</span>
+        }
+<span class="fc" id="L88">        return itinerary.getTitle();</span>
+    }
+
+    private String collaboratorItineraryUserUsername(ItineraryCollaborator itineraryCollaborator) {
+<span class="fc" id="L92">        Itinerary itinerary = itineraryCollaborator.getItinerary();</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if ( itinerary == null ) {</span>
+<span class="nc" id="L94">            return null;</span>
+        }
+<span class="fc" id="L96">        User user = itinerary.getUser();</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if ( user == null ) {</span>
+<span class="nc" id="L98">            return null;</span>
+        }
+<span class="fc" id="L100">        return user.getUsername();</span>
+    }
+
+    protected CollaboratorRoleDTO collaboratorRoleToCollaboratorRoleDTO(CollaboratorRole collaboratorRole) {
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        if ( collaboratorRole == null ) {</span>
+<span class="nc" id="L105">            return null;</span>
+        }
+
+        CollaboratorRoleDTO collaboratorRoleDTO;
+
+<span class="pc bpc" id="L110" title="1 of 4 branches missed.">        switch ( collaboratorRole ) {</span>
+<span class="fc" id="L111">            case VIEWER: collaboratorRoleDTO = CollaboratorRoleDTO.VIEWER;</span>
+<span class="fc" id="L112">            break;</span>
+<span class="fc" id="L113">            case EDITOR: collaboratorRoleDTO = CollaboratorRoleDTO.EDITOR;</span>
+<span class="fc" id="L114">            break;</span>
+<span class="fc" id="L115">            case OWNER: collaboratorRoleDTO = CollaboratorRoleDTO.OWNER;</span>
+<span class="fc" id="L116">            break;</span>
+<span class="nc" id="L117">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + collaboratorRole );</span>
+        }
+
+<span class="fc" id="L120">        return collaboratorRoleDTO;</span>
+    }
+
+    protected InvitationStatusDTO invitationStatusToInvitationStatusDTO(InvitationStatus invitationStatus) {
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">        if ( invitationStatus == null ) {</span>
+<span class="nc" id="L125">            return null;</span>
+        }
+
+        InvitationStatusDTO invitationStatusDTO;
+
+<span class="pc bpc" id="L130" title="1 of 3 branches missed.">        switch ( invitationStatus ) {</span>
+<span class="fc" id="L131">            case PENDING: invitationStatusDTO = InvitationStatusDTO.PENDING;</span>
+<span class="fc" id="L132">            break;</span>
+<span class="fc" id="L133">            case ACCEPTED: invitationStatusDTO = InvitationStatusDTO.ACCEPTED;</span>
+<span class="fc" id="L134">            break;</span>
+<span class="nc" id="L135">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + invitationStatus );</span>
+        }
+
+<span class="fc" id="L138">        return invitationStatusDTO;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

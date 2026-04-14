@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MockMapsRoutingProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TripFlow API Service</a> &gt; <a href="index.source.html" class="el_package">com.tripflow.service.map.provider.routing</a> &gt; <span class="el_source">MockMapsRoutingProvider.java</span></div><h1>MockMapsRoutingProvider.java</h1><pre class="source lang-java linenums">package com.tripflow.service.map.provider.routing;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.tripflow.dto.map.MapCoordinateDTO;
+import com.tripflow.dto.map.MapDirectionsRequestDTO;
+import com.tripflow.dto.map.MapDirectionsResponseDTO;
+import com.tripflow.dto.map.MapRouteDTO;
+import com.tripflow.dto.map.MapRouteLegDTO;
+
+@Service
+<span class="fc" id="L14">public class MockMapsRoutingProvider implements MapsRoutingProvider {</span>
+
+    @Override
+    public MapDirectionsResponseDTO directions(MapDirectionsRequestDTO request) {
+<span class="fc" id="L18">        List&lt;MapCoordinateDTO&gt; geometry = request.waypoints();</span>
+
+<span class="fc" id="L20">        return new MapDirectionsResponseDTO(List.of(</span>
+            new MapRouteDTO(
+                1200.0,
+                780.0,
+                geometry,
+<span class="fc" id="L25">                List.of(new MapRouteLegDTO(1200.0, 780.0, &quot;Gran Via&quot;))</span>
+            )
+        ));
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

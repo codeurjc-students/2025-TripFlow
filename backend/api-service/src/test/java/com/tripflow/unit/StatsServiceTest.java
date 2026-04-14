@@ -14,7 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.tripflow.dto.stats.StatDTO;
 import com.tripflow.dto.stats.UserStatsDTO;
+import com.tripflow.dto.stats.UsersByPlanStatsDTO;
 import com.tripflow.model.User;
+import com.tripflow.model.types.PlanType;
+import com.tripflow.model.types.UserType;
+import com.tripflow.repository.UserRepository;
 import com.tripflow.service.StatsService;
 import com.tripflow.service.UserService;
 import com.tripflow.service.itinerary.ActivityService;
@@ -23,6 +27,7 @@ import com.tripflow.service.itinerary.ItineraryService;
 @Tag("unit")
 public class StatsServiceTest {
     private UserService userService;
+    private UserRepository userRepository;
     private ItineraryService itineraryService;
     private ActivityService activityService;
     private StatsService statsService;
@@ -30,11 +35,12 @@ public class StatsServiceTest {
     @BeforeEach
     public void setUp() {
         this.userService = mock(UserService.class);
+        this.userRepository = mock(UserRepository.class);
         this.itineraryService = mock(ItineraryService.class);
         this.activityService = mock(ActivityService.class);
 
         this.statsService = new StatsService(
-            userService, itineraryService, activityService
+            userService, userRepository, itineraryService, activityService
         );
     }
 
@@ -123,5 +129,43 @@ public class StatsServiceTest {
         assertEquals(1000L, stats.get(0).value());
         assertEquals(500L, stats.get(1).value());
         assertEquals(10000L, stats.get(2).value());
+    }
+
+    @Test
+    @DisplayName("StatsService should return users grouped by plan for admin")
+    public void testGetUsersByPlanStatsAsAdmin() {
+        User admin = new User();
+        admin.setRole(UserType.ADMIN);
+
+        when(userService.getAuthenticatedUser()).thenReturn(admin);
+        when(userRepository.countUsersByPlan()).thenReturn(List.of(
+            new Object[] { PlanType.FREE, 5L },
+            new Object[] { PlanType.PRO, 3L },
+            new Object[] { PlanType.PREMIUM, 1L }
+        ));
+
+        UsersByPlanStatsDTO result = statsService.getUsersByPlanStats();
+
+        assertNotNull(result);
+        assertEquals(3, result.items().size());
+        assertEquals("FREE", result.items().get(0).plan());
+        assertEquals(5L, result.items().get(0).count());
+    }
+
+    @Test
+    @DisplayName("StatsService should throw FORBIDDEN for non-admin user by plan stats")
+    public void testGetUsersByPlanStatsAsNonAdmin() {
+        User user = new User();
+        user.setRole(UserType.USER);
+
+        when(userService.getAuthenticatedUser()).thenReturn(user);
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () ->
+            statsService.getUsersByPlanStats()
+        );
+
+        assertEquals(HttpStatus.FORBIDDEN, ex.getStatusCode());
+        assertEquals("Admin role required", ex.getReason());
+        verify(userRepository, never()).countUsersByPlan();
     }
 }
