@@ -32,7 +32,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          # Pinned to 22: Node 24 has a stream regression (nodejs/node#63487)
+          # that hangs Playwright's browser download at 100% (microsoft/playwright#40724).
+          node-version: '22'
 
       - name: Set up Docker Compose
         uses: docker/setup-compose-action@v1
