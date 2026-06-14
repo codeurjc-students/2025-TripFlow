@@ -18,7 +18,7 @@ FROM eclipse-temurin:21-jre-alpine AS backend
 
 WORKDIR /app
 
-COPY --from=build /app/api-service/target/api-service-1.0.0.jar app.jar
+COPY --from=build /app/api-service/target/api-service-*.jar app.jar
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
