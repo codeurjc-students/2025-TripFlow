@@ -93,7 +93,7 @@ services:
       - dokploy-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.tripflow-api.rule=Host(`backend.tripflow.cub1z.es`)"
+      - "traefik.http.routers.tripflow-api.rule=Host(`backend-tripflow.cub1z.es`)"
       - "traefik.http.routers.tripflow-api.entrypoints=websecure"
       - "traefik.http.routers.tripflow-api.tls.certresolver=letsencrypt"
       - "traefik.http.services.tripflow-api.loadbalancer.server.port=8080"
@@ -147,7 +147,7 @@ services:
       - dokploy-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.tripflow-notify.rule=Host(`ws.tripflow.cub1z.es`)"
+      - "traefik.http.routers.tripflow-notify.rule=Host(`ws-tripflow.cub1z.es`)"
       - "traefik.http.routers.tripflow-notify.entrypoints=websecure"
       - "traefik.http.routers.tripflow-notify.tls.certresolver=letsencrypt"
       - "traefik.http.services.tripflow-notify.loadbalancer.server.port=8082"
