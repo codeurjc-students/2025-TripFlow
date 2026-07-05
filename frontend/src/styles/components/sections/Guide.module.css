@@ -49,6 +49,7 @@
 
         .image {
             max-height: 120%;
+            width: auto;
             filter: drop-shadow(0 10px 20px rgba(0, 136, 255, 0.1));
             transform: rotate(-5deg);
         }

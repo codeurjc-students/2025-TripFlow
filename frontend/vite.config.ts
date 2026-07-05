@@ -13,31 +13,11 @@ export default defineConfig({
         VitePWA({
             registerType: "autoUpdate",
             workbox: {
-                globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest}"],
+                globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,woff2,webmanifest}"],
                 maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
                 navigateFallback: "/index.html",
                 navigateFallbackDenylist: [/^\/api\//, /^\/ws\//],
                 runtimeCaching: [
-                    {
-                        urlPattern: ({ url }) =>
-                            url.origin === "https://fonts.googleapis.com",
-                        handler: "StaleWhileRevalidate",
-                        options: {
-                            cacheName: "google-fonts-stylesheets",
-                        },
-                    },
-                    {
-                        urlPattern: ({ url }) =>
-                            url.origin === "https://fonts.gstatic.com",
-                        handler: "CacheFirst",
-                        options: {
-                            cacheName: "google-fonts-webfonts",
-                            expiration: {
-                                maxEntries: 20,
-                                maxAgeSeconds: 60 * 60 * 24 * 365,
-                            },
-                        },
-                    },
                     {
                         urlPattern: ({ url }) =>
                             url.hostname === "images.unsplash.com" ||

@@ -19,7 +19,7 @@
     width: 200px;
     height: 200px;
     pointer-events: none;
-    background: url("/assets/giddeon_1.png") no-repeat;
+    background: url("/assets/giddeon_1.webp") no-repeat;
     background-size: cover;
   }
 }

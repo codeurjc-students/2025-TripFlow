@@ -32,12 +32,12 @@
     }
 
     &.planned {
-        background-color: var(--active);
+        background-color: var(--active-strong);
     }
 
     &.ongoing,
     &.editor {
-        background-color: var(--info);
+        background-color: var(--primary-strong);
     }
 
     &.completed,
@@ -47,7 +47,7 @@
 
     &.draft,
     &.viewer {
-        background-color: var(--draft);
+        background-color: var(--draft-strong);
     }
 
     &.cancelled {

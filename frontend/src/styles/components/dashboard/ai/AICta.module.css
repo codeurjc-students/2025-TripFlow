@@ -31,7 +31,7 @@
         display: flex;
         align-items: center;
         background: var(--bg-secondary);
-        background-image: var(--cta-overlay), url("/assets/giddeon_2.png");
+        background-image: var(--cta-overlay), url("/assets/giddeon_2.webp");
         background-repeat: no-repeat;
         background-position-y: 24px;
         background-position-x: right;

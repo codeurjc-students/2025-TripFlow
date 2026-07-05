@@ -43,6 +43,8 @@ export default function Guide() {
             <img
               src="/assets/mobile_showcase.webp"
               alt="Mobile TripFlow showcase app"
+              width="453"
+              height="912"
               className={styles.image}
             />
           </div>
