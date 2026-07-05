@@ -1,29 +1,29 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router";
 
-
-
 import IndexPage from "@pages/Index";
-import LoginPage from "@pages/Login";
-import RegisterPage from "@pages/Register";
-import VerifyPage from "@pages/Verify";
-import ForgotPasswordPage from "@pages/ForgotPassword";
-import ResetPasswordPage from "@pages/ResetPassword";
-import HelpPage from "@pages/Help";
-import PrivacyPage from "@pages/Privacy";
-import DashboardPage from "@pages/Dashboard";
-import ItinerariesPage from "@pages/itineraries/Itineraries";
-import ItineraryDetailPage from "@pages/itineraries/ItineraryDetail";
-import SharedItineraryPage from "@pages/itineraries/SharedItinerary";
-import ItineraryNewPage from "@pages/itineraries/ItineraryNew";
-import ItineraryEditPage from "@pages/itineraries/ItineraryEdit";
-import ItineraryMapPage from "@pages/itineraries/ItineraryMap";
-import MapExplorePage from "@pages/map/MapExplore";
-import ProfilePage from "@pages/profile/Profile";
-import ProfileEditPage from "@pages/profile/ProfileEdit";
-import NotificationsPage from "@pages/Notifications";
-import AdminPage from "@pages/Admin";
-import NotFound from "@pages/NotFound";
+import Loader from "@components/shared/Loader";
+
+const LoginPage = lazy(() => import("@pages/Login"));
+const RegisterPage = lazy(() => import("@pages/Register"));
+const VerifyPage = lazy(() => import("@pages/Verify"));
+const ForgotPasswordPage = lazy(() => import("@pages/ForgotPassword"));
+const ResetPasswordPage = lazy(() => import("@pages/ResetPassword"));
+const HelpPage = lazy(() => import("@pages/Help"));
+const PrivacyPage = lazy(() => import("@pages/Privacy"));
+const DashboardPage = lazy(() => import("@pages/Dashboard"));
+const ItinerariesPage = lazy(() => import("@pages/itineraries/Itineraries"));
+const ItineraryDetailPage = lazy(() => import("@pages/itineraries/ItineraryDetail"));
+const SharedItineraryPage = lazy(() => import("@pages/itineraries/SharedItinerary"));
+const ItineraryNewPage = lazy(() => import("@pages/itineraries/ItineraryNew"));
+const ItineraryEditPage = lazy(() => import("@pages/itineraries/ItineraryEdit"));
+const ItineraryMapPage = lazy(() => import("@pages/itineraries/ItineraryMap"));
+const MapExplorePage = lazy(() => import("@pages/map/MapExplore"));
+const ProfilePage = lazy(() => import("@pages/profile/Profile"));
+const ProfileEditPage = lazy(() => import("@pages/profile/ProfileEdit"));
+const NotificationsPage = lazy(() => import("@pages/Notifications"));
+const AdminPage = lazy(() => import("@pages/Admin"));
+const NotFound = lazy(() => import("@pages/NotFound"));
 
 import { useAuth } from "@/providers/authProvider";
 import { useDemo } from "@/providers/demoProvider";
@@ -96,6 +96,7 @@ export default function Router() {
         <BrowserRouter>
             <NotificationsInitializer />
             <ScrollToTop />
+            <Suspense fallback={<Loader />}>
             <Routes>
                 {/* Public routes */}
                 <Route index element={<IndexPage />} />
@@ -145,6 +146,7 @@ export default function Router() {
                 <Route path="/404" element={<NotFound />} />
                 <Route path="*" element={<Navigate to="/404" replace />} />
             </Routes>
+            </Suspense>
         </BrowserRouter>
     );
 }

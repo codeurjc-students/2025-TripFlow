@@ -1,0 +1,19 @@
+# TripFlow
+
+TripFlow is a travel-planning progressive web app (PWA) with AI-generated
+itineraries, route optimization, real-time collaboration, interactive maps,
+offline access and PDF export. Built by Diego Sánchez (CuB1z) as a Software
+Engineering Bachelor's Thesis at Universidad Rey Juan Carlos.
+
+## Navigation
+
+- [Home](https://tripflow.cub1z.es/): landing page with features and install guide.
+- [Login](https://tripflow.cub1z.es/login): sign in to an existing account.
+- [Sign up](https://tripflow.cub1z.es/signup): create a new account.
+- [Help](https://tripflow.cub1z.es/help): usage guide and FAQ.
+- [Privacy](https://tripflow.cub1z.es/privacy): privacy policy.
+
+## About
+
+- [Author's portfolio](https://cub1z.es/): Diego Sánchez, Software Engineer.
+- [Blog posts about TripFlow](https://cub1z.es/blog): development write-ups and release notes.

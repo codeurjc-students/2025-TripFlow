@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router";
-import { pdf } from "@react-pdf/renderer";
 
 import type { ExtendedItinerary as Itinerary } from "@/types/itinerary";
 
@@ -17,7 +16,6 @@ import InnerTabHeader from "@components/dashboard/headers/InnerTabHeader";
 import ExtendedItinerary from "@/components/dashboard/itineraries/ExtendedItinerary";
 import Button from "@/components/shared/Button";
 import CollaborationModal from "@/components/dashboard/itineraries/CollaborationModal";
-import ItineraryPdfDocument from "@/components/dashboard/itineraries/pdf/ItineraryPdfDocument";
 
 export default function ItineraryDetailPage() {
     const [itinerary, setItinerary] = useState<Itinerary | null>(null);
@@ -71,6 +69,11 @@ export default function ItineraryDetailPage() {
         }
 
         try {
+            const [{ pdf }, { default: ItineraryPdfDocument }] =
+                await Promise.all([
+                    import("@react-pdf/renderer"),
+                    import("@/components/dashboard/itineraries/pdf/ItineraryPdfDocument"),
+                ]);
             const itineraryPdfBlob = await pdf(
                 <ItineraryPdfDocument itinerary={itinerary} />
             ).toBlob();
