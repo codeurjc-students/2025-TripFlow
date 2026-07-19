@@ -14,6 +14,8 @@ export default defineConfig({
             registerType: "autoUpdate",
             workbox: {
                 globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,woff2,webmanifest}"],
+                globIgnores: ["**/screenshots/**"], // only used by the browser install dialog, not offline
+
                 maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
                 navigateFallback: "/index.html",
                 navigateFallbackDenylist: [/^\/api\//, /^\/ws\//],
@@ -43,7 +45,10 @@ export default defineConfig({
             manifest: {
                 name: "TripFlow",
                 short_name: "TripFlow",
-                description: "Planifica tus viajes del futuro",
+                description:
+                    "Planifica tus viajes con itinerarios personalizados por IA. " +
+                    "Optimiza rutas, organiza actividades y colabora en tiempo real, " +
+                    "también sin conexión.",
                 theme_color: "#101922",
                 background_color: "#101922",
                 display: "standalone",
@@ -62,6 +67,29 @@ export default defineConfig({
                         sizes: "512x512",
                         type: "image/png",
                         purpose: "any maskable",
+                    },
+                ],
+                screenshots: [
+                    {
+                        src: "screenshots/showcase.png",
+                        sizes: "1920x1080",
+                        type: "image/png",
+                        form_factor: "wide",
+                        label: "Planifica y organiza tus viajes con TripFlow",
+                    },
+                    {
+                        src: "screenshots/showcase-mobile-1.png",
+                        sizes: "453x912",
+                        type: "image/png",
+                        form_factor: "narrow",
+                        label: "Tu panel de viajes",
+                    },
+                    {
+                        src: "screenshots/showcase-mobile-2.png",
+                        sizes: "453x912",
+                        type: "image/png",
+                        form_factor: "narrow",
+                        label: "El detalle de cada itinerario",
                     },
                 ],
             },
