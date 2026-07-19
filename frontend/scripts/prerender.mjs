@@ -1,5 +1,4 @@
-// Snapshots the rendered HTML of the public routes into dist/ so crawlers and
-// social scrapers get real content instead of the empty SPA shell.
+// Snapshot public routes to static HTML so crawlers get content, not the SPA shell.
 import { createServer } from "node:http";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -8,7 +7,8 @@ import { fileURLToPath } from "node:url";
 import puppeteer from "puppeteer-core";
 
 const DIST = join(dirname(fileURLToPath(import.meta.url)), "..", "dist");
-const ROUTES = ["/", "/login", "/signup", "/help", "/privacy"];
+// Content pages only; prerendering auth forms drops values typed before hydration.
+const ROUTES = ["/", "/help", "/privacy"];
 const PORT = 4183;
 
 const MIME = {
@@ -18,7 +18,6 @@ const MIME = {
     ".woff2": "font/woff2", ".webmanifest": "application/manifest+json",
 };
 
-// SPA fallback: real files by extension, index.html for routes.
 const server = createServer(async (req, res) => {
     const url = decodeURIComponent(req.url.split("?")[0]);
     const candidate = join(DIST, url);
@@ -32,7 +31,6 @@ const server = createServer(async (req, res) => {
     }
 });
 
-// Docker sets an explicit path; local dev finds installed Chrome via channel.
 const execPath = process.env.PUPPETEER_EXECUTABLE_PATH;
 const launchOpts = execPath
     ? { executablePath: execPath, args: ["--no-sandbox", "--disable-setuid-sandbox"] }
@@ -43,9 +41,20 @@ let browser;
 try {
     browser = await puppeteer.launch(launchOpts);
     const page = await browser.newPage();
+    // Suppress the install prompt so snapshots show the baseline UI, not the install button.
+    await page.evaluateOnNewDocument(() => {
+        window.addEventListener(
+            "beforeinstallprompt",
+            (e) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            },
+            true,
+        );
+    });
     for (const route of ROUTES) {
         await page.goto(`http://localhost:${PORT}${route}`, { waitUntil: "domcontentloaded" });
-        // Canonical matches the path only once the (lazy) page mounted and useSeo ran.
+        // Canonical matches the path only after the page mounted and useSeo ran.
         await page.waitForFunction(
             () => {
                 const c = document.querySelector('link[rel="canonical"]');
