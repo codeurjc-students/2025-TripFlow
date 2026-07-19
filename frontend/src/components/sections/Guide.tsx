@@ -1,6 +1,7 @@
 import styles from "@styles/components/sections/Guide.module.css";
 
 import Section from "@components/shared/Section";
+import InstallButton from "@components/buttons/InstallButton";
 
 export default function Guide() {
   return (
@@ -37,6 +38,9 @@ export default function Guide() {
               ¡Listo! Accede rápido y sin conexión cuando quieras.
             </li>
           </ol>
+          <div className={styles.installAction}>
+            <InstallButton style={["primary"]} />
+          </div>
         </div>
         <div className={styles.guideImage}>
           <div className={styles.imageContainer}>

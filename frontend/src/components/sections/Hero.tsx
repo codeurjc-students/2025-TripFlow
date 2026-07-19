@@ -7,6 +7,7 @@ import { RocketIcon } from "lucide-react";
 import Badge from "@components/shared/Badge";
 import Button from "@components/shared/Button";
 import DemoButton from "@components/buttons/DemoButton";
+import InstallButton from "@components/buttons/InstallButton";
 
 export default function Hero() {
   const { user } = useAuth();
@@ -28,7 +29,10 @@ export default function Hero() {
           tecnología IA.
         </p>
         <div className={styles.actions}>
-          <Button style={["primary", "big"]} label="Comenzar ahora" to={user ? "/dashboard" : "/signup"} />
+          <InstallButton
+            style={["primary", "big"]}
+            fallback={<Button style={["primary", "big"]} label="Comenzar ahora" to={user ? "/dashboard" : "/signup"} />}
+          />
           <DemoButton style="secondary" />
         </div>
       </div>
