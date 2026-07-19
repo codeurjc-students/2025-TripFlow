@@ -13,7 +13,14 @@ import { LockIcon, MailIcon, UserIcon } from "lucide-react";
 import Layout from "@/layouts/Layout";
 import AuthForm from "@components/form/AuthForm";
 
+import { useSeo } from "@/hooks/useSeo";
+
 export default function RegisterPage() {
+    useSeo(
+        "Crear cuenta | TripFlow",
+        "Regístrate gratis en TripFlow y empieza a planificar viajes con itinerarios generados por IA."
+    );
+
     const { user, register } = useAuth();
     const navigate = useNavigate();
     const [errors, setErrors] = useState<Record<string, string> | null>(null);

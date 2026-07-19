@@ -5,6 +5,8 @@ import Badge from "@/components/shared/Badge";
 
 import { ShieldCheckIcon } from "lucide-react";
 
+import { useSeo } from "@/hooks/useSeo";
+
 const LAST_UPDATE = "13 de abril de 2026";
 
 const PRIVACY_SECTIONS = [
@@ -74,6 +76,11 @@ const PRIVACY_SECTIONS = [
 ];
 
 export default function PrivacyPage() {
+    useSeo(
+        "Política de privacidad | TripFlow",
+        "Cómo TripFlow trata y protege tus datos personales: qué recopilamos, para qué y tus derechos."
+    );
+
     return (
         <Layout>
             <div className={styles.container}>

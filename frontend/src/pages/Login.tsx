@@ -15,7 +15,14 @@ import { LockIcon, UserIcon } from "lucide-react";
 import Layout from "@/layouts/Layout";
 import AuthForm from "@components/form/AuthForm";
 
+import { useSeo } from "@/hooks/useSeo";
+
 export default function LoginPage() {
+    useSeo(
+        "Iniciar sesión | TripFlow",
+        "Accede a tu cuenta de TripFlow para gestionar tus itinerarios de viaje."
+    );
+
     const { user, login } = useAuth();
     const navigate = useNavigate();
     const [errors, setErrors] = useState<Record<string, string> | null>(null);

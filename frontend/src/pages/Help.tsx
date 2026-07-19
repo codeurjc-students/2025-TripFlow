@@ -10,7 +10,14 @@ import Badge from "@/components/shared/Badge";
 
 import { CircleHelpIcon } from "lucide-react";
 
+import { useSeo } from "@/hooks/useSeo";
+
 export default function HelpPage() {
+    useSeo(
+        "Ayuda y preguntas frecuentes | TripFlow",
+        "Resuelve tus dudas sobre TripFlow: itinerarios con IA, rutas, colaboración y modo offline. Preguntas frecuentes y guías de uso."
+    );
+
     const [openId, setOpenId] = useState<string | null>("0-0");
 
     const toggleAccordion = (categoryId: number, itemId: number) => {
