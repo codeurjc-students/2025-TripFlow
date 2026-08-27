@@ -159,6 +159,7 @@ services:
       args:
         PUBLIC_API_BASE_URL: http://localhost:8080
         PUBLIC_WS_BASE_URL: ws://localhost:8082
+        PUBLIC_CARTO_API_KEY: ${PUBLIC_CARTO_API_KEY}
     container_name: tripflow-frontend-local
     restart: unless-stopped
     ports:
