@@ -8,7 +8,7 @@
 }
 
 .mapContainer :global(.leaflet-tile-pane) {
-    filter: brightness(1.2) sepia(0.5) hue-rotate(170deg) saturate(2);
+    filter: brightness(0.5) sepia(0.5) hue-rotate(175deg) saturate(1.75);
 }
 
 .mapContainer :global(.leaflet-control-container) {

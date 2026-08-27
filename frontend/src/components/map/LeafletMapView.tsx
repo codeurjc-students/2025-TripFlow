@@ -11,7 +11,7 @@ interface LeafletMapViewProps {
     className?: string;
 }
 
-const TILE_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+const TILE_URL = "https://tiles.stadiamaps.com/tiles/stamen_toner_dark/{z}/{x}/{y}{r}.png";
 
 export default function LeafletMapView({
     bounds,
