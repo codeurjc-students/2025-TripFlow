@@ -5,7 +5,7 @@
 	<parent>
         <groupId>com.tripflow</groupId>
         <artifactId>tripflow-backend</artifactId>
-        <version>1.1.1</version>
+        <version>1.1.2</version>
     </parent>
 
 	<groupId>com.tripflow</groupId>

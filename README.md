@@ -40,6 +40,7 @@
 - [v1.0.2 Release Notes](docs/releases/v1.0.2.md)
 - [v1.1.0 Release Notes](docs/releases/v1.1.0.md)
 - [v1.1.1 Release Notes](docs/releases/v1.1.1.md)
+- [v1.1.2 Release Notes](docs/releases/v1.1.2.md)
 
 ---
 
