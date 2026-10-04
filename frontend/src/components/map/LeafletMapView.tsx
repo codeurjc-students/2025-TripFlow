@@ -3,6 +3,7 @@ import L from "leaflet";
 import type { LatLngBoundsExpression, LatLngTuple } from "leaflet";
 
 import { DEFAULT_CENTER, DEFAULT_ZOOM, FIT_BOUNDS_PADDING } from "@/utils/mapGeometry";
+import { CARTO_API_KEY } from "@/config/environment";
 
 interface LeafletMapViewProps {
     bounds: LatLngBoundsExpression | null;
@@ -11,7 +12,7 @@ interface LeafletMapViewProps {
     className?: string;
 }
 
-const TILE_URL = "https://tiles.stadiamaps.com/tiles/stamen_toner_dark/{z}/{x}/{y}{r}.png";
+const TILE_URL = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=${CARTO_API_KEY}`;
 
 export default function LeafletMapView({
     bounds,
@@ -29,11 +30,13 @@ export default function LeafletMapView({
             center: DEFAULT_CENTER,
             zoom: DEFAULT_ZOOM,
             zoomControl: false,
-            attributionControl: false,
+            attributionControl: true,
         });
 
         L.tileLayer(TILE_URL, {
             maxZoom: 19,
+            subdomains: "abcd",
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         }).addTo(map);
 
         L.control.zoom({ position: "topright" }).addTo(map);
